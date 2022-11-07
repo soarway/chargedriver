@@ -16,11 +16,11 @@
 
 #include <linux/delay.h>
 
-#include <linux/usb/tcpci.h>
-#include <linux/usb/pd_policy_engine.h>
-#include <linux/usb/pd_dpm_core.h>
-#include <linux/usb/pd_dpm_pdo_select.h>
-#include "pd_dpm_prv.h"
+#include <linux/usb/sypd/sp_tcpci.h>
+#include <linux/usb/sypd/sp_pd_policy_engine.h>
+#include <linux/usb/sypd/sp_pd_dpm_core.h>
+#include <linux/usb/sypd/sp_pd_dpm_pdo_select.h>
+#include <linux/usb/sypd/sp_pd_dpm_prv.h>
 
 struct pd_device_policy_manager {
 	uint8_t temp;

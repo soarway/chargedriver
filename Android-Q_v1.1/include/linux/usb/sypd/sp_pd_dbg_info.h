@@ -17,7 +17,7 @@
 
 #include <linux/kernel.h>
 #include <linux/module.h>
-#include <linux/usb/tcpci_config.h>
+#include <linux/usb/sypd/sp_tcpci_config.h>
 
 #ifdef CONFIG_PD_DBG_INFO
 extern int pd_dbg_info(const char *fmt, ...);

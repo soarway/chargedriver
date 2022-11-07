@@ -30,9 +30,9 @@
 #include <linux/cpu.h>
 #include <linux/version.h>
 
-#include <linux/usb/pd_dbg_info.h>
-#include <linux/usb/tcpci.h>
-#include <linux/usb/rt1711h.h>
+#include <linux/usb/sypd/sp_pd_dbg_info.h>
+#include <linux/usb/sypd/sp_tcpci.h>
+#include <linux/usb/sypd/sp_rt1711h.h>
 
 #ifdef CONFIG_RT_REGMAP
 #include <linux/misc/rt-regmap.h>

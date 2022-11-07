@@ -15,8 +15,8 @@
 #ifndef PD_PROCESS_EVT_H_
 #define PD_PROCESS_EVT_H_
 
-#include <linux/usb/tcpci.h>
-#include <linux/usb/pd_policy_engine.h>
+#include <linux/usb/sypd/sp_tcpci.h>
+#include <linux/usb/sypd/sp_pd_policy_engine.h>
 
 /*---------------------------------------------------------------------------*/
 

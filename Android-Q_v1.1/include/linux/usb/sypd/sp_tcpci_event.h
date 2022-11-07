@@ -15,8 +15,8 @@
 #ifndef TCPC_EVENT_BUF_H_INCLUDED
 #define TCPC_EVENT_BUF_H_INCLUDED
 
-#include <linux/usb/tcpm.h>
-#include <linux/usb/tcpci_timer.h>
+#include <linux/usb/sypd/sp_tcpm.h>
+#include <linux/usb/sypd/sp_tcpci_timer.h>
 
 
 #define PD_MSG_BUF_SIZE		(4*2)

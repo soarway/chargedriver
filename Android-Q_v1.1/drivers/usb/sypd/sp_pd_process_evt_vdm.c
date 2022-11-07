@@ -14,10 +14,10 @@
  * GNU General Public License for more details.
  */
 
-#include <linux/usb/pd_core.h>
-#include <linux/usb/tcpci_event.h>
-#include <linux/usb/pd_process_evt.h>
-#include <linux/usb/pd_dpm_core.h>
+#include <linux/usb/sypd/sp_pd_core.h>
+#include <linux/usb/sypd/sp_tcpci_event.h>
+#include <linux/usb/sypd/sp_pd_process_evt.h>
+#include <linux/usb/sypd/sp_pd_dpm_core.h>
 
 #define VDM_CMD_STATE(cmd, cmd_type)	\
 	((cmd & 0x1f) | ((cmd_type & 0x03) << 6))

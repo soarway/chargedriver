@@ -14,7 +14,7 @@
 
 #ifndef __LINUX_TCPCI_TYPEC_H
 #define __LINUX_TCPCI_TYPEC_H
-#include <linux/usb/tcpci.h>
+#include <linux/usb/sypd/sp_tcpci.h>
 
 struct tcpc_device;
 

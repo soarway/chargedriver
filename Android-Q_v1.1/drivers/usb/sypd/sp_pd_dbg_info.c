@@ -22,7 +22,7 @@
 #include <linux/sched.h>
 #include <linux/mutex.h>
 #include <linux/kthread.h>
-#include <linux/usb/pd_dbg_info.h>
+#include <linux/usb/sypd/sp_pd_dbg_info.h>
 
 #ifdef CONFIG_PD_DBG_INFO
 

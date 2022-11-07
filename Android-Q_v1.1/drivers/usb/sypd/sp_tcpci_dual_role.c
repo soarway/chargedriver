@@ -19,8 +19,8 @@
 #include <linux/device.h>
 #include <linux/slab.h>
 #include <linux/of.h>
-#include <linux/usb/tcpci.h>
-#include <linux/usb/tcpci_typec.h>
+#include <linux/usb/sypd/sp_tcpci.h>
+#include <linux/usb/sypd/sp_tcpci_typec.h>
 
 #ifdef CONFIG_DUAL_ROLE_USB_INTF
 static enum dual_role_property tcpc_dual_role_props[] = {

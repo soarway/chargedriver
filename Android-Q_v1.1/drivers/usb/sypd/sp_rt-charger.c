@@ -19,10 +19,10 @@
 #include <linux/uaccess.h>
 #include <linux/gpio.h>
 #include <linux/of_gpio.h>
-#include <linux/usb/tcpci.h>
 #include <linux/workqueue.h>
-#include <linux/usb/class-dual-role.h>
-#include <linux/usb/tcpm.h>
+#include <linux/usb/sypd/sp_class-dual-role.h>
+#include <linux/usb/sypd/sp_tcpm.h>
+#include <linux/usb/sypd/sp_tcpci.h>
 
 int test_flag;
 struct rt_charger_info {

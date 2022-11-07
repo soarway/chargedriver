@@ -15,8 +15,8 @@
 #ifndef PD_DPM_CORE_H
 #define PD_DPM_CORE_H
 
-#include <linux/usb/tcpci.h>
-#include <linux/usb/pd_core.h>
+#include <linux/usb/sypd/sp_tcpci.h>
+#include <linux/usb/sypd/sp_pd_core.h>
 
 /* ---- MISC ---- */
 int pd_dpm_core_init(struct pd_port *pd_port);

@@ -25,7 +25,7 @@
 #include <linux/usb/tcpci_typec.h>
 
 #ifdef CONFIG_USB_POWER_DELIVERY
-#include "pd_dpm_prv.h"
+#include <linux/usb/sypd/sp_pd_dpm_prv.h>
 #include <linux/usb/tcpm.h>
 #endif /* CONFIG_USB_POWER_DELIVERY */
 

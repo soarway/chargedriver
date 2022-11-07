@@ -15,7 +15,7 @@
 #ifndef TCPM_BLOCK_H_
 #define TCPM_BLOCK_H_
 
-#include <linux/usb/tcpci_config.h>
+#include <linux/usb/sypd/sp_tcpci_config.h>
 
 #ifdef CONFIG_USB_POWER_DELIVERY
 #ifdef CONFIG_USB_PD_BLOCK_TCPM
@@ -30,29 +30,23 @@ extern int tcpm_dpm_pd_soft_reset_bk(struct tcpc_device *tcpc);
 extern int tcpm_dpm_pd_get_source_cap_bk(struct tcpc_device *tcpc);
 extern int tcpm_dpm_pd_get_sink_cap_bk(struct tcpc_device *tcpc);
 extern int tcpm_dpm_pd_request_bk(struct tcpc_device *tcpc, int mv, int ma);
-extern int tcpm_dpm_pd_request_ex_bk(struct tcpc_device *tcpc,
-	uint8_t pos, uint32_t max, uint32_t oper);
+extern int tcpm_dpm_pd_request_ex_bk(struct tcpc_device *tcpc, uint8_t pos, uint32_t max, uint32_t oper);
 
 extern int tcpm_dpm_pd_hard_reset_bk(struct tcpc_device *tcpc);
 
 #ifdef CONFIG_USB_PD_UVDM
-extern int tcpm_dpm_send_uvdm_bk(struct tcpc_device *tcpc,
-	uint8_t cnt, uint32_t *data, bool wait_resp);
+extern int tcpm_dpm_send_uvdm_bk(struct tcpc_device *tcpc, uint8_t cnt, uint32_t *data, bool wait_resp);
 #endif	/* CONFIG_USB_PD_UVDM */
 
-extern int tcpm_set_pd_charging_policy_bk(
-			struct tcpc_device *tcpc, uint8_t policy);
+extern int tcpm_set_pd_charging_policy_bk(struct tcpc_device *tcpc, uint8_t policy);
 
 #ifdef CONFIG_USB_PD_REV30_PPS_SINK
 extern int tcpm_set_apdo_boundary(struct tcpc_device *tcpc, uint8_t index);
 
-extern int tcpm_set_apdo_charging_policy_bk(
-	struct tcpc_device *tcpc, uint8_t policy, int mv, int ma);
+extern int tcpm_set_apdo_charging_policy_bk(struct tcpc_device *tcpc, uint8_t policy, int mv, int ma);
 
-extern int tcpm_dpm_pd_get_status_bk(
-	struct tcpc_device *tcpc, uint8_t *status);
-extern int tcpm_dpm_pd_get_pps_status_bk(
-	struct tcpc_device *tcpc, uint8_t *pps_status);
+extern int tcpm_dpm_pd_get_status_bk(struct tcpc_device *tcpc, uint8_t *status);
+extern int tcpm_dpm_pd_get_pps_status_bk(struct tcpc_device *tcpc, uint8_t *pps_status);
 
 #endif	/* CONFIG_USB_PD_REV30_PPS_SINK */
 

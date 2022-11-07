@@ -15,7 +15,7 @@
  */
 #include <linux/ctype.h>
 #include <linux/device.h>
-#include <linux/usb/class-dual-role.h>
+#include <linux/usb/sypd/sp_class-dual-role.h>
 #include <linux/err.h>
 #include <linux/init.h>
 #include <linux/module.h>
@@ -58,9 +58,7 @@ static char *kstrdupcase(const char *str, gfp_t gfp, bool to_upper)
 }
 static void dual_role_changed_work(struct work_struct *work)
 {
-	struct dual_role_phy_instance *dual_role =
-	    container_of(work, struct dual_role_phy_instance,
-			 changed_work);
+	struct dual_role_phy_instance *dual_role = container_of(work, struct dual_role_phy_instance, changed_work);
 	dev_dbg(&dual_role->dev, "%s\n", __func__);
 	kobject_uevent(&dual_role->dev.kobj, KOBJ_CHANGE);
 }
@@ -71,24 +69,19 @@ void dual_role_instance_changed(struct dual_role_phy_instance *dual_role)
 	schedule_work(&dual_role->changed_work);
 }
 EXPORT_SYMBOL_GPL(dual_role_instance_changed);
-int dual_role_get_property(struct dual_role_phy_instance *dual_role,
-			   enum dual_role_property prop,
-			   unsigned int *val)
+int dual_role_get_property(struct dual_role_phy_instance *dual_role,  enum dual_role_property prop, unsigned int *val)
 {
 	return dual_role->desc->get_property(dual_role, prop, val);
 }
 EXPORT_SYMBOL_GPL(dual_role_get_property);
-int dual_role_set_property(struct dual_role_phy_instance *dual_role,
-			   enum dual_role_property prop,
-			   const unsigned int *val)
+int dual_role_set_property(struct dual_role_phy_instance *dual_role, enum dual_role_property prop, const unsigned int *val)
 {
 	if (!dual_role->desc->set_property)
 		return -ENODEV;
 	return dual_role->desc->set_property(dual_role, prop, val);
 }
 EXPORT_SYMBOL_GPL(dual_role_set_property);
-int dual_role_property_is_writeable(struct dual_role_phy_instance *dual_role,
-				    enum dual_role_property prop)
+int dual_role_property_is_writeable(struct dual_role_phy_instance *dual_role, enum dual_role_property prop)
 {
 	if (!dual_role->desc->property_is_writeable)
 		return -ENODEV;
@@ -104,11 +97,9 @@ static int dual_role_match_device_byname(struct device *dev, const void *data)
 	return strcmp(dual_role->desc->name, name) == 0;
 }
 
-struct dual_role_phy_instance
-		*dual_role_phy_instance_get_byname(const char *name)
+struct dual_role_phy_instance	*dual_role_phy_instance_get_byname(const char *name)
 {
-	struct device *dev = class_find_device(dual_role_class, NULL, name,
-						dual_role_match_device_byname);
+	struct device *dev = class_find_device(dual_role_class, NULL, name,	dual_role_match_device_byname);
 
 	return dev ? dev_get_drvdata(dev) : NULL;
 }
@@ -116,14 +107,12 @@ EXPORT_SYMBOL_GPL(dual_role_phy_instance_get_byname);
 
 static void dual_role_dev_release(struct device *dev)
 {
-	struct dual_role_phy_instance *dual_role =
-	    container_of(dev, struct dual_role_phy_instance, dev);
+	struct dual_role_phy_instance *dual_role = container_of(dev, struct dual_role_phy_instance, dev);
 	pr_debug("device: '%s': %s\n", dev_name(dev), __func__);
 	kfree(dual_role);
 }
 static struct dual_role_phy_instance *__must_check
-__dual_role_register(struct device *parent,
-		     const struct dual_role_phy_desc *desc)
+__dual_role_register(struct device *parent, const struct dual_role_phy_desc *desc)
 {
 	struct device *dev;
 	struct dual_role_phy_instance *dual_role;
@@ -159,8 +148,7 @@ dev_set_name_failed:
 	kfree(dual_role);
 	return ERR_PTR(rc);
 }
-static void dual_role_instance_unregister(struct dual_role_phy_instance
-					  *dual_role)
+static void dual_role_instance_unregister(struct dual_role_phy_instance  *dual_role)
 {
 	cancel_work_sync(&dual_role->changed_work);
 	device_init_wakeup(&dual_role->dev, false);
@@ -172,8 +160,7 @@ static void devm_dual_role_release(struct device *dev, void *res)
 	dual_role_instance_unregister(*dual_role);
 }
 struct dual_role_phy_instance *__must_check
-devm_dual_role_instance_register(struct device *parent,
-				 const struct dual_role_phy_desc *desc)
+devm_dual_role_instance_register(struct device *parent,	 const struct dual_role_phy_desc *desc)
 {
 	struct dual_role_phy_instance **ptr, *dual_role;
 	ptr = devres_alloc(devm_dual_role_release, sizeof(*ptr), GFP_KERNEL);
@@ -201,8 +188,7 @@ void devm_dual_role_instance_unregister(struct device *dev,
 					*dual_role)
 {
 	int rc;
-	rc = devres_release(dev, devm_dual_role_release,
-			    devm_dual_role_match, dual_role);
+	rc = devres_release(dev, devm_dual_role_release, devm_dual_role_match, dual_role);
 	WARN_ON(rc);
 }
 EXPORT_SYMBOL_GPL(devm_dual_role_instance_unregister);
@@ -232,8 +218,7 @@ static char *dr_text[] = {
 static char *vconn_supply_text[] = {
 	"n", "y"
 };
-static ssize_t dual_role_show_property(struct device *dev,
-				       struct device_attribute *attr, char *buf)
+static ssize_t dual_role_show_property(struct device *dev, struct device_attribute *attr, char *buf)
 {
 	ssize_t ret = 0;
 	struct dual_role_phy_instance *dual_role = dev_get_drvdata(dev);
@@ -245,52 +230,40 @@ static ssize_t dual_role_show_property(struct device *dev,
 		ret = dual_role_get_property(dual_role, off, &value);
 		if (ret < 0) {
 			if (ret == -ENODATA)
-				dev_dbg(dev,
-					"driver has no data for `%s' property\n",
-					attr->attr.name);
+				dev_dbg(dev, "driver has no data for `%s' property\n", attr->attr.name);
 			else if (ret != -ENODEV)
-				dev_err(dev,
-					"driver failed to report `%s' property: %zd\n",
-					attr->attr.name, ret);
+				dev_err(dev, "driver failed to report `%s' property: %zd\n",	attr->attr.name, ret);
 			return ret;
 		}
 	}
 	if (off == DUAL_ROLE_PROP_SUPPORTED_MODES) {
-		BUILD_BUG_ON(DUAL_ROLE_PROP_SUPPORTED_MODES_TOTAL !=
-			ARRAY_SIZE(supported_modes_text));
+		BUILD_BUG_ON(DUAL_ROLE_PROP_SUPPORTED_MODES_TOTAL != ARRAY_SIZE(supported_modes_text));
 		if (value < DUAL_ROLE_PROP_SUPPORTED_MODES_TOTAL)
-			return snprintf(buf, PAGE_SIZE, "%s\n",
-					supported_modes_text[value]);
+			return snprintf(buf, PAGE_SIZE, "%s\n",	supported_modes_text[value]);
 		else
 			return -EIO;
 	} else if (off == DUAL_ROLE_PROP_MODE) {
-		BUILD_BUG_ON(DUAL_ROLE_PROP_MODE_TOTAL !=
-			ARRAY_SIZE(mode_text));
+		BUILD_BUG_ON(DUAL_ROLE_PROP_MODE_TOTAL != ARRAY_SIZE(mode_text));
 		if (value < DUAL_ROLE_PROP_MODE_TOTAL)
-			return snprintf(buf, PAGE_SIZE, "%s\n",
-					mode_text[value]);
+			return snprintf(buf, PAGE_SIZE, "%s\n",	mode_text[value]);
 		else
 			return -EIO;
 	} else if (off == DUAL_ROLE_PROP_PR) {
 		BUILD_BUG_ON(DUAL_ROLE_PROP_PR_TOTAL != ARRAY_SIZE(pr_text));
 		if (value < DUAL_ROLE_PROP_PR_TOTAL)
-			return snprintf(buf, PAGE_SIZE, "%s\n",
-					pr_text[value]);
+			return snprintf(buf, PAGE_SIZE, "%s\n",	pr_text[value]);
 		else
 			return -EIO;
 	} else if (off == DUAL_ROLE_PROP_DR) {
 		BUILD_BUG_ON(DUAL_ROLE_PROP_DR_TOTAL != ARRAY_SIZE(dr_text));
 		if (value < DUAL_ROLE_PROP_DR_TOTAL)
-			return snprintf(buf, PAGE_SIZE, "%s\n",
-					dr_text[value]);
+			return snprintf(buf, PAGE_SIZE, "%s\n",	dr_text[value]);
 		else
 			return -EIO;
 	} else if (off == DUAL_ROLE_PROP_VCONN_SUPPLY) {
-		BUILD_BUG_ON(DUAL_ROLE_PROP_VCONN_SUPPLY_TOTAL !=
-				ARRAY_SIZE(vconn_supply_text));
+		BUILD_BUG_ON(DUAL_ROLE_PROP_VCONN_SUPPLY_TOTAL != ARRAY_SIZE(vconn_supply_text));
 		if (value < DUAL_ROLE_PROP_VCONN_SUPPLY_TOTAL)
-			return snprintf(buf, PAGE_SIZE, "%s\n",
-					vconn_supply_text[value]);
+			return snprintf(buf, PAGE_SIZE, "%s\n",	vconn_supply_text[value]);
 		else
 			return -EIO;
 	} else
@@ -349,8 +322,7 @@ error:
 		return ret;
 	return count;
 }
-static umode_t dual_role_attr_is_visible(struct kobject *kobj,
-					 struct attribute *attr, int attrno)
+static umode_t dual_role_attr_is_visible(struct kobject *kobj, struct attribute *attr, int attrno)
 {
 	struct device *dev = container_of(kobj, struct device, kobj);
 	struct dual_role_phy_instance *dual_role = dev_get_drvdata(dev);
@@ -362,8 +334,7 @@ static umode_t dual_role_attr_is_visible(struct kobject *kobj,
 		int property = dual_role->desc->properties[i];
 		if (property == attrno) {
 			if (dual_role->desc->property_is_writeable &&
-			    dual_role_property_is_writeable(dual_role, property)
-			    > 0)
+			    dual_role_property_is_writeable(dual_role, property) > 0)
 				mode |= S_IWUSR;
 			return mode;
 		}

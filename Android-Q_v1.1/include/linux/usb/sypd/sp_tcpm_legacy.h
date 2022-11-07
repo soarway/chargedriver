@@ -15,7 +15,7 @@
 #ifndef TCPM_LEGACY_H_
 #define TCPM_LEGACY_H_
 
-#include <linux/usb/tcpci_config.h>
+#include <linux/usb/sypd/sp_tcpci_config.h>
 
 #ifdef CONFIG_USB_POWER_DELIVERY
 #ifdef CONFIG_USB_PD_LEGACY_TCPM
@@ -30,41 +30,32 @@ extern int tcpm_vconn_swap(struct tcpc_device *tcpc_dev);
 extern int tcpm_goto_min(struct tcpc_device *tcpc_dev);
 extern int tcpm_soft_reset(struct tcpc_device *tcpc_dev);
 extern int tcpm_hard_reset(struct tcpc_device *tcpc_dev);
-extern int tcpm_get_source_cap(
-	struct tcpc_device *tcpc_dev, struct tcpm_power_cap *cap);
-extern int tcpm_get_sink_cap(
-	struct tcpc_device *tcpc_dev, struct tcpm_power_cap *cap);
+extern int tcpm_get_source_cap(struct tcpc_device *tcpc_dev, struct tcpm_power_cap *cap);
+extern int tcpm_get_sink_cap(struct tcpc_device *tcpc_dev, struct tcpm_power_cap *cap);
 extern int tcpm_bist_cm2(struct tcpc_device *tcpc_dev);
-extern int tcpm_request(
-	struct tcpc_device *tcpc_dev, int mv, int ma);
+extern int tcpm_request(struct tcpc_device *tcpc_dev, int mv, int ma);
 extern int tcpm_error_recovery(struct tcpc_device *tcpc_dev);
 
 /* Request TCPM to send VDM */
 
-extern int tcpm_discover_cable(
-	struct tcpc_device *tcpc_dev, uint32_t *vdos);
+extern int tcpm_discover_cable(struct tcpc_device *tcpc_dev, uint32_t *vdos);
 
-extern int tcpm_vdm_request_id(
-	struct tcpc_device *tcpc_dev, uint32_t *vdos);
+extern int tcpm_vdm_request_id(struct tcpc_device *tcpc_dev, uint32_t *vdos);
 
 /* Request TCPM to send PD-DP Request */
 
 #ifdef CONFIG_USB_PD_ALT_MODE
-extern int tcpm_dp_attention(
-	struct tcpc_device *tcpc_dev, uint32_t dp_status);
+extern int tcpm_dp_attention(struct tcpc_device *tcpc_dev, uint32_t dp_status);
 #ifdef CONFIG_USB_PD_ALT_MODE_DFP
-extern int tcpm_dp_status_update(
-	struct tcpc_device *tcpc_dev, uint32_t dp_status);
-extern int tcpm_dp_configuration(
-	struct tcpc_device *tcpc_dev, uint32_t dp_config);
+extern int tcpm_dp_status_update(struct tcpc_device *tcpc_dev, uint32_t dp_status);
+extern int tcpm_dp_configuration(struct tcpc_device *tcpc_dev, uint32_t dp_config);
 #endif	/* CONFIG_USB_PD_ALT_MODE_DFP */
 #endif	/* CONFIG_USB_PD_ALT_MODE */
 
 /* Request TCPM to send PD-UVDM Request */
 
 #ifdef CONFIG_USB_PD_UVDM
-extern int tcpm_send_uvdm(struct tcpc_device *tcpc_dev,
-	uint8_t cnt, uint32_t *data, bool wait_resp);
+extern int tcpm_send_uvdm(struct tcpc_device *tcpc_dev, uint8_t cnt, uint32_t *data, bool wait_resp);
 #endif	/* CONFIG_USB_PD_UVDM */
 
 #endif	/* CONFIG_USB_PD_LEGACY_TCPM */

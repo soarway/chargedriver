@@ -22,8 +22,8 @@
 #include <linux/workqueue.h>
 #include <linux/gpio.h>
 #include <linux/notifier.h>
-#include <linux/usb/tcpci.h>
-#include <linux/usb/tcpm.h>
+#include <linux/usb/sypd/sp_tcpci.h>
+#include <linux/usb/sypd/sp_tcpm.h>
 
 
 enum {

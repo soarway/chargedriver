@@ -17,9 +17,9 @@
 #include <linux/delay.h>
 #include <linux/cpu.h>
 
-#include <linux/usb/tcpci.h>
-#include <linux/usb/tcpci_typec.h>
-#include <linux/usb/tcpci_timer.h>
+#include <linux/usb/sypd/sp_tcpci.h>
+#include <linux/usb/sypd/sp_tcpci_typec.h>
+#include <linux/usb/sypd/sp_tcpci_timer.h>
 
 #ifdef CONFIG_TYPEC_CAP_TRY_SOURCE
 #define CONFIG_TYPEC_CAP_TRY_STATE

@@ -15,7 +15,7 @@
 #ifndef PD_POLICY_ENGINE_H_
 #define PD_POLICY_ENGINE_H_
 
-#include <linux/usb/pd_core.h>
+#include <linux/usb/sypd/sp_pd_core.h>
 
 /* ---- Policy Engine State ---- */
 

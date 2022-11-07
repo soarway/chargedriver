@@ -13,7 +13,7 @@
 
 #ifndef __LINUX_RT1711_H
 #define __LINUX_RT1711_H
-#include <linux/usb/pd_dbg_info.h>
+#include <linux/usb/sypd/sp_pd_dbg_info.h>
 
 /*show debug message or not */
 #define ENABLE_RT1711_DBG	0

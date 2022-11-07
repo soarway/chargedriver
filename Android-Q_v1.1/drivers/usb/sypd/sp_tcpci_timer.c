@@ -26,9 +26,9 @@
 #include <linux/sched/rt.h>
 #endif /* #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 9, 0)) */
 
-#include <linux/usb/tcpci.h>
-#include <linux/usb/tcpci_timer.h>
-#include <linux/usb/tcpci_typec.h>
+#include <linux/usb/sypd/sp_tcpci.h>
+#include <linux/usb/sypd/sp_tcpci_timer.h>
+#include <linux/usb/sypd/sp_tcpci_typec.h>
 
 #define RT_MASK64(i)	(((uint64_t)1) << i)
 

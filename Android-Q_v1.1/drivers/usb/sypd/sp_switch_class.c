@@ -26,8 +26,7 @@
 struct class *switch_class;
 static atomic_t device_count;
 
-static ssize_t state_show(struct device *dev, struct device_attribute *attr,
-		char *buf)
+static ssize_t state_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
 	struct switch_dev *sdev = (struct switch_dev *)
 		dev_get_drvdata(dev);

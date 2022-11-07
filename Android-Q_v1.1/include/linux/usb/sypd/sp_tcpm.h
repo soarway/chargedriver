@@ -18,7 +18,7 @@
 #include <linux/kernel.h>
 #include <linux/notifier.h>
 
-#include <linux/usb/tcpci_config.h>
+#include <linux/usb/sypd/sp_tcpci_config.h>
 
 struct tcpc_device;
 

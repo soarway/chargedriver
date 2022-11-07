@@ -24,10 +24,10 @@
 #include <linux/delay.h>
 
 #ifdef CONFIG_DUAL_ROLE_USB_INTF
-#include <linux/usb/class-dual-role.h>
+#include <linux/usb/sypd/sp_class-dual-role.h>
 #endif /* CONFIG_DUAL_ROLE_USB_INTF */
 
-#include <linux/usb/tcpci_core.h>
+#include <linux/usb/sypd/sp_tcpci_core.h>
 
 
 #ifdef CONFIG_PD_DBG_INFO

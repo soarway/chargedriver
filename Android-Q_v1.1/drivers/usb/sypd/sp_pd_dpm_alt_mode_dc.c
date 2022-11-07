@@ -15,10 +15,10 @@
  */
 
 #include <linux/random.h>
-#include <linux/usb/tcpci.h>
-#include <linux/usb/pd_policy_engine.h>
-#include <linux/usb/pd_dpm_core.h>
-#include "pd_dpm_prv.h"
+#include <linux/usb/sypd/sp_tcpci.h>
+#include <linux/usb/sypd/sp_pd_policy_engine.h>
+#include <linux/usb/sypd/sp_pd_dpm_core.h>
+#include <linux/usb/sypd/sp_pd_dpm_prv.h>
 
 #ifdef CONFIG_USB_POWER_DELIVERY
 #ifdef CONFIG_USB_PD_ALT_MODE_RTDC

@@ -14,15 +14,15 @@
  * GNU General Public License for more details.
  */
 
-#include <linux/usb/tcpm.h>
-#include <linux/usb/tcpci.h>
-#include <linux/usb/tcpci_typec.h>
+#include <linux/usb/sypd/sp_tcpm.h>
+#include <linux/usb/sypd/sp_tcpci.h>
+#include <linux/usb/sypd/sp_tcpci_typec.h>
 
 #ifdef CONFIG_USB_POWER_DELIVERY
-#include <linux/usb/pd_core.h>
-#include <linux/usb/pd_dpm_core.h>
-#include <linux/usb/pd_policy_engine.h>
-#include <linux/usb/pd_dpm_pdo_select.h>
+#include <linux/usb/sypd/sp_pd_core.h>
+#include <linux/usb/sypd/sp_pd_dpm_core.h>
+#include <linux/usb/sypd/sp_pd_policy_engine.h>
+#include <linux/usb/sypd/sp_pd_dpm_pdo_select.h>
 #endif	/* CONFIG_USB_POWER_DELIVERY */
 
 

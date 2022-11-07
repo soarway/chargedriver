@@ -15,8 +15,8 @@
  */
 
 #include <linux/usb/pd_core.h>
-#include <linux/usb/tcpci_event.h>
-#include <linux/usb/pd_process_evt.h>
+#include <linux/usb/sypd/sp_tcpci_event.h>
+#include <linux/usb/sypd/sp_pd_process_evt.h>
 
 #ifdef CONFIG_USB_PD_CUSTOM_DBGACC
 

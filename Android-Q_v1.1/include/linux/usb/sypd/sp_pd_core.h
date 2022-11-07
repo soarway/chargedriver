@@ -15,10 +15,10 @@
 #ifndef PD_CORE_H_
 #define PD_CORE_H_
 
-#include <linux/usb/pd_dbg_info.h>
-#include <linux/usb/tcpci_timer.h>
-#include <linux/usb/tcpci_event.h>
-#include <linux/usb/tcpm.h>
+#include <linux/usb/sypd/sp_pd_dbg_info.h>
+#include <linux/usb/sypd/sp_tcpci_timer.h>
+#include <linux/usb/sypd/sp_tcpci_event.h>
+#include <linux/usb/sypd/sp_tcpm.h>
 
 /*---------------------------------------------------------------------------*/
 

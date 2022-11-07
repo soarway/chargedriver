@@ -11,7 +11,7 @@
  * of the License, or (at your option) any later version.
  */
 
-#include <linux/usb/pd_dpm_pdo_select.h>
+#include <linux/usb/sypd/sp_pd_dpm_pdo_select.h>
 
 #ifdef CONFIG_USB_POWER_DELIVERY
 
