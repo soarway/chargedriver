@@ -59,12 +59,12 @@ static char *kstrdupcase(const char *str, gfp_t gfp, bool to_upper)
 static void dual_role_changed_work(struct work_struct *work)
 {
 	struct dual_role_phy_instance *dual_role = container_of(work, struct dual_role_phy_instance, changed_work);
-	dev_dbg(&dual_role->dev, "%s\n", __func__);
+	dev_dbg(&dual_role->dev, "[OBEI]%s\n", __func__);
 	kobject_uevent(&dual_role->dev.kobj, KOBJ_CHANGE);
 }
 void dual_role_instance_changed(struct dual_role_phy_instance *dual_role)
 {
-	dev_dbg(&dual_role->dev, "%s\n", __func__);
+	dev_dbg(&dual_role->dev, "[OBEI]%s\n", __func__);
 	pm_wakeup_event(&dual_role->dev, DUAL_ROLE_NOTIFICATION_TIMEOUT);
 	schedule_work(&dual_role->changed_work);
 }
@@ -230,9 +230,9 @@ static ssize_t dual_role_show_property(struct device *dev, struct device_attribu
 		ret = dual_role_get_property(dual_role, off, &value);
 		if (ret < 0) {
 			if (ret == -ENODATA)
-				dev_dbg(dev, "driver has no data for `%s' property\n", attr->attr.name);
+				dev_dbg(dev, "[OBEI]driver has no data for `%s' property\n", attr->attr.name);
 			else if (ret != -ENODEV)
-				dev_err(dev, "driver failed to report `%s' property: %zd\n",	attr->attr.name, ret);
+				dev_err(dev, "[OBEI]driver failed to report `%s' property: %zd\n",	attr->attr.name, ret);
 			return ret;
 		}
 	}
@@ -363,12 +363,12 @@ int dual_role_uevent(struct device *dev, struct kobj_uevent_env *env)
 	int ret = 0, j;
 	char *prop_buf;
 	char *attrname;
-	dev_dbg(dev, "uevent\n");
+	dev_dbg(dev, "[OBEI]uevent\n");
 	if (!dual_role || !dual_role->desc) {
-		dev_dbg(dev, "No dual_role phy yet\n");
+		dev_dbg(dev, "[OBEI]No dual_role phy yet\n");
 		return ret;
 	}
-	dev_dbg(dev, "DUAL_ROLE_NAME=%s\n", dual_role->desc->name);
+	dev_dbg(dev, "[OBEI]DUAL_ROLE_NAME=%s\n", dual_role->desc->name);
 	ret = add_uevent_var(env, "DUAL_ROLE_NAME=%s", dual_role->desc->name);
 	if (ret)
 		return ret;
@@ -392,9 +392,8 @@ int dual_role_uevent(struct device *dev, struct kobj_uevent_env *env)
 		attrname = kstrdupcase(attr->attr.name, GFP_KERNEL, true);
 		if (!attrname)
 			ret = -ENOMEM;
-		dev_dbg(dev, "prop %s=%s\n", attrname, prop_buf);
-		ret = add_uevent_var(env, "DUAL_ROLE_%s=%s", attrname,
-				     prop_buf);
+		dev_dbg(dev, "[OBEI]prop %s=%s\n", attrname, prop_buf);
+		ret = add_uevent_var(env, "DUAL_ROLE_%s=%s", attrname, prop_buf);
 		kfree(attrname);
 		if (ret)
 			goto out;

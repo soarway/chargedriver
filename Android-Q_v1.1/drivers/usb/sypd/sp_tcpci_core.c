@@ -220,7 +220,7 @@ static ssize_t tcpc_store_property(struct device *dev,
 	case TCPC_DESC_ROLE_DEF:
 		ret = get_parameters((char *)buf, &val, 1);
 		if (ret < 0) {
-			dev_err(dev, "get parameters fail\n");
+			dev_err(dev, "[OBEI]get parameters fail\n");
 			return -EINVAL;
 		}
 
@@ -229,7 +229,7 @@ static ssize_t tcpc_store_property(struct device *dev,
 	case TCPC_DESC_TIMER:
 		ret = get_parameters((char *)buf, &val, 1);
 		if (ret < 0) {
-			dev_err(dev, "get parameters fail\n");
+			dev_err(dev, "[OBEI]get parameters fail\n");
 			return -EINVAL;
 		}
 		#ifdef CONFIG_USB_POWER_DELIVERY
@@ -246,7 +246,7 @@ static ssize_t tcpc_store_property(struct device *dev,
 	case TCPC_DESC_PD_TEST:
 		ret = get_parameters((char *)buf, &val, 1);
 		if (ret < 0) {
-			dev_err(dev, "get parameters fail\n");
+			dev_err(dev, "[OBEI]get parameters fail\n");
 			return -EINVAL;
 		}
 		switch (val) {
@@ -331,7 +331,7 @@ static void tcpc_device_release(struct device *dev)
 {
 	struct tcpc_device *tcpc_dev = to_tcpc_device(dev);
 
-	pr_info("%s : %s device release\n", __func__, dev_name(dev));
+	pr_info("[OBEI]%s : %s device release\n", __func__, dev_name(dev));
 	PD_BUG_ON(tcpc_dev == NULL);
 	/* Un-init pe thread */
 #ifdef CONFIG_USB_POWER_DELIVERY
@@ -352,10 +352,10 @@ struct tcpc_device *tcpc_device_register(struct device *parent,
 	struct tcpc_device *tcpc;
 	int ret = 0;
 
-	pr_info("%s register tcpc device (%s)\n", __func__, tcpc_desc->name);
+	pr_info("[OBEI]%s register tcpc device (%s)\n", __func__, tcpc_desc->name);
 	tcpc = devm_kzalloc(parent, sizeof(*tcpc), GFP_KERNEL);
 	if (!tcpc) {
-		pr_err("%s : allocate tcpc memeory failed\n", __func__);
+		pr_err("[OBEI]%s : allocate tcpc memeory failed\n", __func__);
 		return NULL;
 	}
 
@@ -406,7 +406,7 @@ struct tcpc_device *tcpc_device_register(struct device *parent,
 #ifdef CONFIG_DUAL_ROLE_USB_INTF
 	ret = tcpc_dual_role_phy_init(tcpc);
 	if (ret < 0)
-		dev_err(&tcpc->dev, "dual role usb init fail\n");
+		dev_err(&tcpc->dev, "[OBEI]dual role usb init fail\n");
 #endif /* CONFIG_DUAL_ROLE_USB_INTF */
 
 	return tcpc;
@@ -418,14 +418,14 @@ static int tcpc_device_irq_enable(struct tcpc_device *tcpc)
 	int ret;
 
 	if (!tcpc->ops->init) {
-		pr_err("%s Please implment tcpc ops init function\n",
+		pr_err("[OBEI]%s Please implment tcpc ops init function\n",
 		__func__);
 		return -EINVAL;
 	}
 
 	ret = tcpci_init(tcpc, false);
 	if (ret < 0) {
-		pr_err("%s tcpc init fail\n", __func__);
+		pr_err("[OBEI]%s tcpc init fail\n", __func__);
 		return ret;
 	}
 
@@ -434,11 +434,11 @@ static int tcpc_device_irq_enable(struct tcpc_device *tcpc)
 	tcpci_unlock_typec(tcpc);
 
 	if (ret < 0) {
-		pr_err("%s : tcpc typec init fail\n", __func__);
+		pr_err("[OBEI]%s : tcpc typec init fail\n", __func__);
 		return ret;
 	}
 
-	pr_info("%s : tcpc irq enable OK!\n", __func__);
+	pr_info("[OBEI]%s : tcpc irq enable OK!\n", __func__);
 	return 0;
 }
 
@@ -450,7 +450,7 @@ static void tcpc_init_work(struct work_struct *work)
 	if (tcpc->desc.notifier_supply_num == 0)
 		return;
 
-	pr_info("%s force start\n", __func__);
+	pr_info("[OBEI]%s force start\n", __func__);
 
 	tcpc->desc.notifier_supply_num = 0;
 	tcpc_device_irq_enable(tcpc);
@@ -461,7 +461,7 @@ int tcpc_schedule_init_work(struct tcpc_device *tcpc)
 	if (tcpc->desc.notifier_supply_num == 0)
 		return tcpc_device_irq_enable(tcpc);
 
-	pr_info("%s wait %d num\n", __func__, tcpc->desc.notifier_supply_num);
+	pr_info("[OBEI]%s wait %d num\n", __func__, tcpc->desc.notifier_supply_num);
 
 	schedule_delayed_work(
 		&tcpc->init_work, msecs_to_jiffies(30*1000));
@@ -478,12 +478,12 @@ int register_tcp_dev_notifier(struct tcpc_device *tcp_dev,
 		return ret;
 
 	if (tcp_dev->desc.notifier_supply_num == 0) {
-		pr_info("%s already started\n", __func__);
+		pr_info("[OBEI]%s already started\n", __func__);
 		return 0;
 	}
 
 	tcp_dev->desc.notifier_supply_num--;
-	pr_info("%s supply_num = %d\n", __func__,
+	pr_info("[OBEI]%s supply_num = %d\n", __func__,
 		tcp_dev->desc.notifier_supply_num);
 
 	if (tcp_dev->desc.notifier_supply_num == 0) {
@@ -549,7 +549,7 @@ static void tcpc_init_attrs(struct device_type *dev_type)
 
 static int __init tcpc_class_init(void)
 {
-	pr_info("%s (%s)\n", __func__, TCPC_CORE_VERSION);
+	pr_info("[OBEI]%s (%s)\n", __func__, TCPC_CORE_VERSION);
 
 #ifdef CONFIG_USB_POWER_DELIVERY
 	dpm_check_supported_modes();
@@ -557,7 +557,7 @@ static int __init tcpc_class_init(void)
 
 	tcpc_class = class_create(THIS_MODULE, "tcpc");
 	if (IS_ERR(tcpc_class)) {
-		pr_info("Unable to create tcpc class; errno = %ld\n",
+		pr_info("[OBEI]Unable to create tcpc class; errno = %ld\n",
 		       PTR_ERR(tcpc_class));
 		return PTR_ERR(tcpc_class);
 	}
@@ -565,14 +565,14 @@ static int __init tcpc_class_init(void)
 	tcpc_class->suspend = NULL;
 	tcpc_class->resume = NULL;
 
-	pr_info("TCPC class init OK\n");
+	pr_info("[OBEI]TCPC class init OK\n");
 	return 0;
 }
 
 static void __exit tcpc_class_exit(void)
 {
 	class_destroy(tcpc_class);
-	pr_info("TCPC class un-init OK\n");
+	pr_info("[OBEI]TCPC class un-init OK\n");
 }
 
 subsys_initcall(tcpc_class_init);

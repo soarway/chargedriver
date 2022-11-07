@@ -76,8 +76,7 @@ static uint32_t dc_get_authorization_code(uint32_t data)
 	return dwCrc;
 }
 
-static inline bool dc_dfp_send_en_unlock(pd_port_t *pd_port,
-		uint32_t cmd, uint32_t data0, uint32_t data1)
+static inline bool dc_dfp_send_en_unlock(pd_port_t *pd_port, uint32_t cmd, uint32_t data0, uint32_t data1)
 {
 	pd_port->uvdm_cnt = 3;
 	pd_port->uvdm_wait_resp = true;

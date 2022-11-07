@@ -59,7 +59,7 @@
 
 #define CONFIG_TCPC_ATTACH_WAKE_LOCK_TOUT	5
 
-#define CONFIG_TCPC_DBG_PRESTR		"TCPC-"
+#define CONFIG_TCPC_DBG_PRESTR		"[OBEI]TCPC-"
 
 /*
  * USB 2.0 & 3.0 current

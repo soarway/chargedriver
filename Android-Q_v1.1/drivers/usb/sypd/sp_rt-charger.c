@@ -38,7 +38,7 @@ struct rt_charger_info {
 
 int tcpc_check_vsafe0v(struct tcpc_device *tcpc)
 {
-	pr_info("%s !!!!!!!!!!Please inpement check vsafe0v function !!!!!!!!!\n", __func__);
+	pr_info("[OBEI]%s !!!!!!!!!!Please inpement check vsafe0v function !!!!!!!!!\n", __func__);
 	return 0;
 }
 
@@ -59,7 +59,7 @@ static int rt_chg_handle_source_vbus(struct tcp_notify *tcp_noti, int enable)
 	
 	chg = power_supply_get_by_name("rt-chg");
 	if (!chg) {
-		pr_err("%s: no rt-charger psy\n", __func__);
+		pr_err("[OBEI]%s: no rt-charger psy\n", __func__);
 		return -ENODEV;
 	}
 
@@ -129,24 +129,24 @@ static int rtchg_init_vbus(struct rt_charger_info *info)
 	int ret;
 
 	if (np == NULL) {
-		pr_err("Error: rt-changer np = NULL\n");
+		pr_err("[OBEI]Error: rt-changer np = NULL\n");
 		return -1;
 	}
 
 	info->vbus_gpio = of_get_named_gpio(np, "rt,vbus_gpio", 0);
 	ret = gpio_request(info->vbus_gpio, "DUMMY CHG VBUS CONTRL");
 	if (ret < 0) {
-		pr_err("Error: failed to request GPIO %d\n", info->vbus_gpio);
+		pr_err("[OBEI]Error: failed to request GPIO %d\n", info->vbus_gpio);
 		return ret;
 	}
 	ret = gpio_direction_output(info->vbus_gpio, 0);
 	if (ret < 0) {
-		pr_err("Error: failed to set GPIO as output pin\n");
+		pr_err("[OBEI]Error: failed to set GPIO as output pin\n");
 		return ret;
 	}
 #endif /* CONFIG_OF */
 
-	pr_info("%s: OK\n", __func__);
+	pr_info("[OBEI]%s: OK\n", __func__);
 	return 0;
 }
 
@@ -195,7 +195,7 @@ void dwork_func(struct work_struct *work)
 		container_of(work, struct rt_charger_info, dwork.work);
 
 	if (test_flag)
-		pr_info("WHATWHATWHATWHATWHATWHATWWWWWWWHATHATHATHATHATHATHAT\n");
+		pr_info("[OBEI]WHATWHATWHATWHATWHATWHATWWWWWWWHATHATHATHATHATHATHAT\n");
 
 	schedule_delayed_work(&info->dwork, msecs_to_jiffies(10));
 }
@@ -205,7 +205,7 @@ static int rt_charger_probe(struct platform_device *pdev)
 	struct rt_charger_info *info;
 	int ret;
 
-	pr_info("%s\n", __func__);
+	pr_info("[OBEI]%s\n", __func__);
 	info = devm_kzalloc(&pdev->dev, sizeof(*info), GFP_KERNEL);
 	if (!info)
 		return -ENOMEM;
@@ -221,20 +221,20 @@ static int rt_charger_probe(struct platform_device *pdev)
 	info->chg.set_property = chg_set_prop;
 	ret = power_supply_register(&pdev->dev, &info->chg);
 	if (ret < 0) {
-		dev_err(&pdev->dev, "chg register fail\n");
+		dev_err(&pdev->dev, "[OBEI]chg register fail\n");
 		return -EINVAL;
 	}
 
 	ret = rtchg_init_vbus(info);
 	if (ret < 0) {
-		pr_err("%s gpio init fail\n", __func__);
+		pr_err("[OBEI]%s gpio init fail\n", __func__);
 		return -EINVAL;
 	}
 
 	/* Get tcpc device by tcpc_device'name */
 	info->tcpc = tcpc_dev_get_by_name("type_c_port0");
 	if (!info->tcpc) {
-		dev_err(&pdev->dev, "get rt1711-tcpc fail\n");
+		dev_err(&pdev->dev, "[OBEI]get rt1711-tcpc fail\n");
 		power_supply_unregister(&info->chg);
 		return -ENODEV;
 	}
@@ -243,7 +243,7 @@ static int rt_charger_probe(struct platform_device *pdev)
 	info->nb.notifier_call = chg_tcp_notifer_call;
 	ret = register_tcp_dev_notifier(info->tcpc, &info->nb);
 	if (ret < 0) {
-		dev_err(&pdev->dev, "register tcpc notifer fail\n");
+		dev_err(&pdev->dev, "[OBEI]register tcpc notifer fail\n");
 		return -EINVAL;
 	}
 
@@ -251,7 +251,7 @@ static int rt_charger_probe(struct platform_device *pdev)
 
 	schedule_delayed_work(&info->dwork, 0);
 
-	pr_info("%s: OK!\n", __func__);
+	pr_info("[OBEI]%s: OK!\n", __func__);
 	return 0;
 }
 

@@ -40,7 +40,7 @@
 #if TCPC_TIMER_DBG_EN
 #define TCPC_TIMER_DBG(tcpc, id)				\
 {								\
-	RT_DBG_INFO("Trigger %s\n", tcpc_timer_name[id]);	\
+	RT_DBG_INFO("[OBEI]Trigger %s\n", tcpc_timer_name[id]);	\
 }
 #else
 #define TCPC_TIMER_DBG(format, args...)
@@ -49,7 +49,7 @@
 #if TCPC_TIMER_INFO_EN
 #define TCPC_TIMER_EN_DBG(tcpc, id)				\
 {								\
-	RT_DBG_INFO("Enable %s\n", tcpc_timer_name[id]);	\
+	RT_DBG_INFO("[OBEI]Enable %s\n", tcpc_timer_name[id]);	\
 }
 #else
 #define TCPC_TIMER_EN_DBG(format, args...)
@@ -1097,7 +1097,7 @@ int tcpci_timer_init(struct tcpc_device *tcpc_dev)
 {
 	int i;
 
-	pr_info("PD Timer number = %d\n", PD_TIMER_NR);
+	pr_info("[OBEI]PD Timer number = %d\n", PD_TIMER_NR);
 	tcpc_dev->timer_task = kthread_create(tcpc_timer_thread, tcpc_dev,
 			"tcpc_timer_%s.%p", dev_name(&tcpc_dev->dev), tcpc_dev);
 	init_waitqueue_head(&tcpc_dev->timer_wait_que);
@@ -1112,7 +1112,7 @@ int tcpci_timer_init(struct tcpc_device *tcpc_dev)
 		tcpc_dev->tcpc_timer[i].function = tcpc_timer_call[i];
 	}
 
-	pr_info("%s : init OK\n", __func__);
+	pr_info("[OBEI]%s : init OK\n", __func__);
 	return 0;
 }
 
@@ -1131,7 +1131,7 @@ int tcpci_timer_deinit(struct tcpc_device *tcpc_dev)
 			hrtimer_try_to_cancel(&tcpc_dev->tcpc_timer[i]);
 	}
 
-	pr_info("%s : de init OK\n", __func__);
+	pr_info("[OBEI]%s : de init OK\n", __func__);
 	mutex_unlock(&tcpc_dev->timer_lock);
 	return 0;
 }

@@ -196,7 +196,7 @@ static int rt1711_reg_read(struct i2c_client *i2c, u8 reg)
 	ret = rt1711_read_device(chip->client, reg, 1, &val);
 #endif /* CONFIG_RT_REGMAP */
 	if (ret < 0) {
-		dev_err(chip->dev, "rt1711 reg read fail\n");
+		dev_err(chip->dev, "[OBEI]rt1711 reg read fail\n");
 		return ret;
 	}
 	return val;
@@ -213,7 +213,7 @@ static int rt1711_reg_write(struct i2c_client *i2c, u8 reg, const u8 data)
 	ret = rt1711_write_device(chip->client, reg, 1, &data);
 #endif /* CONFIG_RT_REGMAP */
 	if (ret < 0)
-		dev_err(chip->dev, "rt1711 reg write fail\n");
+		dev_err(chip->dev, "[OBEI]rt1711 reg write fail\n");
 	return ret;
 }
 
@@ -229,7 +229,7 @@ static int rt1711_block_read(struct i2c_client *i2c,
 	ret = rt1711_read_device(chip->client, reg, len, dst);
 #endif /* #ifdef CONFIG_RT_REGMAP */
 	if (ret < 0)
-		dev_err(chip->dev, "rt1711 block read fail\n");
+		dev_err(chip->dev, "[OBEI]rt1711 block read fail\n");
 	return ret;
 }
 
@@ -244,7 +244,7 @@ static int rt1711_block_write(struct i2c_client *i2c,
 	ret = rt1711_write_device(chip->client, reg, len, src);
 #endif /* #ifdef CONFIG_RT_REGMAP */
 	if (ret < 0)
-		dev_err(chip->dev, "rt1711 block write fail\n");
+		dev_err(chip->dev, "[OBEI]rt1711 block write fail\n");
 	return ret;
 }
 
@@ -297,7 +297,7 @@ static int rt1711_regmap_init(struct rt1711_chip *chip)
 	chip->m_dev = rt_regmap_device_register(props,
 			&rt1711_regmap_fops, chip->dev, chip->client, chip);
 	if (!chip->m_dev) {
-		dev_err(chip->dev, "rt1711 chip rt_regmap register fail\n");
+		dev_err(chip->dev, "[OBEI]rt1711 chip rt_regmap register fail\n");
 		return -EINVAL;
 	}
 #endif
@@ -421,8 +421,8 @@ static int rt1711_init_alert(struct tcpc_device *tcpc)
 	name = devm_kzalloc(chip->dev, len+5, GFP_KERNEL);
 	snprintf(name, PAGE_SIZE, "%s-IRQ", chip->tcpc_desc->name);
 
-	pr_info("%s name = %s\n", __func__, chip->tcpc_desc->name);
-	pr_info("%s gpio # = %d\n", __func__, chip->irq_gpio);
+	pr_info("[OBEI]%s name = %s\n", __func__, chip->tcpc_desc->name);
+	pr_info("[OBEI]%s gpio # = %d\n", __func__, chip->irq_gpio);
 
 	ret = devm_gpio_request(chip->dev, chip->irq_gpio, name);
 #ifdef DEBUG_GPIO
@@ -430,38 +430,38 @@ static int rt1711_init_alert(struct tcpc_device *tcpc)
 	gpio_direction_output(DEBUG_GPIO, 1);
 #endif
 	if (ret < 0) {
-		pr_err("Error: failed to request GPIO%d (ret = %d)\n",
+		pr_err("[OBEI]Error: failed to request GPIO%d (ret = %d)\n",
 		chip->irq_gpio, ret);
 		goto init_alert_err;
 	}
-	pr_info("GPIO requested...\n");
+	pr_info("[OBEI]GPIO requested...\n");
 
 	ret = gpio_direction_input(chip->irq_gpio);
 	if (ret < 0) {
-		pr_err("Error: failed to set GPIO%d as input pin(ret = %d)\n",
+		pr_err("[OBEI]Error: failed to set GPIO%d as input pin(ret = %d)\n",
 		chip->irq_gpio, ret);
 		goto init_alert_err;
 	}
 
 	chip->irq = gpio_to_irq(chip->irq_gpio);
-	pr_info("%s : IRQ number = %d\n", __func__, chip->irq);
+	pr_info("[OBEI]%s : IRQ number = %d\n", __func__, chip->irq);
 
-	pr_info("IRQF_NO_THREAD Test\r\n");
+	pr_info("[OBEI]IRQF_NO_THREAD Test\r\n");
 	ret = request_irq(chip->irq, rt1711_intr_handler,
 		IRQF_TRIGGER_FALLING | IRQF_NO_THREAD |
 		IRQF_NO_SUSPEND, name, chip);
 	if (ret < 0) {
-		pr_err("Error: failed to request irq%d (gpio = %d, ret = %d)\n",
+		pr_err("[OBEI]Error: failed to request irq%d (gpio = %d, ret = %d)\n",
 			chip->irq, chip->irq_gpio, ret);
 		goto init_alert_err;
 	}
-	pr_info("%s : irq initialized...\n", __func__);
+	pr_info("[OBEI]%s : irq initialized...\n", __func__);
 
 	init_kthread_worker(&chip->irq_worker);
 	chip->irq_worker_task = kthread_run(kthread_worker_fn,
 			&chip->irq_worker, chip->tcpc_desc->name);
 	if (IS_ERR(chip->irq_worker_task)) {
-		pr_err("Error: Could not create tcpc task\n");
+		pr_err("[OBEI]Error: Could not create tcpc task\n");
 		goto init_alert_err;
 	}
 
@@ -955,7 +955,7 @@ static int rt_parse_dt(struct rt1711_chip *chip, struct device *dev)
 	if (!np)
 		return -EINVAL;
 
-	pr_info("%s\n", __func__);
+	pr_info("[OBEI]%s\n", __func__);
 	chip->irq_gpio = of_get_named_gpio(np, "rt1711,irq_pin", 0);
 
 	return 0;
@@ -990,18 +990,16 @@ static void check_printk_performance(void)
 		t2 = local_clock();
 		t2 -= t1;
 		nsrem = do_div(t2, 1000000000);
-		pr_info("pr_info : t2-t1 = %lu\n",
-				(unsigned long)nsrem / 1000);
+		pr_info("[OBEI]pr_info : t2-t1 = %lu\n", (unsigned long)nsrem / 1000);
 	}
 #else
 	for (i = 0; i < 10; i++) {
 		t1 = local_clock();
-		pr_info("%d\n", i);
+		pr_info("[OBEI]%d\n", i);
 		t2 = local_clock();
 		t2 -= t1;
 		nsrem = do_div(t2, 1000000000);
-		pr_info("t2-t1 = %lu\n",
-				(unsigned long)nsrem /  1000);
+		pr_info("[OBEI]t2-t1 = %lu\n", (unsigned long)nsrem /  1000);
 		PD_BUG_ON(nsrem > 100*1000);
 	}
 #endif /* CONFIG_PD_DBG_INFO */
@@ -1024,7 +1022,7 @@ static int rt1711_tcpcdev_init(struct rt1711_chip *chip, struct device *dev)
 		else
 			desc->role_def = val;
 	} else {
-		dev_info(dev, "use default Role DRP\n");
+		dev_info(dev, "[OBEI]use default Role DRP\n");
 		desc->role_def = TYPEC_ROLE_DRP;
 	}
 
@@ -1060,7 +1058,7 @@ static int rt1711_tcpcdev_init(struct rt1711_chip *chip, struct device *dev)
 		else
 			desc->vconn_supply = val;
 	} else {
-		dev_info(dev, "use default VconnSupply\n");
+		dev_info(dev, "[OBEI]use default VconnSupply\n");
 		desc->vconn_supply = TCPC_VCONN_SUPPLY_ALWAYS;
 	}
 #endif	/* CONFIG_TCPC_VCONN_SUPPLY_MODE */
@@ -1106,27 +1104,27 @@ static int rt1711_i2c_probe(struct i2c_client *client,
 	bool use_dt = client->dev.of_node;
 	u16 vendor;
 
-	pr_info("%s\n", __func__);
+	pr_info("[OBEI]%s\n", __func__);
 	if (i2c_check_functionality(client->adapter,
 		I2C_FUNC_SMBUS_I2C_BLOCK | I2C_FUNC_SMBUS_BYTE_DATA))
-		pr_info("I2C functionality : OK...\n");
+		pr_info("[OBEI]I2C functionality : OK...\n");
 	else
-		pr_info("I2C functionality check : failuare...\n");
+		pr_info("[OBEI]I2C functionality check : failuare...\n");
 
 	ret = rt1711_read_device(client, RT1711_REG_VENDOR_ID, 2, &vendor);
 	if (ret < 0) {
-		dev_err(&client->dev, "read chip ID fail\n");
+		dev_err(&client->dev, "[OBEI]read chip ID fail\n");
 		return -EIO;
 	}
 
 	if (vendor != 0) {
-		pr_info("Not Old RT1711\n");
+		pr_info("[OBEI]Not Old RT1711\n");
 		return -ENODEV;
 	}
 
 	ret = rt1711_check_i2c(client);
 	if (ret < 0) {
-		dev_err(&client->dev, "i2c fail\n");
+		dev_err(&client->dev, "[OBEI]i2c fail\n");
 		return -EIO;
 	}
 
@@ -1141,7 +1139,7 @@ static int rt1711_i2c_probe(struct i2c_client *client,
 	if (use_dt)
 		rt_parse_dt(chip, &client->dev);
 	else {
-		dev_err(&client->dev, "no dts node\n");
+		dev_err(&client->dev, "[OBEI]no dts node\n");
 		return -ENODEV;
 	}
 	chip->dev = &client->dev;
@@ -1152,28 +1150,28 @@ static int rt1711_i2c_probe(struct i2c_client *client,
 	INIT_DELAYED_WORK(&chip->poll_work, rt1711_poll_work);
 
 	chip->ven_id = vendor;
-	pr_err("chip->ven_id = %d\n", vendor);
+	pr_err("[OBEI]chip->ven_id = %d\n", vendor);
 
 	ret = rt1711_regmap_init(chip);
 	if (ret < 0) {
-		dev_err(chip->dev, "rt1711 regmap init fail\n");
+		dev_err(chip->dev, "[OBEI]rt1711 regmap init fail\n");
 		return -EINVAL;
 	}
 
 	ret = rt1711_tcpcdev_init(chip, &client->dev);
 	if (ret < 0) {
-		dev_err(&client->dev, "rt1711 tcpc dev init fail\n");
+		dev_err(&client->dev, "[OBEI]rt1711 tcpc dev init fail\n");
 		goto err_tcpc_reg;
 	}
 
 	ret = rt1711_init_alert(chip->tcpc);
 	if (ret < 0) {
-		pr_err("rt1711 init alert fail\n");
+		pr_err("[OBEI]rt1711 init alert fail\n");
 		goto err_irq_init;
 	}
 
 	tcpc_schedule_init_work(chip->tcpc);
-	pr_info("%s probe OK!\n", __func__);
+	pr_info("[OBEI]%s probe OK!\n", __func__);
 	return 0;
 
 err_irq_init:
@@ -1237,13 +1235,13 @@ static void rt1711_shutdown(struct i2c_client *client)
 
 static int rt1711_pm_suspend_runtime(struct device *device)
 {
-	dev_dbg(device, "pm_runtime: suspending...\n");
+	dev_dbg(device, "[OBEI]pm_runtime: suspending...\n");
 	return 0;
 }
 
 static int rt1711_pm_resume_runtime(struct device *device)
 {
-	dev_dbg(device, "pm_runtime: resuming...\n");
+	dev_dbg(device, "[OBEI]pm_runtime: resuming...\n");
 	return 0;
 }
 
@@ -1290,12 +1288,12 @@ static int __init rt1711_init(void)
 {
 	struct device_node *np;
 
-	pr_info("rt1711_init (%s) : initializing...\n", RT1711_DRV_VERSION);
+	pr_info("[OBEI]rt1711_init (%s) : initializing...\n", RT1711_DRV_VERSION);
 	np = of_find_node_by_name(NULL, "rt1711");
 	if (np != NULL)
-		pr_info("rt1711 node found...\n");
+		pr_info("[OBEI]rt1711 node found...\n");
 	else
-		pr_info("rt1711 node not found...\n");
+		pr_info("[OBEI]rt1711 node not found...\n");
 
 
 	return i2c_add_driver(&rt1711_driver);

@@ -55,8 +55,7 @@ static ssize_t state_store(struct device *dev, struct device_attribute *attr,
 	return endp - buf;
 }
 
-static ssize_t name_show(struct device *dev, struct device_attribute *attr,
-		char *buf)
+static ssize_t name_show(struct device *dev, struct device_attribute *attr,	char *buf)
 {
 	struct switch_dev *sdev = (struct switch_dev *)
 		dev_get_drvdata(dev);

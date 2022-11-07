@@ -176,7 +176,7 @@ static int hd3ss460_switch_set_state(struct switch_dev *sdev, int new_state)
 	struct hd3ss460_switch_data *switch_data =  switch_dev_get_drvdata(sdev);
 	int index = sdev - switch_data->sdevs;
 
-	dev_dbg(sdev->dev, "%s : switch number = %d, name = %s\n",
+	dev_dbg(sdev->dev, "[OBEI]%s : switch number = %d, name = %s\n",
 		__FUNCTION__, index, hd3ss460_sw_default_names[index]);
 	if (index >= SW_NR)
 		return -EFAULT;
@@ -224,10 +224,9 @@ static int hd3ss460_switch_probe(struct platform_device *pdev)
 	switch_data->tcpc = tcpc_dev_get_by_name(switch_data->tcpc_name);
 	if (switch_data->tcpc) {
 		switch_data->nb.notifier_call = hd3ss460_tcp_notifer_call;
-		register_tcp_dev_notifier(switch_data->tcpc,
-			&switch_data->nb);
+		register_tcp_dev_notifier(switch_data->tcpc, &switch_data->nb);
 	} else
-		pr_info("%s : Warning *** can't find tcpc device [%s]\n",
+		pr_info("[OBEI]%s : Warning *** can't find tcpc device [%s]\n",
 			__FUNCTION__, switch_data->tcpc_name);
 
 	return 0;
@@ -261,13 +260,13 @@ static int __devexit hd3ss460_switch_remove(struct platform_device *pdev)
 #ifdef CONFIG_PM
 static int hd3ss460_suspend(struct device *dev)
 {
-	dev_dbg(dev, "hd3ss460 system suspending...\n");
+	dev_dbg(dev, "[OBEI]hd3ss460 system suspending...\n");
 	return 0;
 }
 
 static int hd3ss460_resume(struct device *dev)
 {
-	dev_dbg(dev, "hd3ss460 system resuming...\n");
+	dev_dbg(dev, "[OBEI]hd3ss460 system resuming...\n");
 	return 0;
 }
 
@@ -275,18 +274,18 @@ static int hd3ss460_resume(struct device *dev)
 
 static int hd3ss460_pm_suspend_runtime(struct device *dev)
 {
-	dev_dbg(dev, "hd3ss460 pm_runtime: suspending...\n");
+	dev_dbg(dev, "[OBEI]hd3ss460 pm_runtime: suspending...\n");
 	return 0;
 }
 
 static int hd3ss460_pm_resume_runtime(struct device *dev)
 {
-	dev_dbg(dev, "hd3ss460 pm_runtime: resuming...\n");
+	dev_dbg(dev, "[OBEI]hd3ss460 pm_runtime: resuming...\n");
 	return 0;
 }
 static void hd3ss460_shutdown(struct platform_device *pdev)
 {
-	dev_dbg(&pdev->dev, "hd3ss460 shutdown...\n");
+	dev_dbg(&pdev->dev, "[OBEI]hd3ss460 shutdown...\n");
 }
 
 static const struct dev_pm_ops hd3ss460_pm_ops = {

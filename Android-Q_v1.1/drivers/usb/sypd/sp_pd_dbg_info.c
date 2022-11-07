@@ -70,7 +70,7 @@ static inline bool pd_dbg_print_out(void)
 
 	pd_dbg_buffer[index].buf[used] = '\0';
 
-	pr_info("///PD dbg info %ud\n", used);
+	pr_info("[OBEI]///PD dbg info %ud\n", used);
 
 	for (i = 0; i < used; i += OUT_BUF_MAX) {
 		temp = pd_dbg_buffer[index].buf[OUT_BUF_MAX + i];
@@ -83,7 +83,7 @@ static inline bool pd_dbg_print_out(void)
 		pd_dbg_buffer[index].buf[OUT_BUF_MAX + i] = temp;
 	}
 
-	pr_info("PD dbg info///\n");
+	pr_info("[OBEI]PD dbg info///\n");
 	pd_dbg_buffer[index].used = 0;
 	msleep(MSG_POLLING_MS);
 	return true;
@@ -92,9 +92,7 @@ static inline bool pd_dbg_print_out(void)
 static int print_out_thread_fn(void *arg)
 {
 	while (true) {
-		wait_event_interruptible(event_loop_wait_que,
-				atomic_read(&pending_event) |
-				event_loop_thead_stop);
+		wait_event_interruptible(event_loop_wait_que,atomic_read(&pending_event) |	event_loop_thead_stop);
 		if (kthread_should_stop() || event_loop_thead_stop)
 			break;
 		do {
@@ -120,13 +118,10 @@ int pd_dbg_info(const char *fmt, ...)
 	mutex_lock(&buff_lock);
 	index = using_buf;
 	used = pd_dbg_buffer[index].used;
-	r = snprintf(pd_dbg_buffer[index].buf + used,
-		PD_INFO_BUF_SIZE - used, "<%5lu.%03lu>",
-		(unsigned long)ts, rem_usec);
+	r = snprintf(pd_dbg_buffer[index].buf + used,	PD_INFO_BUF_SIZE - used, "[OBEI]<%5lu.%03lu>", (unsigned long)ts, rem_usec);
 	if (r > 0)
 		used += r;
-	r = vsnprintf(pd_dbg_buffer[index].buf + used,
-			PD_INFO_BUF_SIZE - used, fmt, args);
+	r = vsnprintf(pd_dbg_buffer[index].buf + used,	PD_INFO_BUF_SIZE - used, fmt, args);
 	if (r > 0)
 		used += r;
 
@@ -145,10 +140,9 @@ static struct task_struct *print_out_tsk;
 
 int pd_dbg_info_init(void)
 {
-	pr_info("%s\n", __func__);
+	pr_info("[OBEI]%s\n", __func__);
 	mutex_init(&buff_lock);
-	print_out_tsk = kthread_create(
-			print_out_thread_fn, NULL, "pd_dbg_info");
+	print_out_tsk = kthread_create(	print_out_thread_fn, NULL, "pd_dbg_info");
 	init_waitqueue_head(&event_loop_wait_que);
 	atomic_set(&pending_event, 0);
 	wake_up_process(print_out_tsk);
