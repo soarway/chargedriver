@@ -56,3 +56,40 @@ config USB_PD_VBUS_PRESENT_TOUT
 	  for
 	  VBUS present
 	  stable
+
+config RT_REGMAP
+	bool "Richtek Regmap"
+	select DEBUG_FS
+	default n
+	help
+	  Say Y to enable Richtek Register Map
+
+config DUAL_ROLE_USB_INTF
+	bool "Dual Role Class Device"
+	help
+	  Say Y to enable USB DUAL_ROLE Class
+
+
+
+
+# menuconfig SWITCH
+# 	tristate "Switch class support"
+# 	help
+# 	  Say Y here to enable switch class support. This allows
+# 	  monitoring switches by userspace via sysfs and uevent.
+# 
+# if SWITCH
+# 
+# config SWITCH_GPIO
+# 	tristate "GPIO Swith support"
+# 	depends on GENERIC_GPIO
+# 	help
+# 	  Say Y here to enable GPIO based switch support.
+# 
+# config SWITCH_HD3SS460
+# 	tristate "HD3SS460 Switch support"
+# 	depends on GENERIC_GPIO
+# 	help
+# 	  Say Y here to enable TI HD3SS460 switch support (for DisplayPort).
+# 
+# endif # SWITCH
