@@ -1,0 +1,646 @@
+#include "kona-qrd.dtsi"
+#include "dsi-panel-ili9806e-fwvga-video.dtsi"
+#include "dsi-panel-nt36850-truly-dualmipi-wqhd-cmd.dtsi"
+#include "camera/kona-camera-sensor-openq.dtsi"
+
+&qupv3_se13_i2c {
+	status = "ok";
+	goodix_ts@5d {
+		compatible = "goodix,gt9xx";
+		reg = <0x5d>;
+		interrupt-parent = <&tlmm>;
+		interrupts = <1 0x2800>;
+		pinctrl-names = "default", "int-output-low","int-output-high", "int-input";
+		pinctrl-0 = <&ts_int_default>;
+		pinctrl-1 = <&ts_int_output_low>;
+		pinctrl-2 = <&ts_int_output_high>;
+		pinctrl-3 = <&ts_int_input>;
+
+		reset-gpios = <&tlmm 38 0x00>;
+		irq-gpios = <&tlmm 1 0x2800>;
+		irq-flags = <2>;
+
+		vdd_ana-supply = <&pm8150a_l11>;
+		vcc_i2c-supply = <&pm8150_s4>;
+
+		touchscreen-max-id = <5>;
+		touchscreen-size-x = <480>;
+		touchscreen-size-y = <852>;
+		goodix,driver-send-cfg = <1>;
+		goodix,int-sync = <1>;
+		goodix,power-off-sleep = <1>;
+
+		goodix,cfg-group0 = [
+			42 D0 02 00 05 05 75 01 01 0F 24
+			0F 64 3C 03 05 00 00 00 02 00 00
+			00 16 19 1C 14 8C 0E 0E 24 00 31
+			0D 00 00 00 83 33 1D 00 41 00 00
+			00 00 00 08 0A 00 2B 1C 3C 94 D5
+			03 08 00 00 04 93 1E 00 82 23 00
+			74 29 00 69 2F 00 5F 37 00 5F 20
+			40 60 00 F0 40 30 55 50 27 00 00
+			00 00 00 00 00 00 00 00 00 00 00
+			00 00 00 00 00 00 00 14 19 00 00
+			50 50 02 04 06 08 0A 0C 0E 10 12
+			14 16 18 1A 1C 00 00 00 00 00 00
+			00 00 00 00 00 00 00 00 00 00 1D
+			1E 1F 20 21 22 24 26 28 29 2A 1C
+			18 16 14 13 12 10 0F 0C 0A 08 06
+			04 02 00 00 00 00 00 00 00 00 00
+			00 00 00 00 00 00 00 00 9C 01];
+		goodix,cfg-group2 = [
+			5A E0 01 56 03 0A 05 01 01 0F 23
+			0F 50 32 03 05 00 00 FF 7F 01 00
+			0F 18 1A 1E 14 89 29 0A 59 5B 09
+			06 03 0A 00 02 32 11 55 01 00 00
+			00 00 00 32 00 00 2B 2D 67 94 C5
+			02 07 00 00 04 DD 31 00 C0 39 00
+			A3 44 00 8C 50 00 78 5F 00 78 00
+			00 00 00 F0 4A 3A FF FF 27 00 1E
+			02 32 1E 02 05 2D 1E 19 00 00 01
+			0F 0F 03 04 10 42 F8 0F 19 00 00
+			46 32 08 0A 0C 0E 10 12 14 16 18
+			1A 00 00 00 00 00 00 00 00 00 00
+			00 00 00 00 FF FF FF FF 00 00 2A
+			29 28 24 22 20 1F 1E 1D 0E 0C 0A
+			08 06 05 04 02 00 00 00 00 00 00
+			00 00 00 00 FF FF FF FF FF FF FF
+			FF FF FF FF FF FF FF FF 74 01];
+	};
+};
+
+&kona_snd {
+	qcom,audio-routing =
+			"AMIC1", "MIC BIAS1",
+			"MIC BIAS1", "Analog Mic1",
+			"AMIC2", "MIC BIAS2",
+			"MIC BIAS2", "Analog Mic2",
+			"AMIC6", "MIC BIAS3",
+			"MIC BIAS3", "Analog Mic6",
+			"AMIC7", "MIC BIAS4",
+			"MIC BIAS4", "Analog Mic7",
+			"DMIC3", "MIC BIAS3",
+			"MIC BIAS3", "Digital Mic3",
+			"VA MIC BIAS3", "Digital Mic3",
+			"DMIC4", "MIC BIAS3",
+			"MIC BIAS3", "Digital Mic4",
+			"VA MIC BIAS3", "Digital Mic4",
+			"DMIC5", "MIC BIAS3",
+			"MIC BIAS3", "Digital Mic5",
+			"VA MIC BIAS3", "Digital Mic5",
+			"IN1_HPHL", "HPHL_OUT",
+			"IN2_HPHR", "HPHR_OUT",
+			"IN3_AUX", "AUX_OUT",
+			"VA DMIC3", "VA MIC BIAS3",
+			"VA DMIC4", "VA MIC BIAS3",
+			"VA DMIC5", "VA MIC BIAS3",
+			"TX SWR_ADC0", "ADC1_OUTPUT",
+			"TX SWR_ADC1", "ADC2_OUTPUT",
+			"TX SWR_ADC2", "ADC3_OUTPUT",
+			"TX SWR_ADC3", "ADC4_OUTPUT",
+			"TX SWR_DMIC0", "DMIC1_OUTPUT",
+			"TX SWR_DMIC1", "DMIC2_OUTPUT",
+			"TX SWR_DMIC2", "DMIC3_OUTPUT",
+			"TX SWR_DMIC3", "DMIC4_OUTPUT",
+			"TX SWR_DMIC4", "DMIC5_OUTPUT",
+			"TX SWR_DMIC5", "DMIC6_OUTPUT",
+			"TX SWR_DMIC6", "DMIC7_OUTPUT",
+			"TX SWR_DMIC7", "DMIC8_OUTPUT",
+			"WSA SRC0_INP", "SRC0",
+			"WSA_TX DEC0_INP", "TX DEC0 MUX",
+			"WSA_TX DEC1_INP", "TX DEC1 MUX",
+			"RX_TX DEC0_INP", "TX DEC0 MUX",
+			"RX_TX DEC1_INP", "TX DEC1 MUX",
+			"RX_TX DEC2_INP", "TX DEC2 MUX",
+			"RX_TX DEC3_INP", "TX DEC3 MUX",
+			"SpkrRight IN", "WSA_SPK2 OUT",
+			"VA_AIF1 CAP", "VA_SWR_CLK",
+			"VA_AIF2 CAP", "VA_SWR_CLK",
+			"VA_AIF3 CAP", "VA_SWR_CLK",
+			"VA SWR_ADC0", "VA_SWR_CLK",
+			"VA SWR_ADC1", "VA_SWR_CLK",
+			"VA SWR_ADC2", "VA_SWR_CLK",
+			"VA SWR_ADC3", "VA_SWR_CLK",
+			"VA SWR_MIC0", "VA_SWR_CLK",
+			"VA SWR_MIC1", "VA_SWR_CLK",
+			"VA SWR_MIC2", "VA_SWR_CLK",
+			"VA SWR_MIC3", "VA_SWR_CLK",
+			"VA SWR_MIC4", "VA_SWR_CLK",
+			"VA SWR_MIC5", "VA_SWR_CLK",
+			"VA SWR_MIC6", "VA_SWR_CLK",
+			"VA SWR_MIC7", "VA_SWR_CLK",
+			"VA SWR_MIC0", "DMIC1_OUTPUT",
+			"VA SWR_MIC1", "DMIC2_OUTPUT",
+			"VA SWR_MIC2", "DMIC3_OUTPUT",
+			"VA SWR_MIC3", "DMIC4_OUTPUT",
+			"VA SWR_MIC4", "DMIC5_OUTPUT",
+			"VA SWR_MIC5", "DMIC6_OUTPUT",
+			"VA SWR_MIC6", "DMIC7_OUTPUT",
+			"VA SWR_MIC7", "DMIC8_OUTPUT",
+			"VA SWR_ADC0", "ADC1_OUTPUT",
+			"VA SWR_ADC1", "ADC2_OUTPUT",
+			"VA SWR_ADC2", "ADC3_OUTPUT",
+			"VA SWR_ADC3", "ADC4_OUTPUT";
+	qcom,wsa-max-devs = <0>;
+	qcom,wsa-devs = <&wsa881x_0211>, <&wsa881x_0212>,
+			<&wsa881x_0213>, <&wsa881x_0214>;
+	qcom,wsa-aux-dev-prefix = "SpkrLeft", "SpkrRight",
+				"SpkrLeft", "SpkrRight";
+	qcom,msm-mbhc-usbc-audio-supported = <0>;
+};
+
+&redriver {
+	status = "disabled";
+};
+
+&dwc1 {
+	dr_mode = "host";
+};
+
+&usb2_phy0 {
+	qcom,param-override-seq =
+		<0xc7 0x6c
+		0x03 0x70
+		0x03 0x74>;
+};
+
+&mhi_0_iommu_group {
+	qcom,iommu-dma = "bypass";
+};
+
+&pcie2 {
+	qcom,boot-option = <0x0>;
+};
+
+&pcie2_msi {
+	status = "disabled";
+};
+
+&tlmm {
+	usb1_vbus_boost {
+		usb1_vbus_boost_default: usb1_vbus_boost_default {
+				mux {
+					pins = "gpio26";
+					function = "gpio";
+				};
+
+				config {
+					pins = "gpio26";
+					output-high;
+				};
+		};
+	};
+	key_user {
+		key_user_default: key_user_default {
+			mux {
+				pins = "gpio117";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio117";
+				bias-pull-up;
+				input-enable;
+			};
+		};
+	};
+
+	ts_mux_goodix {
+		ts_int_default: ts_int_default {
+			mux {
+				pins = "gpio1";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio1";
+				output-disable;
+			};
+		};
+
+		ts_int_output_low: ts_int_output_low {
+			mux {
+				pins = "gpio1";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio1";
+				drive-strength = <16>;
+				output-enable;
+				output-low;
+			};
+		};
+
+		ts_int_output_high: ts_int_output_high {
+			mux {
+				pins = "gpio1";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio1";
+				drive-strength = <16>;
+				output-enable;
+				output-high;
+			};
+		};
+
+		ts_int_input: ts_int_input {
+			mux {
+				pins = "gpio1";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio1";
+				input-enable;
+				bias-disable;
+			};
+		};
+	};
+
+	cam_vcm_active_rear: cam_vcm_active_rear {
+		/* STANDBY REAR */
+		mux {
+			pins = "gpio97";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio97";
+			bias-disable; /* No PULL */
+			drive-strength = <2>; /* 2 MA */
+		};
+	};
+	cam_vcm_suspend_rear: cam_vcm_suspend_rear {
+		/* STANDBY REAR */
+		mux {
+			pins = "gpio97";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio97";
+			bias-pull-down; /* PULL DOWN */
+			drive-strength = <2>; /* 2 MA */
+			output-low;
+		};
+	};
+
+	cam_vcm_active_rear_aux: cam_vcm_active_rear_aux {
+		/* STANDBY REAR */
+		mux {
+			pins = "gpio98";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio98";
+			bias-disable; /* No PULL */
+			drive-strength = <2>; /* 2 MA */
+		};
+	};
+	cam_vcm_suspend_rear_aux: cam_vcm_suspend_rear_aux {
+		/* STANDBY REAR */
+		mux {
+			pins = "gpio98";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio98";
+			bias-pull-down; /* PULL DOWN */
+			drive-strength = <2>; /* 2 MA */
+			output-low;
+		};
+	};
+
+	cam_vcm_active_front: cam_vcm_active_front {
+		/* STANDBY FRONT */
+		mux {
+			pins = "gpio99";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio99";
+			bias-disable; /* No PULL */
+			drive-strength = <2>; /* 2 MA */
+		};
+	};
+	cam_vcm_suspend_front: cam_vcm_suspend_front {
+		/* STANDBY FRONT */
+		mux {
+			pins = "gpio99";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio99";
+			bias-pull-down; /* PULL DOWN */
+			drive-strength = <2>; /* 2 MA */
+			output-low;
+		};
+	};
+
+	camera_dvdd_en_default: camera_dvdd_en_default {
+		mux {
+			pins = "gpio159";
+			function = "gpio";
+		};
+
+		config {
+			pins = "gpio159";
+			bias-disable; /* No PULL */
+			drive-strength = <2>; /* 2 MA */
+		};
+	};
+
+	spkr_1_sd_n {
+		spkr_1_sd_n_sleep: spkr_1_sd_n_sleep {
+			mux {
+				pins = "gpio127";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio127";
+				drive-strength = <2>;   /* 2 mA */
+				bias-pull-down;
+				input-enable;
+			};
+		};
+
+		spkr_1_sd_n_active: spkr_1_sd_n_active {
+			mux {
+				pins = "gpio127";
+				function = "gpio";
+ 			};
+
+			config {
+				pins = "gpio127";
+				drive-strength = <16>;   /* 16 mA */
+				bias-disable;
+				output-high;
+			};
+		};
+	};
+
+	spkr_2_sd_n {
+		spkr_2_sd_n_sleep: spkr_2_sd_n_sleep {
+			mux {
+				pins = "gpio128";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio128";
+				drive-strength = <2>;   /* 2 mA */
+				bias-pull-down;
+				input-enable;
+			};
+		};
+
+		spkr_2_sd_n_active: spkr_2_sd_n_active {
+ 			mux {
+				pins = "gpio128";
+				function = "gpio";
+			};
+
+			config {
+				pins = "gpio128";
+				drive-strength = <16>;   /* 16 mA */
+				bias-disable;
+				output-high;
+			};
+		};
+	};
+};
+
+&vendor {
+	openq_batterydata: qcom,battery-data {
+		qcom,batt-id-range-pct = <15>;
+		#include "fg-gen4-batterydata-powerizer-3350mah.dtsi"
+	};
+	extcon_usb1: extcon_usb1 {
+		compatible = "linux,extcon-usb-gpio";
+		id-gpio = <&tlmm 91 GPIO_ACTIVE_HIGH>;
+		vbus-out-gpio = <&tlmm 26 GPIO_ACTIVE_HIGH>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&usb2_id_det_default
+				&usb1_vbus_boost_default>;
+	};
+};
+
+&usb1 {
+	extcon = <&extcon_usb1>;
+};
+
+&pm8150_l16 {
+	qcom,init-voltage = <3304000>;
+};
+
+&soc {
+	gpio_keys {
+		compatible = "gpio-keys";
+		label = "gpio-keys";
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&key_vol_up_default
+			&key_user_default>;
+
+		vol_up {
+			label = "volume_up";
+			gpios = <&pm8150_gpios 6 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_VOLUMEUP>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+			linux,can-disable;
+		};
+
+		user {
+			label = "user";
+			gpios = <&tlmm 117 GPIO_ACTIVE_LOW>;
+			linux,input-type = <1>;
+			linux,code = <KEY_HOME>;
+			gpio-key,wakeup;
+			debounce-interval = <15>;
+		};
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		boot_status {
+			gpios = <&tlmm 15 0>;
+			linux,default-trigger = "heartbeat";
+		};
+	};
+};
+
+&soc {
+	dsi_openq_panel_pwr_supply: dsi_openq_panel_pwr_supply {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		qcom,panel-supply-entry@0 {
+			reg = <0>;
+			qcom,supply-name = "vddio";
+			qcom,supply-min-voltage = <1800000>;
+			qcom,supply-max-voltage = <1800000>;
+			qcom,supply-enable-load = <62000>;
+			qcom,supply-disable-load = <80>;
+			qcom,supply-post-on-sleep = <20>;
+		};
+
+		qcom,panel-supply-entry@1 {
+			reg = <1>;
+			qcom,supply-name = "vdd";
+			qcom,supply-min-voltage = <3000000>;
+			qcom,supply-max-voltage = <3000000>;
+			qcom,supply-enable-load = <857000>;
+			qcom,supply-disable-load = <0>;
+			qcom,supply-post-on-sleep = <0>;
+		};
+	};
+};
+
+&pm8150l_wled {
+	status = "ok";
+};
+
+&pm8150l_lcdb {
+	status = "ok";
+};
+
+&sde_dsi {
+	qcom,dsi-default-panel = <&dsi_ili9806e_fwvga_video>;
+	lab-supply = <&lcdb_ldo_vreg>;
+	ibb-supply = <&lcdb_ncp_vreg>;
+};
+
+&pm8150l_pwm {
+	status = "ok";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pwm_out_gpio06_default>;
+};
+
+&pm8150l_gpios {
+	status = "ok";
+	pwm_out_gpio06 {
+		pwm_out_gpio06_default: pwm_out_gpio06_default {
+			pins = "gpio6";
+			function = "func1";
+			bias-disable;
+			power-source = <0>;
+			output-low;
+			qcom,drive-strength = <3>;
+			drive-push-pull;
+		};
+	};
+	pwr_src_det_gpio04 {
+		gpio_power_src_det: gpio_power_src_det {
+			pins = "gpio4";
+			function = "normal";
+			bias-pull-up;
+		};
+	};
+};
+
+&dsi_ili9806e_fwvga_video {
+	qcom,panel-supply-entries = <&dsi_openq_panel_pwr_supply>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_pwm";
+	pwms = <&pm8150l_pwm 0 0>;
+	qcom,bl-pmic-pwm-period-usecs = <100>;
+	qcom,platform-te-gpio = <&tlmm 66 0>;
+	qcom,platform-reset-gpio = <&tlmm 75 0>;
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
+	qcom,mdss-dsi-display-timings {
+		timing@0 {
+			qcom,mdss-dsi-panel-phy-timings =  [00 13 04 04 13 1F
+				04 05 04 02 04 00 10 09];
+			qcom,display-topology = <1 0 1>;
+			qcom,default-topology-index = <0>;
+		};
+	};
+};
+
+&dsi_sim_vid {
+	qcom,panel-supply-entries = <&dsi_openq_panel_pwr_supply>;
+	qcom,platform-reset-gpio = <&tlmm 75 0>;
+	qcom,mdss-dsi-display-timings {
+		timing@0 {
+			qcom,mdss-dsi-panel-width = <1920>;
+			qcom,mdss-dsi-panel-height = <1080>;
+		};
+	};
+};
+
+&dsi_dual_nt36850_truly_cmd {
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_wled";
+	qcom,platform-te-gpio = <&tlmm 66 0>;
+	qcom,platform-reset-gpio = <&tlmm 75 0>;
+	qcom,ulps-enabled;
+	qcom,dsi-select-clocks = "mux_byte_clk0", "mux_pixel_clk0";
+	qcom,mdss-dsi-display-timings {
+		timing@0 {
+			qcom,mdss-dsi-panel-phy-timings =  [00 1f 08 08 24 23 08
+				08 05 03 04 00 30 0e];
+			qcom,display-topology = <2 0 2>, <1 0 2>;
+			qcom,default-topology-index = <0>;
+		};
+	};
+};
+
+/*General 1.8v rail*/
+&pm8150_s4 {
+	regulator-max-microvolt = <1800000>;
+};
+
+/*Display Vdd*/
+&pm8150a_l11 {
+	regulator-min-microvolt = <3000000>;
+	qcom,init-voltage = <3000000>;
+};
+
+/* SMB1390 is absent from Open-Q 865 SOM */
+&smb1390 {
+	status = "disabled";
+};
+
+&smb1390_charger {
+	status = "disabled";
+};
+
+&smb1390_slave {
+	status = "disabled";
+};
+
+&smb1390_slave_charger {
+	status = "disabled";
+};
+
+&pm8150b_charger {
+	qcom,sec-charger-config = <0>; /* no secondary charger */
+	qcom,battery-data = <&openq_batterydata>;
+	/delete-property/ qcom,fcc-stepping-enable;
+	qcom,usb-icl-ua = <1500000>;
+};
+
+&pm8150b_pdphy {
+	qcom,default-sink-caps = <5000 1500>, /* 5V @ 1.5A */
+				 <9000 1500>, /* 9V @ 1.5A */
+				 <12000 1500>; /* 12V @ 1.5A */
+};
+
+&pm8150b_fg {
+	qcom,battery-data = <&openq_batterydata>;
+	/delete-property/ qcom,five-pin-battery;
+	qcom,pwr-src-det-gpio = <&pm8150l_gpios 4 0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&gpio_power_src_det>;
+};
+
