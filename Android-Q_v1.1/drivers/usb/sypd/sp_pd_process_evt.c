@@ -219,8 +219,7 @@ static inline void print_tcp_event(uint8_t msg)
 }
 #endif
 
-static inline void print_event(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline void print_event(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 #if PE_EVENT_DBG_ENABLE
 	switch (pd_event->event_type) {
@@ -263,17 +262,14 @@ static inline void print_event(
 
 /*---------------------------------------------------------------------------*/
 
-bool pd_make_pe_state_transit(struct pd_port *pd_port,
-	uint8_t curr_state, const struct pe_state_reaction *state_reaction)
+bool pd_make_pe_state_transit(struct pd_port *pd_port,	uint8_t curr_state, const struct pe_state_reaction *state_reaction)
 {
 	int i;
-	const struct pe_state_transition *state_transition =
-		state_reaction->state_transition;
+	const struct pe_state_transition *state_transition = state_reaction->state_transition;
 
 	for (i = 0; i < state_reaction->nr_transition; i++) {
 		if (state_transition[i].curr_state == curr_state) {
-			PE_TRANSIT_STATE(pd_port,
-				state_transition[i].next_state);
+			PE_TRANSIT_STATE(pd_port,state_transition[i].next_state);
 			return true;
 		}
 	}
@@ -284,8 +280,7 @@ bool pd_make_pe_state_transit(struct pd_port *pd_port,
 bool pd_make_pe_state_transit_virt(struct pd_port *pd_port,
 	uint8_t curr_state, const struct pe_state_reaction *state_reaction)
 {
-	bool ret = pd_make_pe_state_transit(
-			pd_port, curr_state, state_reaction);
+	bool ret = pd_make_pe_state_transit(pd_port, curr_state, state_reaction);
 
 	if (ret) {
 		switch (pd_port->pe_state_next) {
@@ -303,12 +298,10 @@ bool pd_make_pe_state_transit_virt(struct pd_port *pd_port,
 }
 
 
-bool pd_make_pe_state_transit_force(struct pd_port *pd_port,
-	uint8_t curr_state, uint8_t force_state,
+bool pd_make_pe_state_transit_force(struct pd_port *pd_port,uint8_t curr_state, uint8_t force_state,
 	const struct pe_state_reaction *state_reaction)
 {
-	bool ret = pd_make_pe_state_transit(
-			pd_port, curr_state, state_reaction);
+	bool ret = pd_make_pe_state_transit(pd_port, curr_state, state_reaction);
 
 	if (ret)
 		return ret;
@@ -319,8 +312,7 @@ bool pd_make_pe_state_transit_force(struct pd_port *pd_port,
 
 /*---------------------------------------------------------------------------*/
 
-bool pd_process_protocol_error(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+bool pd_process_protocol_error(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool power_change = false;
 	struct pd_msg *pd_msg = pd_event->pd_msg;
@@ -334,16 +326,14 @@ bool pd_process_protocol_error(
 	case PE_SRC_TRANSITION_SUPPLY:
 	case PE_SRC_TRANSITION_SUPPLY2:
 		power_change = true;
-		if (pd_event_msg_match(pd_event,
-				PD_EVT_CTRL_MSG, PD_CTRL_PING)) {
+		if (pd_event_msg_match(pd_event, PD_EVT_CTRL_MSG, PD_CTRL_PING)) {
 			PE_DBG("Ignore Ping\r\n");
 			return false;
 		}
 		break;
 
 	case PE_PRS_SRC_SNK_WAIT_SOURCE_ON:
-		if (pd_event_msg_match(pd_event,
-				PD_EVT_CTRL_MSG, PD_CTRL_PING)) {
+		if (pd_event_msg_match(pd_event,PD_EVT_CTRL_MSG, PD_CTRL_PING)) {
 			PE_DBG("Ignore Ping\r\n");
 			return false;
 		}
@@ -386,8 +376,7 @@ bool pd_process_protocol_error(
 	return true;
 }
 
-bool pd_process_data_msg_bist(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+bool pd_process_data_msg_bist(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	if (!pd_check_pe_state_ready(pd_port))
 		return false;
@@ -430,8 +419,7 @@ bool pd_process_data_msg_bist(
  * DRP (dr_swap, pr_swap, vconn_swap)
  */
 
-bool pd_process_ctrl_msg_dr_swap(
-		struct pd_port *pd_port, struct pd_event *pd_event)
+bool pd_process_ctrl_msg_dr_swap(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool accept = false;
 
@@ -445,11 +433,9 @@ bool pd_process_ctrl_msg_dr_swap(
 
 	if (pd_port->dpm_caps & DPM_CAP_LOCAL_DR_DATA) {
 		if (pd_port->data_role == PD_ROLE_DFP) {
-			accept = (pd_port->dpm_caps &
-					DPM_CAP_DR_SWAP_REJECT_AS_UFP) == 0;
+			accept = (pd_port->dpm_caps &DPM_CAP_DR_SWAP_REJECT_AS_UFP) == 0;
 		} else {
-			accept = (pd_port->dpm_caps &
-					DPM_CAP_DR_SWAP_REJECT_AS_DFP) == 0;
+			accept = (pd_port->dpm_caps &DPM_CAP_DR_SWAP_REJECT_AS_DFP) == 0;
 		}
 	}
 
@@ -467,8 +453,7 @@ bool pd_process_ctrl_msg_dr_swap(
 	return false;
 }
 
-bool pd_process_ctrl_msg_pr_swap(
-		struct pd_port *pd_port, struct pd_event *pd_event)
+bool pd_process_ctrl_msg_pr_swap(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool reject;
 
@@ -479,11 +464,9 @@ bool pd_process_ctrl_msg_pr_swap(
 
 	if (!reject) {
 		if (pd_port->power_role == PD_ROLE_SOURCE)
-			reject = pd_port->dpm_caps &
-					DPM_CAP_PR_SWAP_REJECT_AS_SNK;
+			reject = pd_port->dpm_caps &DPM_CAP_PR_SWAP_REJECT_AS_SNK;
 		else
-			reject = pd_port->dpm_caps &
-					DPM_CAP_PR_SWAP_REJECT_AS_SRC;
+			reject = pd_port->dpm_caps &DPM_CAP_PR_SWAP_REJECT_AS_SRC;
 	}
 
 	if (reject) {
@@ -501,8 +484,7 @@ bool pd_process_ctrl_msg_pr_swap(
 	return true;
 }
 
-bool pd_process_ctrl_msg_vconn_swap(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+bool pd_process_ctrl_msg_vconn_swap(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	if (!pd_check_pe_state_ready(pd_port))
 		return false;
@@ -519,8 +501,7 @@ bool pd_process_ctrl_msg_vconn_swap(
 
 /*---------------------------------------------------------------------------*/
 
-bool pd_process_recv_hard_reset(struct pd_port *pd_port,
-		struct pd_event *pd_event, uint8_t hreset_state)
+bool pd_process_recv_hard_reset(struct pd_port *pd_port,struct pd_event *pd_event, uint8_t hreset_state)
 {
 #ifdef CONFIG_USB_PD_RECV_HRESET_COUNTER
 	if (pd_port->recv_hard_reset_count > PD_HARD_RESET_COUNT) {
@@ -539,8 +520,7 @@ bool pd_process_recv_hard_reset(struct pd_port *pd_port,
  * tcp_event
  */
 
-static inline int pd_handle_tcp_event_pr_swap(
-	struct pd_port *pd_port, uint8_t new_role)
+static inline int pd_handle_tcp_event_pr_swap(struct pd_port *pd_port, uint8_t new_role)
 {
 #ifdef CONFIG_USB_PD_PR_SWAP
 	if (pd_port->power_role == new_role)
@@ -555,17 +535,14 @@ static inline int pd_handle_tcp_event_pr_swap(
 	pd_port->during_swap = false;
 	pd_port->state_machine = PE_STATE_MACHINE_PR_SWAP;
 
-	PE_TRANSIT_POWER_STATE(pd_port,
-		PE_PRS_SNK_SRC_SEND_SWAP,
-		PE_PRS_SRC_SNK_SEND_SWAP);
+	PE_TRANSIT_POWER_STATE(pd_port,	PE_PRS_SNK_SRC_SEND_SWAP,PE_PRS_SRC_SNK_SEND_SWAP);
 	return TCP_DPM_RET_SENT;
 #else
 	return TCP_DPM_RET_DENIED_NO_SUPPORT;
 #endif	/* CONFIG_USB_PD_PR_SWAP */
 }
 
-static inline int pd_handle_tcp_event_dr_swap(
-	struct pd_port *pd_port, uint8_t new_role)
+static inline int pd_handle_tcp_event_dr_swap(struct pd_port *pd_port, uint8_t new_role)
 {
 #ifdef CONFIG_USB_PD_DR_SWAP
 	if (pd_port->data_role == new_role)
@@ -580,9 +557,7 @@ static inline int pd_handle_tcp_event_dr_swap(
 	pd_port->during_swap = false;
 	pd_port->state_machine = PE_STATE_MACHINE_DR_SWAP;
 
-	PE_TRANSIT_DATA_STATE(pd_port,
-		PE_DRS_UFP_DFP_SEND_DR_SWAP,
-		PE_DRS_DFP_UFP_SEND_DR_SWAP);
+	PE_TRANSIT_DATA_STATE(pd_port,	PE_DRS_UFP_DFP_SEND_DR_SWAP,PE_DRS_DFP_UFP_SEND_DR_SWAP);
 
 	return TCP_DPM_RET_SENT;
 #else
@@ -590,8 +565,7 @@ static inline int pd_handle_tcp_event_dr_swap(
 #endif	/* CONFIG_USB_PD_DR_SWAP */
 }
 
-static inline int pd_handle_tcp_event_vconn_swap(
-	struct pd_port *pd_port, uint8_t new_role)
+static inline int pd_handle_tcp_event_vconn_swap(struct pd_port *pd_port, uint8_t new_role)
 {
 #ifdef CONFIG_USB_PD_VCONN_SWAP
 	if (pd_port->vconn_source == new_role)
@@ -701,12 +675,10 @@ static inline int pd_handle_tcp_event_request(struct pd_port *pd_port)
 
 	switch (tcp_event->event_id) {
 	case TCP_DPM_EVT_REQUEST:
-		ret = pd_dpm_update_tcp_request(
-			pd_port, &tcp_event->tcp_dpm_data.pd_req);
+		ret = pd_dpm_update_tcp_request(pd_port, &tcp_event->tcp_dpm_data.pd_req);
 		break;
 	case TCP_DPM_EVT_REQUEST_EX:
-		ret = pd_dpm_update_tcp_request_ex(
-			pd_port, &tcp_event->tcp_dpm_data.pd_req_ex);
+		ret = pd_dpm_update_tcp_request_ex(pd_port, &tcp_event->tcp_dpm_data.pd_req_ex);
 		break;
 	case TCP_DPM_EVT_REQUEST_AGAIN:
 		ret = pd_dpm_update_tcp_request_again(pd_port);
@@ -768,28 +740,24 @@ static inline int pd_handle_tcp_event_error_recovery(struct pd_port *pd_port)
 	return TCP_DPM_RET_SENT;
 }
 
-static inline int pd_process_tcp_dpm_event(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline int pd_process_tcp_dpm_event(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	int ret = TCP_DPM_RET_DENIED_UNKNOWM;
 
 	switch (pd_event->msg) {
 	case TCP_DPM_EVT_PR_SWAP_AS_SNK:
 	case TCP_DPM_EVT_PR_SWAP_AS_SRC:
-		ret = pd_handle_tcp_event_pr_swap(pd_port,
-			pd_event->msg - TCP_DPM_EVT_PR_SWAP_AS_SNK);
+		ret = pd_handle_tcp_event_pr_swap(pd_port,	pd_event->msg - TCP_DPM_EVT_PR_SWAP_AS_SNK);
 		break;
 
 	case TCP_DPM_EVT_DR_SWAP_AS_UFP:
 	case TCP_DPM_EVT_DR_SWAP_AS_DFP:
-		ret = pd_handle_tcp_event_dr_swap(pd_port,
-			pd_event->msg - TCP_DPM_EVT_DR_SWAP_AS_UFP);
+		ret = pd_handle_tcp_event_dr_swap(pd_port,	pd_event->msg - TCP_DPM_EVT_DR_SWAP_AS_UFP);
 		break;
 
 	case TCP_DPM_EVT_VCONN_SWAP_OFF:
 	case TCP_DPM_EVT_VCONN_SWAP_ON:
-		ret = pd_handle_tcp_event_vconn_swap(pd_port,
-			pd_event->msg - TCP_DPM_EVT_VCONN_SWAP_OFF);
+		ret = pd_handle_tcp_event_vconn_swap(pd_port,pd_event->msg - TCP_DPM_EVT_VCONN_SWAP_OFF);
 		break;
 
 	case TCP_DPM_EVT_GOTOMIN:
@@ -851,8 +819,7 @@ static inline int pd_process_tcp_dpm_event(
  * common_event
  */
 
-static inline bool pd_process_ctrl_msg(
-		struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_ctrl_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	switch (pd_event->msg) {
 	case PD_CTRL_GOOD_CRC:
@@ -870,14 +837,12 @@ static inline bool pd_process_ctrl_msg(
 	return false;
 }
 
-static inline bool pd_process_data_msg(
-		struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_data_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	return false;
 }
 
-static inline bool pd_process_timer_msg(
-		struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_timer_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	switch (pd_event->msg) {
 	case PD_TIMER_SENDER_RESPONSE:
@@ -888,8 +853,7 @@ static inline bool pd_process_timer_msg(
 	return false;
 }
 
-static inline bool pd_process_event_common(
-		struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_event_common(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	switch (pd_event->event_type) {
 	case PD_EVT_CTRL_MSG:
@@ -906,8 +870,7 @@ static inline bool pd_process_event_common(
 /*---------------------------------------------------------------------------*/
 
 #ifdef CONFIG_USB_PD_RESET_CABLE
-static inline bool pd_process_cable_ctrl_msg_accept(
-		struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_cable_ctrl_msg_accept(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	switch (pd_port->pe_state_curr) {
 #ifdef CONFIG_PD_SRC_RESET_CABLE
@@ -927,8 +890,7 @@ static inline bool pd_process_cable_ctrl_msg_accept(
 }
 #endif	/* CONFIG_USB_PD_RESET_CABLE */
 
-static inline bool pd_process_event_cable(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_event_cable(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool ret = false;
 
@@ -951,8 +913,7 @@ static inline bool pd_process_event_cable(
  * @ false : invalid message, pe should drop the message
  * */
 
-static inline bool pe_is_valid_pd_msg(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pe_is_valid_pd_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	struct pd_msg *pd_msg = pd_event->pd_msg;
 
@@ -991,8 +952,7 @@ static inline bool pe_is_valid_pd_msg(
 
 	if ((pd_port->msg_id_rx_init[sop_type]) &&
 		(pd_port->msg_id_rx[sop_type] == msg_id)) {
-		PE_INFO("Repeat msg: %c:%d:%d\r\n",
-			(pd_event->event_type == PD_EVT_CTRL_MSG) ? 'C' : 'D',
+		PE_INFO("Repeat msg: %c:%d:%d\r\n",	(pd_event->event_type == PD_EVT_CTRL_MSG) ? 'C' : 'D',
 			pd_event->msg, msg_id);
 		return false;
 	}
@@ -1003,8 +963,7 @@ static inline bool pe_is_valid_pd_msg(
 	return true;
 }
 
-static inline bool pe_is_valid_pd_msg_role(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pe_is_valid_pd_msg_role(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool ret = true;
 	uint8_t msg_pr, msg_dr;
@@ -1046,8 +1005,7 @@ static inline bool pe_is_valid_pd_msg_role(
 	return ret;
 }
 
-static inline bool pe_translate_pd_msg_event(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pe_translate_pd_msg_event(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	struct pd_msg *pd_msg;
 
@@ -1068,16 +1026,14 @@ static inline bool pe_translate_pd_msg_event(
 		pd_event->event_type = PD_EVT_EXT_MSG;
 
 	if (pd_msg->frame_type == TCPC_TX_SOP_PRIME) {
-		pd_sync_sop_prime_spec_revision(
-				pd_port, PD_HEADER_REV(pd_msg->msg_hdr));
+		pd_sync_sop_prime_spec_revision(pd_port, PD_HEADER_REV(pd_msg->msg_hdr));
 	}
 #endif	/* CONFIG_USB_PD_REV30 */
 
 	return pe_is_valid_pd_msg(pd_port, pd_event);
 }
 
-static inline bool pe_exit_idle_state(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pe_exit_idle_state(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool act_as_sink;
 
@@ -1183,8 +1139,7 @@ static inline bool pe_exit_idle_state(
 	return true;
 }
 
-static inline bool pe_is_trap_in_idle_state(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pe_is_trap_in_idle_state(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool trap = true;
 
@@ -1222,14 +1177,12 @@ static inline bool pe_is_trap_in_idle_state(
 	return trap;
 }
 
-bool pd_process_event(struct pd_port *pd_port,
-			struct pd_event *pd_event, bool vdm_evt)
+bool pd_process_event(struct pd_port *pd_port,	struct pd_event *pd_event, bool vdm_evt)
 {
 	bool ret = false;
 
 	if (pe_is_trap_in_idle_state(pd_port, pd_event)) {
-		PE_DBG("Trap in idle state, Ignore All MSG (%d:%d)\r\n",
-			pd_event->event_type, pd_event->msg);
+		PE_DBG("Trap in idle state, Ignore All MSG (%d:%d)\r\n",pd_event->event_type, pd_event->msg);
 		return false;
 	}
 

@@ -560,8 +560,7 @@ static int rt1711_init_alert(struct tcpc_device *tcpc)
 
 	snprintf(name, PAGE_SIZE, "%s-IRQ", chip->tcpc_desc->name);
 
-	pr_info("[OBEI]%s name = %s, gpio = %d\n", __func__,
-				chip->tcpc_desc->name, chip->irq_gpio);
+	pr_info("[OBEI]%s name = %s, gpio = %d\n", __func__, chip->tcpc_desc->name, chip->irq_gpio);
 
 	ret = devm_gpio_request(chip->dev, chip->irq_gpio, name);
 #ifdef DEBUG_GPIO
@@ -1226,7 +1225,7 @@ static struct tcpc_ops rt1711_tcpc_ops = {
 #endif	/* CONFIG_USB_PD_RETRY_CRC_DISCARD */
 };
 
-static int rt_parse_dt(struct rt1711_chip *chip, struct device *dev)
+static int rt_parse_device_tree(struct rt1711_chip *chip, struct device *dev)
 {
 	struct device_node *np = dev->of_node;
 
@@ -1439,7 +1438,7 @@ static int rt1711_i2c_probe(struct i2c_client *client,	const struct i2c_device_i
 		return -ENOMEM;
 
 	if (use_dt)
-		rt_parse_dt(chip, &client->dev);
+		rt_parse_device_tree(chip, &client->dev);
 	else {
 		dev_err(&client->dev, "[OBEI]no dts node\n");
 		return -ENODEV;

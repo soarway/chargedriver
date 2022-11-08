@@ -93,8 +93,7 @@ extern int tcpci_timer_init(struct tcpc_device *tcpc);
 extern int tcpci_timer_deinit(struct tcpc_device *tcpc);
 extern void tcpc_restart_timer(struct tcpc_device *tcpc, uint32_t timer_id);
 extern  void tcpc_enable_timer(struct tcpc_device *tcpc, uint32_t timer_id);
-extern  void tcpc_disable_timer(
-		struct tcpc_device *tcpc, uint32_t timer_id);
+extern  void tcpc_disable_timer(struct tcpc_device *tcpc, uint32_t timer_id);
 extern void tcpc_reset_typec_try_timer(struct tcpc_device *tcpc);
 extern void tcpc_reset_typec_debounce_timer(struct tcpc_device *tcpc);
 

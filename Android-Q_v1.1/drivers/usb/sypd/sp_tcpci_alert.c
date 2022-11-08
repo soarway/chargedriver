@@ -65,8 +65,7 @@ void tcpci_vbus_level_init(struct tcpc_device *tcpc_dev, uint16_t power_status)
 {
 	mutex_lock(&tcpc_dev->access_lock);
 
-	tcpc_dev->vbus_level =
-			power_status & TCPC_REG_POWER_STATUS_VBUS_PRES ?
+	tcpc_dev->vbus_level = power_status & TCPC_REG_POWER_STATUS_VBUS_PRES ?
 			TCPC_VBUS_VALID : TCPC_VBUS_INVALID;
 
 #ifdef CONFIG_TCPC_VSAFE0V_DETECT_IC
@@ -165,9 +164,7 @@ static int tcpci_alert_tx_discard(struct tcpc_device *tcpc_dev)
 	if (tx_state == PD_TX_STATE_WAIT_CRC_VDM)
 		pd_put_last_vdm_event(tcpc_dev);
 	else {
-		retry_crc_discard =
-			(tcpc_dev->tcpc_flags &
-					TCPC_FLAGS_RETRY_CRC_DISCARD) != 0;
+		retry_crc_discard =	(tcpc_dev->tcpc_flags &	TCPC_FLAGS_RETRY_CRC_DISCARD) != 0;
 
 		if (retry_crc_discard) {
 #ifdef CONFIG_USB_PD_RETRY_CRC_DISCARD
@@ -198,8 +195,7 @@ static int tcpci_alert_recv_msg(struct tcpc_device *tcpc_dev)
 		return -EINVAL;
 	}
 
-	retval = tcpci_get_message(tcpc_dev,
-		pd_msg->payload, &pd_msg->msg_hdr, &type);
+	retval = tcpci_get_message(tcpc_dev, pd_msg->payload, &pd_msg->msg_hdr, &type);
 	if (retval < 0) {
 		TCPC_INFO("recv_msg failed: %d\r\n", retval);
 		pd_free_msg(tcpc_dev, pd_msg);
@@ -312,8 +308,7 @@ const struct tcpci_alert_handler tcpci_alert_handlers[] = {
 };
 
 #ifdef CONFIG_USB_POWER_DELIVERY
-static inline bool tcpci_check_hard_reset_complete(
-	struct tcpc_device *tcpc_dev, uint32_t alert_status)
+static inline bool tcpci_check_hard_reset_complete(struct tcpc_device *tcpc_dev, uint32_t alert_status)
 {
 	if ((alert_status & TCPC_REG_ALERT_HRESET_SUCCESS)
 			== TCPC_REG_ALERT_HRESET_SUCCESS) {
@@ -404,8 +399,7 @@ static inline void tcpci_attach_wake_lock(struct tcpc_device *tcpc)
 #endif	/* CONFIG_TCPC_ATTACH_WAKE_LOCK_TOUT */
 }
 
-int tcpci_set_wake_lock(
-	struct tcpc_device *tcpc, bool pd_lock, bool user_lock)
+int tcpci_set_wake_lock(struct tcpc_device *tcpc, bool pd_lock, bool user_lock)
 {
 	bool ori_lock, new_lock;
 
@@ -437,8 +431,7 @@ int tcpci_set_wake_lock(
 	return 0;
 }
 
-static inline int tcpci_set_wake_lock_pd(
-	struct tcpc_device *tcpc, bool pd_lock)
+static inline int tcpci_set_wake_lock_pd(struct tcpc_device *tcpc, bool pd_lock)
 {
 	uint8_t wake_lock_pd;
 

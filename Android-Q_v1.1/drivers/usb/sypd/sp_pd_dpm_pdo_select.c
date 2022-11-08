@@ -22,8 +22,7 @@ struct dpm_select_info_t {
 	uint8_t policy;
 };
 
-static inline void dpm_extract_apdo_info(
-		uint32_t pdo, struct dpm_pdo_info_t *info)
+static inline void dpm_extract_apdo_info(uint32_t pdo, struct dpm_pdo_info_t *info)
 {
 #ifdef CONFIG_USB_PD_REV30_PPS_SINK
 	switch (APDO_TYPE(pdo)) {
@@ -44,8 +43,7 @@ static inline void dpm_extract_apdo_info(
 	info->type = TCPM_POWER_CAP_VAL_TYPE_UNKNOWN;
 }
 
-void dpm_extract_pdo_info(
-			uint32_t pdo, struct dpm_pdo_info_t *info)
+void dpm_extract_pdo_info(uint32_t pdo, struct dpm_pdo_info_t *info)
 {
 	memset(info, 0, sizeof(struct dpm_pdo_info_t));
 
@@ -83,8 +81,7 @@ void dpm_extract_pdo_info(
 #define MIN(a, b)	((a < b) ? (a) : (b))
 #endif
 
-static inline int dpm_calc_src_cap_power_uw(
-	struct dpm_pdo_info_t *source, struct dpm_pdo_info_t *sink)
+static inline int dpm_calc_src_cap_power_uw(struct dpm_pdo_info_t *source, struct dpm_pdo_info_t *sink)
 {
 	int uw, ma;
 
@@ -218,11 +215,9 @@ static bool dpm_select_pdo_from_max_power(
 	overload = uw > select_info->max_uw;
 
 	if ((!overload) && (uw == select_info->max_uw)) {
-		if (select_info->policy &
-			DPM_CHARGING_POLICY_PREFER_LOW_VOLTAGE)
+		if (select_info->policy & DPM_CHARGING_POLICY_PREFER_LOW_VOLTAGE)
 			overload |= (source->vmax < select_info->cur_mv);
-		else if (select_info->policy &
-			DPM_CHARGING_POLICY_PREFER_HIGH_VOLTAGE)
+		else if (select_info->policy &	DPM_CHARGING_POLICY_PREFER_HIGH_VOLTAGE)
 			overload |= (source->vmax > select_info->cur_mv);
 	}
 
@@ -240,8 +235,7 @@ static bool dpm_select_pdo_from_max_power(
  */
 
 #ifdef CONFIG_USB_PD_REV30_PPS_SINK
-static bool dpm_select_pdo_from_pps(
-		struct dpm_select_info_t *select_info,
+static bool dpm_select_pdo_from_pps(struct dpm_select_info_t *select_info,
 		struct dpm_pdo_info_t *sink, struct dpm_pdo_info_t *source)
 {
 	if (sink->type != DPM_PDO_TYPE_FIXED ||
@@ -267,8 +261,7 @@ static bool dpm_select_pdo_from_pps(
   * Select PDO from defined rule ...
   */
 
-typedef bool (*dpm_select_pdo_fun)(
-	struct dpm_select_info_t *select_info,
+typedef bool (*dpm_select_pdo_fun)(struct dpm_select_info_t *select_info,
 	struct dpm_pdo_info_t *sink, struct dpm_pdo_info_t *source);
 
 bool dpm_find_match_req_info(struct dpm_rdo_info_t *req_info,

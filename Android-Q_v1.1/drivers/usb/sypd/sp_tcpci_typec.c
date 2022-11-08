@@ -52,8 +52,7 @@ static const char *const typec_wait_ps_name[] = {
 };
 #endif	/* TYPEC_INFO2_ENABLE */
 
-static inline void typec_wait_ps_change(struct tcpc_device *tcpc_dev,
-					enum TYPEC_WAIT_PS_STATE state)
+static inline void typec_wait_ps_change(struct tcpc_device *tcpc_dev,enum TYPEC_WAIT_PS_STATE state)
 {
 #if TYPEC_INFO2_ENABLE
 	uint8_t old_state = tcpc_dev->typec_wait_ps_change;
@@ -68,8 +67,7 @@ static inline void typec_wait_ps_change(struct tcpc_device *tcpc_dev,
 		tcpc_enable_timer(tcpc_dev, TYPEC_RT_TIMER_SAFE0V_TOUT);
 #endif	/* CONFIG_TYPEC_ATTACHED_SRC_SAFE0V_TIMEOUT */
 
-	if (tcpc_dev->typec_wait_ps_change == TYPEC_WAIT_PS_SRC_VSAFE0V
-		&& state != TYPEC_WAIT_PS_SRC_VSAFE0V) {
+	if (tcpc_dev->typec_wait_ps_change == TYPEC_WAIT_PS_SRC_VSAFE0V	&& state != TYPEC_WAIT_PS_SRC_VSAFE0V) {
 		tcpc_disable_timer(tcpc_dev, TYPEC_RT_TIMER_SAFE0V_DELAY);
 
 #ifdef CONFIG_TYPEC_ATTACHED_SRC_SAFE0V_TIMEOUT
@@ -83,8 +81,7 @@ static inline void typec_wait_ps_change(struct tcpc_device *tcpc_dev,
 /* #define TYPEC_EXIT_ATTACHED_SRC_NO_DEBOUNCE */
 #define TYPEC_EXIT_ATTACHED_SNK_VIA_VBUS
 
-static inline int typec_enable_low_power_mode(
-	struct tcpc_device *tcpc_dev, int pull);
+static inline int typec_enable_low_power_mode(struct tcpc_device *tcpc_dev, int pull);
 
 #define typec_get_cc1()		\
 	tcpc_dev->typec_remote_cc[0]
@@ -253,8 +250,7 @@ static const char *const typec_state_name[] = {
 	"UnattachWait.PE",
 };
 
-static inline void typec_transfer_state(struct tcpc_device *tcpc_dev,
-					enum TYPEC_CONNECTION_STATE state)
+static inline void typec_transfer_state(struct tcpc_device *tcpc_dev,enum TYPEC_CONNECTION_STATE state)
 {
 	TYPEC_INFO("** %s\r\n", typec_state_name[state]);
 	tcpc_dev->typec_state = (uint8_t) state;
@@ -295,13 +291,11 @@ static int typec_alert_attach_state_change(struct tcpc_device *tcpc_dev)
 #endif	/* CONFIG_TYPEC_CHECK_LEGACY_CABLE */
 
 	if (tcpc_dev->typec_attach_old == tcpc_dev->typec_attach_new) {
-		TYPEC_DBG("Attached-> %s(repeat)\r\n",
-			typec_attach_name[tcpc_dev->typec_attach_new]);
+		TYPEC_DBG("Attached-> %s(repeat)\r\n",	typec_attach_name[tcpc_dev->typec_attach_new]);
 		return 0;
 	}
 
-	TYPEC_INFO("Attached-> %s\r\n",
-		   typec_attach_name[tcpc_dev->typec_attach_new]);
+	TYPEC_INFO("Attached-> %s\r\n",  typec_attach_name[tcpc_dev->typec_attach_new]);
 
 	/*Report function */
 	ret = tcpci_report_usb_port_changed(tcpc_dev);
@@ -327,8 +321,7 @@ static inline int typec_set_drp_toggling(struct tcpc_device *tcpc_dev)
 
 static inline int typec_try_low_power_mode(struct tcpc_device *tcpc_dev)
 {
-	int ret = tcpci_set_low_power_mode(
-		tcpc_dev, true, tcpc_dev->typec_lpm_pull);
+	int ret = tcpci_set_low_power_mode(	tcpc_dev, true, tcpc_dev->typec_lpm_pull);
 	if (ret < 0)
 		return ret;
 
@@ -366,8 +359,7 @@ static inline int typec_enter_low_power_mode(struct tcpc_device *tcpc_dev)
 	return ret;
 }
 
-static inline int typec_enable_low_power_mode(
-	struct tcpc_device *tcpc_dev, int pull)
+static inline int typec_enable_low_power_mode(struct tcpc_device *tcpc_dev, int pull)
 {
 	int ret = 0;
 
@@ -399,8 +391,7 @@ static inline int typec_enable_low_power_mode(
 	return ret;
 }
 
-static inline int typec_disable_low_power_mode(
-	struct tcpc_device *tcpc_dev)
+static inline int typec_disable_low_power_mode(struct tcpc_device *tcpc_dev)
 {
 	int ret = 0;
 
@@ -524,15 +515,13 @@ static inline void typec_error_recovery_entry(struct tcpc_device *tcpc_dev)
  * [BLOCK] Attached Entry
  */
 
-static inline int typec_set_polarity(struct tcpc_device *tcpc_dev,
-					bool polarity)
+static inline int typec_set_polarity(struct tcpc_device *tcpc_dev,	bool polarity)
 {
 	tcpc_dev->typec_polarity = polarity;
 	return tcpci_set_polarity(tcpc_dev, polarity);
 }
 
-static inline int typec_set_plug_orient(struct tcpc_device *tcpc_dev,
-				uint8_t res, bool polarity)
+static inline int typec_set_plug_orient(struct tcpc_device *tcpc_dev,uint8_t res, bool polarity)
 {
 	int rv = typec_set_polarity(tcpc_dev, polarity);
 
@@ -568,8 +557,7 @@ static inline void typec_source_attached_entry(struct tcpc_device *tcpc_dev)
 
 	tcpci_report_power_control(tcpc_dev, true);
 	typec_enable_vconn(tcpc_dev);
-	tcpci_source_vbus(tcpc_dev,
-			TCP_VBUS_CTRL_TYPEC, TCPC_VBUS_SOURCE_5V, -1);
+	tcpci_source_vbus(tcpc_dev,	TCP_VBUS_CTRL_TYPEC, TCPC_VBUS_SOURCE_5V, -1);
 }
 
 static inline void typec_sink_attached_entry(struct tcpc_device *tcpc_dev)

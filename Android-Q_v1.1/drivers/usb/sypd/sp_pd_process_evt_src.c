@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  */
 
-#include <linux/usb/pd_core.h>
+#include <linux/usb/sypd/sp_pd_core.h>
 #include <linux/usb/sypd/sp_tcpci_event.h>
 #include <linux/usb/sypd/sp_pd_process_evt.h>
 #include <linux/usb/sypd/sp_pd_dpm_core.h>
@@ -217,9 +217,7 @@ static inline bool pd_process_ctrl_msg_get_sink_cap(
 	return false;
 }
 
-static inline bool pd_process_ctrl_msg(
-	struct pd_port *pd_port, struct pd_event *pd_event)
-
+static inline bool pd_process_ctrl_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool ret = false;
 
@@ -231,8 +229,7 @@ static inline bool pd_process_ctrl_msg(
 			pd_event->msg <= PD_CTRL_VCONN_SWAP) {
 			PE_DBG("Port Partner Request First\r\n");
 			pd_port->pe_state_curr = PE_SRC_READY;
-			pd_disable_timer(
-				pd_port, PD_TIMER_SENDER_RESPONSE);
+			pd_disable_timer(pd_port, PD_TIMER_SENDER_RESPONSE);
 		}
 		break;
 	}
@@ -288,8 +285,7 @@ static inline bool pd_process_ctrl_msg(
 
 #ifdef CONFIG_USB_PD_REV30
 	case PD_CTRL_GET_STATUS:
-		ret = PE_MAKE_STATE_TRANSIT_SINGLE(
-				PE_SRC_READY, PE_SRC_GIVE_SOURCE_STATUS);
+		ret = PE_MAKE_STATE_TRANSIT_SINGLE(PE_SRC_READY, PE_SRC_GIVE_SOURCE_STATUS);
 		break;
 
 #endif	/* CONFIG_USB_PD_REV30 */

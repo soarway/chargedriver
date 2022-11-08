@@ -99,13 +99,11 @@
 
 #define PDO_FIXED_EXTRACT_VOLT_RAW(raw)	(((raw) >> 10) & 0x3ff)
 #define PDO_FIXED_EXTRACT_CURR_RAW(raw)	(((raw) >> 0) & 0x3ff)
-#define PDO_FIXED_EXTRACT_VOLT(raw)	(PDO_FIXED_EXTRACT_VOLT_RAW(raw) * 50)
-#define PDO_FIXED_EXTRACT_CURR(raw)	(PDO_FIXED_EXTRACT_CURR_RAW(raw) * 10)
-#define PDO_FIXED_RESET_CURR(raw, ma)	\
-	((raw & ~0x3ff) | PDO_FIXED_CURR(ma))
+#define PDO_FIXED_EXTRACT_VOLT(raw)		(PDO_FIXED_EXTRACT_VOLT_RAW(raw) * 50)
+#define PDO_FIXED_EXTRACT_CURR(raw)		(PDO_FIXED_EXTRACT_CURR_RAW(raw) * 10)
+#define PDO_FIXED_RESET_CURR(raw, ma)	((raw & ~0x3ff) | PDO_FIXED_CURR(ma))
 
-#define PDO_FIXED(mv, ma, flags) (PDO_FIXED_VOLT(mv) |\
-				  PDO_FIXED_CURR(ma) | (flags))
+#define PDO_FIXED(mv, ma, flags) 		(PDO_FIXED_VOLT(mv) | PDO_FIXED_CURR(ma) | (flags))
 
 #define PDO_VAR_MAX_VOLT(mv) ((((mv) / 50) & 0x3FF) << 20)
 #define PDO_VAR_MIN_VOLT(mv) ((((mv) / 50) & 0x3FF) << 10)
@@ -117,10 +115,9 @@
 
 #define PDO_VAR_EXTRACT_MAX_VOLT(raw)	(PDO_VAR_EXTRACT_MAX_VOLT_RAW(raw) * 50)
 #define PDO_VAR_EXTRACT_MIN_VOLT(raw)	(PDO_VAR_EXTRACT_MIN_VOLT_RAW(raw) * 50)
-#define PDO_VAR_EXTRACT_CURR(raw)	(PDO_VAR_EXTRACT_CURR_RAW(raw) * 10)
+#define PDO_VAR_EXTRACT_CURR(raw)		(PDO_VAR_EXTRACT_CURR_RAW(raw) * 10)
 
-#define PDO_VAR_RESET_CURR(raw, ma)	\
-	((raw & ~0x3ff) | PDO_VAR_OP_CURR(ma))
+#define PDO_VAR_RESET_CURR(raw, ma)		((raw & ~0x3ff) | PDO_VAR_OP_CURR(ma))
 
 #define PDO_VAR(min_mv, max_mv, op_ma) \
 				(PDO_VAR_MIN_VOLT(min_mv) | \
@@ -136,12 +133,9 @@
 #define PDO_BATT_EXTRACT_MIN_VOLT_RAW(raw)	(((raw) >> 10) & 0x3ff)
 #define PDO_BATT_EXTRACT_OP_POWER_RAW(raw)	(((raw) >> 0) & 0x3ff)
 
-#define PDO_BATT_EXTRACT_MAX_VOLT(raw)	\
-	(PDO_BATT_EXTRACT_MAX_VOLT_RAW(raw) * 50)
-#define PDO_BATT_EXTRACT_MIN_VOLT(raw)	\
-	(PDO_BATT_EXTRACT_MIN_VOLT_RAW(raw) * 50)
-#define PDO_BATT_EXTRACT_OP_POWER(raw)	\
-	(PDO_BATT_EXTRACT_OP_POWER_RAW(raw) * 250)
+#define PDO_BATT_EXTRACT_MAX_VOLT(raw)		(PDO_BATT_EXTRACT_MAX_VOLT_RAW(raw) * 50)
+#define PDO_BATT_EXTRACT_MIN_VOLT(raw)		(PDO_BATT_EXTRACT_MIN_VOLT_RAW(raw) * 50)
+#define PDO_BATT_EXTRACT_OP_POWER(raw)		(PDO_BATT_EXTRACT_OP_POWER_RAW(raw) * 250)
 
 #define PDO_BATT(min_mv, max_mv, op_mw) \
 				(PDO_BATT_MIN_VOLT(min_mv) | \
@@ -164,14 +158,11 @@
 
 #define APDO_PPS_EXTRACT_MAX_VOLT_RAW(raw)	(((raw) >> 17) & 0xff)
 #define APDO_PPS_EXTRACT_MIN_VOLT_RAW(raw)	(((raw) >> 8) & 0Xff)
-#define APDO_PPS_EXTRACT_CURR_RAW(raw)	(((raw) >> 0) & 0x7f)
+#define APDO_PPS_EXTRACT_CURR_RAW(raw)		(((raw) >> 0) & 0x7f)
 
-#define APDO_PPS_EXTRACT_MAX_VOLT(raw)	\
-	(APDO_PPS_EXTRACT_MAX_VOLT_RAW(raw) * 100)
-#define APDO_PPS_EXTRACT_MIN_VOLT(raw)	\
-	(APDO_PPS_EXTRACT_MIN_VOLT_RAW(raw) * 100)
-#define APDO_PPS_EXTRACT_CURR(raw)	\
-	(APDO_PPS_EXTRACT_CURR_RAW(raw) * 50)
+#define APDO_PPS_EXTRACT_MAX_VOLT(raw)		(APDO_PPS_EXTRACT_MAX_VOLT_RAW(raw) * 100)
+#define APDO_PPS_EXTRACT_MIN_VOLT(raw)		(APDO_PPS_EXTRACT_MIN_VOLT_RAW(raw) * 100)
+#define APDO_PPS_EXTRACT_CURR(raw)			(APDO_PPS_EXTRACT_CURR_RAW(raw) * 50)
 
 #define APDO_PPS(min_mv, max_mv, ma, flags)	\
 	(APDO_PPS_MIN_VOLT(min_mv)	 | \
@@ -186,8 +177,8 @@
 #define RDO_CAP_MISMATCH           (1 << 26)
 #define RDO_COMM_CAP               (1 << 25)
 #define RDO_NO_SUSPEND             (1 << 24)
-#define RDO_EXTEND_MESSAGE	(1 << 23)
-#define RDO_CURR_FOLDBACK	(1 << 22)
+#define RDO_EXTEND_MESSAGE			(1 << 23)
+#define RDO_CURR_FOLDBACK			(1 << 22)
 
 #define RDO_FIXED_VAR_OP_CURR(ma)  ((((ma) / 10) & 0x3FF) << 10)
 #define RDO_FIXED_VAR_MAX_CURR(ma) ((((ma) / 10) & 0x3FF) << 0)

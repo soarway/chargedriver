@@ -929,8 +929,7 @@ static tcpc_hrtimer_call tcpc_timer_call[PD_TIMER_NR] = {
  * [BLOCK] Control Timer
  */
 
-static inline void tcpc_reset_timer_range(
-		struct tcpc_device *tcpc, int start, int end)
+static inline void tcpc_reset_timer_range(struct tcpc_device *tcpc, int start, int end)
 {
 	int i;
 	uint64_t mask;
@@ -982,8 +981,7 @@ void tcpc_enable_timer(struct tcpc_device *tcpc, uint32_t timer_id)
 	mod = tout % 1000000;
 
 	mutex_unlock(&tcpc->timer_lock);
-	hrtimer_start(&tcpc->tcpc_timer[timer_id],
-				ktime_set(r, mod*1000), HRTIMER_MODE_REL);
+	hrtimer_start(&tcpc->tcpc_timer[timer_id],	ktime_set(r, mod*1000), HRTIMER_MODE_REL);
 }
 
 void tcpc_disable_timer(struct tcpc_device *tcpc_dev, uint32_t timer_id)
@@ -1032,8 +1030,7 @@ void tcpc_reset_typec_debounce_timer(struct tcpc_device *tcpc)
 void tcpc_reset_typec_try_timer(struct tcpc_device *tcpc)
 {
 	mutex_lock(&tcpc->timer_lock);
-	tcpc_reset_timer_range(tcpc,
-			TYPEC_TRY_TIMER_START_ID, TYPEC_TIMER_START_ID);
+	tcpc_reset_timer_range(tcpc, TYPEC_TRY_TIMER_START_ID, TYPEC_TIMER_START_ID);
 	mutex_unlock(&tcpc->timer_lock);
 }
 
@@ -1081,9 +1078,7 @@ static int tcpc_timer_thread(void *param)
 
 	sched_setscheduler(current, SCHED_FIFO, &sch_param);
 	while (true) {
-		wait_event_interruptible(tcpc_dev->timer_wait_que,
-				((*timer_tick) ? true : false) |
-				tcpc_dev->timer_thead_stop);
+		wait_event_interruptible(tcpc_dev->timer_wait_que,	((*timer_tick) ? true : false) | tcpc_dev->timer_thead_stop);
 		if (kthread_should_stop() || tcpc_dev->timer_thead_stop)
 			break;
 		do {
@@ -1098,8 +1093,7 @@ int tcpci_timer_init(struct tcpc_device *tcpc_dev)
 	int i;
 
 	pr_info("[OBEI]PD Timer number = %d\n", PD_TIMER_NR);
-	tcpc_dev->timer_task = kthread_create(tcpc_timer_thread, tcpc_dev,
-			"tcpc_timer_%s.%p", dev_name(&tcpc_dev->dev), tcpc_dev);
+	tcpc_dev->timer_task = kthread_create(tcpc_timer_thread, tcpc_dev,	"tcpc_timer_%s.%p", dev_name(&tcpc_dev->dev), tcpc_dev);
 	init_waitqueue_head(&tcpc_dev->timer_wait_que);
 
 	tcpc_dev->timer_tick = 0;
@@ -1107,8 +1101,7 @@ int tcpci_timer_init(struct tcpc_device *tcpc_dev)
 
 	wake_up_process(tcpc_dev->timer_task);
 	for (i = 0; i < PD_TIMER_NR; i++) {
-		hrtimer_init(&tcpc_dev->tcpc_timer[i],
-					CLOCK_MONOTONIC, HRTIMER_MODE_REL);
+		hrtimer_init(&tcpc_dev->tcpc_timer[i],	CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 		tcpc_dev->tcpc_timer[i].function = tcpc_timer_call[i];
 	}
 

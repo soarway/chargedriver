@@ -39,8 +39,7 @@ struct gpio_switch_data {
 static void gpio_switch_work(struct work_struct *work)
 {
 	int state;
-	struct gpio_switch_data	*data =
-		container_of(work, struct gpio_switch_data, work);
+	struct gpio_switch_data	*data =	container_of(work, struct gpio_switch_data, work);
 
 	state = gpio_get_value(data->gpio);
 	switch_set_state(&data->sdev, state);
@@ -48,8 +47,7 @@ static void gpio_switch_work(struct work_struct *work)
 
 static irqreturn_t gpio_irq_handler(int irq, void *dev_id)
 {
-	struct gpio_switch_data *switch_data =
-	    (struct gpio_switch_data *)dev_id;
+	struct gpio_switch_data *switch_data = (struct gpio_switch_data *)dev_id;
 
 	schedule_work(&switch_data->work);
 	return IRQ_HANDLED;
@@ -57,8 +55,7 @@ static irqreturn_t gpio_irq_handler(int irq, void *dev_id)
 
 static ssize_t switch_gpio_print_state(struct switch_dev *sdev, char *buf)
 {
-	struct gpio_switch_data	*switch_data =
-		container_of(sdev, struct gpio_switch_data, sdev);
+	struct gpio_switch_data	*switch_data =	container_of(sdev, struct gpio_switch_data, sdev);
 	const char *state;
 	if (switch_get_state(sdev))
 		state = switch_data->state_on;
@@ -111,8 +108,7 @@ static int gpio_switch_probe(struct platform_device *pdev)
 		goto err_detect_irq_num_failed;
 	}
 
-	ret = request_irq(switch_data->irq, gpio_irq_handler,
-			  IRQF_TRIGGER_LOW, pdev->name, switch_data);
+	ret = request_irq(switch_data->irq, gpio_irq_handler, IRQF_TRIGGER_LOW, pdev->name, switch_data);
 	if (ret < 0)
 		goto err_request_irq;
 

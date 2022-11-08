@@ -31,11 +31,8 @@
 
 #define TCPC_CORE_VERSION		"1.2.1_G"
 
-static ssize_t tcpc_show_property(struct device *dev,
-				  struct device_attribute *attr, char *buf);
-static ssize_t tcpc_store_property(struct device *dev,
-				   struct device_attribute *attr,
-				   const char *buf, size_t count);
+static ssize_t tcpc_show_property(struct device *dev,  struct device_attribute *attr, char *buf);
+static ssize_t tcpc_store_property(struct device *dev,  struct device_attribute *attr, const char *buf, size_t count);
 
 #define TCPC_DEVICE_ATTR(_name, _mode)					\
 {									\
@@ -85,8 +82,7 @@ static const char * const role_text[] = {
 	"Try.SNK",
 };
 
-static ssize_t tcpc_show_property(struct device *dev,
-				  struct device_attribute *attr, char *buf)
+static ssize_t tcpc_show_property(struct device *dev,  struct device_attribute *attr, char *buf)
 {
 	struct tcpc_device *tcpc = to_tcpc_device(dev);
 	const ptrdiff_t offset = attr - tcpc_device_attributes;
@@ -98,47 +94,28 @@ static ssize_t tcpc_show_property(struct device *dev,
 	switch (offset) {
 #ifdef CONFIG_USB_POWER_DELIVERY
 	case TCPC_DESC_CAP_INFO:
-		snprintf(buf+strlen(buf), 256, "%s = %d\n%s = %d\n",
-			"local_selected_cap",
-			tcpc->pd_port.local_selected_cap,
-			"remote_selected_cap",
-			tcpc->pd_port.remote_selected_cap);
+		snprintf(buf+strlen(buf), 256, "%s = %d\n%s = %d\n","local_selected_cap",
+			tcpc->pd_port.local_selected_cap,	"remote_selected_cap",	tcpc->pd_port.remote_selected_cap);
 
-		snprintf(buf+strlen(buf), 256, "%s\n",
-				"local_src_cap(type, vmin, vmax, oper)");
+		snprintf(buf+strlen(buf), 256, "%s\n",	"local_src_cap(type, vmin, vmax, oper)");
 		for (i = 0; i < tcpc->pd_port.local_src_cap.nr; i++) {
-			tcpm_extract_power_cap_val(
-				tcpc->pd_port.local_src_cap.pdos[i],
-				&cap);
-			snprintf(buf+strlen(buf), 256, "%d %d %d %d\n",
-				cap.type, cap.min_mv, cap.max_mv, cap.ma);
+			tcpm_extract_power_cap_val(	tcpc->pd_port.local_src_cap.pdos[i],&cap);
+			snprintf(buf+strlen(buf), 256, "%d %d %d %d\n",	cap.type, cap.min_mv, cap.max_mv, cap.ma);
 		}
-		snprintf(buf+strlen(buf), 256, "%s\n",
-				"local_snk_cap(type, vmin, vmax, ioper)");
+		snprintf(buf+strlen(buf), 256, "%s\n",	"local_snk_cap(type, vmin, vmax, ioper)");
 		for (i = 0; i < tcpc->pd_port.local_snk_cap.nr; i++) {
-			tcpm_extract_power_cap_val(
-				tcpc->pd_port.local_snk_cap.pdos[i],
-				&cap);
-			snprintf(buf+strlen(buf), 256, "%d %d %d %d\n",
-				cap.type, cap.min_mv, cap.max_mv, cap.ma);
+			tcpm_extract_power_cap_val(	tcpc->pd_port.local_snk_cap.pdos[i],&cap);
+			snprintf(buf+strlen(buf), 256, "%d %d %d %d\n",	cap.type, cap.min_mv, cap.max_mv, cap.ma);
 		}
-		snprintf(buf+strlen(buf), 256, "%s\n",
-				"remote_src_cap(type, vmin, vmax, ioper)");
+		snprintf(buf+strlen(buf), 256, "%s\n",	"remote_src_cap(type, vmin, vmax, ioper)");
 		for (i = 0; i < tcpc->pd_port.remote_src_cap.nr; i++) {
-			tcpm_extract_power_cap_val(
-				tcpc->pd_port.remote_src_cap.pdos[i],
-				&cap);
-			snprintf(buf+strlen(buf), 256, "%d %d %d %d\n",
-				cap.type, cap.min_mv, cap.max_mv, cap.ma);
+			tcpm_extract_power_cap_val(	tcpc->pd_port.remote_src_cap.pdos[i],&cap);
+			snprintf(buf+strlen(buf), 256, "%d %d %d %d\n",	cap.type, cap.min_mv, cap.max_mv, cap.ma);
 		}
-		snprintf(buf+strlen(buf), 256, "%s\n",
-				"remote_snk_cap(type, vmin, vmax, ioper)");
+		snprintf(buf+strlen(buf), 256, "%s\n",	"remote_snk_cap(type, vmin, vmax, ioper)");
 		for (i = 0; i < tcpc->pd_port.remote_snk_cap.nr; i++) {
-			tcpm_extract_power_cap_val(
-				tcpc->pd_port.remote_snk_cap.pdos[i],
-				&cap);
-			snprintf(buf+strlen(buf), 256, "%d %d %d %d\n",
-				cap.type, cap.min_mv, cap.max_mv, cap.ma);
+			tcpm_extract_power_cap_val(	tcpc->pd_port.remote_snk_cap.pdos[i],&cap);
+			snprintf(buf+strlen(buf), 256, "%d %d %d %d\n",	cap.type, cap.min_mv, cap.max_mv, cap.ma);
 		}
 		break;
 #endif	/* CONFIG_USB_POWER_DELIVERY */
@@ -203,9 +180,7 @@ static int get_parameters(char *buf, long int *param1, int num_of_par)
 	return 0;
 }
 
-static ssize_t tcpc_store_property(struct device *dev,
-				   struct device_attribute *attr,
-				   const char *buf, size_t count)
+static ssize_t tcpc_store_property(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
 {
 #ifdef CONFIG_USB_POWER_DELIVERY
 	uint8_t role;
@@ -318,11 +293,9 @@ static int tcpc_match_device_by_name(struct device *dev, void *data)
 struct tcpc_device *tcpc_dev_get_by_name(const char *name)
 {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 9, 0))
-	struct device *dev = class_find_device(tcpc_class,
-			NULL, (const void *)name, tcpc_match_device_by_name);
+	struct device *dev = class_find_device(tcpc_class,	NULL, (const void *)name, tcpc_match_device_by_name);
 #else
-	struct device *dev = class_find_device(tcpc_class,
-			NULL, (void *)name, tcpc_match_device_by_name);
+	struct device *dev = class_find_device(tcpc_class,	NULL, (void *)name, tcpc_match_device_by_name);
 #endif
 	return dev ? dev_get_drvdata(dev) : NULL;
 }
@@ -392,10 +365,8 @@ struct tcpc_device *tcpc_device_register(struct device *parent,
 	/* If system support "WAKE_LOCK_IDLE",
 	 * please use it instead of "WAKE_LOCK_SUSPEND"
 	 */
-	wake_lock_init(&tcpc->attach_wake_lock, WAKE_LOCK_SUSPEND,
-		"tcpc_attach_wakelock");
-	wake_lock_init(&tcpc->dettach_temp_wake_lock, WAKE_LOCK_SUSPEND,
-		"tcpc_detach_wakelock");
+	wake_lock_init(&tcpc->attach_wake_lock, WAKE_LOCK_SUSPEND,"tcpc_attach_wakelock");
+	wake_lock_init(&tcpc->dettach_temp_wake_lock, WAKE_LOCK_SUSPEND,"tcpc_detach_wakelock");
 
 	tcpci_timer_init(tcpc);
 #ifdef CONFIG_USB_POWER_DELIVERY
@@ -468,8 +439,7 @@ int tcpc_schedule_init_work(struct tcpc_device *tcpc)
 	return 0;
 }
 
-int register_tcp_dev_notifier(struct tcpc_device *tcp_dev,
-			      struct notifier_block *nb)
+int register_tcp_dev_notifier(struct tcpc_device *tcp_dev, struct notifier_block *nb)
 {
 	int ret;
 
@@ -483,8 +453,7 @@ int register_tcp_dev_notifier(struct tcpc_device *tcp_dev,
 	}
 
 	tcp_dev->desc.notifier_supply_num--;
-	pr_info("[OBEI]%s supply_num = %d\n", __func__,
-		tcp_dev->desc.notifier_supply_num);
+	pr_info("[OBEI]%s supply_num = %d\n", __func__,	tcp_dev->desc.notifier_supply_num);
 
 	if (tcp_dev->desc.notifier_supply_num == 0) {
 		cancel_delayed_work(&tcp_dev->init_work);
@@ -557,8 +526,7 @@ static int __init tcpc_class_init(void)
 
 	tcpc_class = class_create(THIS_MODULE, "tcpc");
 	if (IS_ERR(tcpc_class)) {
-		pr_info("[OBEI]Unable to create tcpc class; errno = %ld\n",
-		       PTR_ERR(tcpc_class));
+		pr_info("[OBEI]Unable to create tcpc class; errno = %ld\n", PTR_ERR(tcpc_class));
 		return PTR_ERR(tcpc_class);
 	}
 	tcpc_init_attrs(&tcpc_dev_type);

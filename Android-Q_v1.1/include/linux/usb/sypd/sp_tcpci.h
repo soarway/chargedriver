@@ -18,7 +18,7 @@
 #include <linux/device.h>
 #include <linux/hrtimer.h>
 #include <linux/workqueue.h>
-#include <linux/wakelock.h>
+//#include <linux/wakelock.h>
 #include <linux/err.h>
 #include <linux/cpu.h>
 #include <linux/delay.h>
@@ -31,29 +31,25 @@
 
 
 #ifdef CONFIG_PD_DBG_INFO
-#include <linux/usb/pd_dbg_info.h>
+#include <linux/usb/sypd/sp_pd_dbg_info.h>
 #endif /* CONFIG_PD_DBG_INFO */
 
 #ifdef CONFIG_USB_POWER_DELIVERY
-#include <linux/usb/pd_core.h>
+#include <linux/usb/sypd/sp_pd_core.h>
 #endif /* CONFIG_USB_POWER_DELIVERY */
 
 #define PE_STATE_FULL_NAME	0
 
 /* provide to TCPC interface */
 extern int tcpci_report_usb_port_changed(struct tcpc_device *tcpc);
-extern int tcpci_set_wake_lock(
-	struct tcpc_device *tcpc, bool pd_lock, bool user_lock);
+extern int tcpci_set_wake_lock(struct tcpc_device *tcpc, bool pd_lock, bool user_lock);
 extern int tcpci_report_power_control(struct tcpc_device *tcpc, bool en);
 extern int tcpc_typec_init(struct tcpc_device *tcpc, uint8_t typec_role);
 extern void tcpc_typec_deinit(struct tcpc_device *tcpc);
 extern int tcpc_dual_role_phy_init(struct tcpc_device *tcpc);
 
-extern struct tcpc_device *tcpc_device_register(
-		struct device *parent, struct tcpc_desc *tcpc_desc,
-		struct tcpc_ops *ops, void *drv_data);
-extern void tcpc_device_unregister(
-			struct device *dev, struct tcpc_device *tcpc);
+extern struct tcpc_device *tcpc_device_register(struct device *parent, struct tcpc_desc *tcpc_desc,	struct tcpc_ops *ops, void *drv_data);
+extern void tcpc_device_unregister(struct device *dev, struct tcpc_device *tcpc);
 
 extern int tcpc_schedule_init_work(struct tcpc_device *tcpc);
 
@@ -62,8 +58,7 @@ extern void tcpci_lock_typec(struct tcpc_device *tcpc);
 extern void tcpci_unlock_typec(struct tcpc_device *tcpc);
 extern int tcpci_alert(struct tcpc_device *tcpc);
 
-extern void tcpci_vbus_level_init(
-		struct tcpc_device *tcpc, uint16_t power_status);
+extern void tcpci_vbus_level_init(struct tcpc_device *tcpc, uint16_t power_status);
 
 static inline int tcpci_check_vbus_valid(struct tcpc_device *tcpc)
 {
@@ -83,28 +78,24 @@ static inline int tcpci_check_vsafe0v(struct tcpc_device *tcpc, bool detect_en)
 	return ret;
 }
 
-static inline int tcpci_alert_status_clear(
-		struct tcpc_device *tcpc, uint32_t mask)
+static inline int tcpci_alert_status_clear(struct tcpc_device *tcpc, uint32_t mask)
 {
 	return tcpc->ops->alert_status_clear(tcpc, mask);
 }
 
-static inline int tcpci_fault_status_clear(
-	struct tcpc_device *tcpc, uint8_t status)
+static inline int tcpci_fault_status_clear(struct tcpc_device *tcpc, uint8_t status)
 {
 	if (tcpc->ops->fault_status_clear)
 		return tcpc->ops->fault_status_clear(tcpc, status);
 	return 0;
 }
 
-static inline int tcpci_get_alert_status(
-		struct tcpc_device *tcpc, uint32_t *alert)
+static inline int tcpci_get_alert_status(struct tcpc_device *tcpc, uint32_t *alert)
 {
 	return tcpc->ops->get_alert_status(tcpc, alert);
 }
 
-static inline int tcpci_get_fault_status(
-		struct tcpc_device *tcpc, uint8_t *fault)
+static inline int tcpci_get_fault_status(struct tcpc_device *tcpc, uint8_t *fault)
 {
 	if (tcpc->ops->get_fault_status)
 		return tcpc->ops->get_fault_status(tcpc, fault);
@@ -113,8 +104,7 @@ static inline int tcpci_get_fault_status(
 	return 0;
 }
 
-static inline int tcpci_get_power_status(
-		struct tcpc_device *tcpc, uint16_t *pw_status)
+static inline int tcpci_get_power_status(struct tcpc_device *tcpc, uint16_t *pw_status)
 {
 	return tcpc->ops->get_power_status(tcpc, pw_status);
 }
@@ -197,8 +187,7 @@ static inline int tcpci_set_vconn(struct tcpc_device *tcpc, int enable)
 	struct tcp_notify tcp_noti;
 
 	tcp_noti.en_state.en = enable != 0;
-	srcu_notifier_call_chain(&tcpc->evt_nh,
-				TCP_NOTIFY_SOURCE_VCONN, &tcp_noti);
+	srcu_notifier_call_chain(&tcpc->evt_nh,	TCP_NOTIFY_SOURCE_VCONN, &tcp_noti);
 
 	return tcpc->ops->set_vconn(tcpc, enable);
 #else
@@ -231,8 +220,7 @@ static inline int tcpci_is_low_power_mode(struct tcpc_device *tcpc)
 	return rv;
 }
 
-static inline int tcpci_set_low_power_mode(
-	struct tcpc_device *tcpc, bool en, int pull)
+static inline int tcpci_set_low_power_mode(struct tcpc_device *tcpc, bool en, int pull)
 {
 	int rv = 0;
 
@@ -243,8 +231,7 @@ static inline int tcpci_set_low_power_mode(
 	return rv;
 }
 
-static inline int tcpci_idle_poll_ctrl(
-		struct tcpc_device *tcpc, bool en, bool lock)
+static inline int tcpci_idle_poll_ctrl(struct tcpc_device *tcpc, bool en, bool lock)
 {
 	int rv = 0;
 
@@ -291,11 +278,9 @@ static inline int tcpci_set_watchdog(struct tcpc_device *tcpc, bool en)
 
 #ifdef CONFIG_USB_POWER_DELIVERY
 
-static inline int tcpci_set_msg_header(
-	struct tcpc_device *tcpc, int power_role, int data_role, uint8_t pd_rev)
+static inline int tcpci_set_msg_header(struct tcpc_device *tcpc, int power_role, int data_role, uint8_t pd_rev)
 {
-	return tcpc->ops->set_msg_header(
-		tcpc, power_role, data_role, pd_rev);
+	return tcpc->ops->set_msg_header(tcpc, power_role, data_role, pd_rev);
 }
 
 static inline int tcpci_set_rx_enable(struct tcpc_device *tcpc, uint8_t enable)
@@ -320,8 +305,7 @@ static inline int tcpci_set_bist_test_mode(struct tcpc_device *tcpc, bool en)
 	return tcpc->ops->set_bist_test_mode(tcpc, en);
 }
 
-static inline int tcpci_set_bist_carrier_mode(
-		struct tcpc_device *tcpc, uint8_t pattern)
+static inline int tcpci_set_bist_carrier_mode(struct tcpc_device *tcpc, uint8_t pattern)
 {
 	if (pattern)	/* wait for GoodCRC */
 		udelay(240);
@@ -337,8 +321,7 @@ static inline int tcpci_retransmit(struct tcpc_device *tcpc)
 #endif	/* CONFIG_USB_PD_RETRY_CRC_DISCARD */
 #endif	/* CONFIG_USB_POWER_DELIVERY */
 
-static inline int tcpci_notify_typec_state(
-	struct tcpc_device *tcpc)
+static inline int tcpci_notify_typec_state(struct tcpc_device *tcpc)
 {
 	struct tcp_notify tcp_noti;
 
@@ -347,12 +330,10 @@ static inline int tcpci_notify_typec_state(
 	tcp_noti.typec_state.new_state = tcpc->typec_attach_new;
 	tcp_noti.typec_state.rp_level = tcpc->typec_remote_rp_level;
 
-	return srcu_notifier_call_chain(&tcpc->evt_nh,
-				TCP_NOTIFY_TYPEC_STATE, &tcp_noti);
+	return srcu_notifier_call_chain(&tcpc->evt_nh,TCP_NOTIFY_TYPEC_STATE, &tcp_noti);
 }
 
-static inline int tcpci_notify_role_swap(
-	struct tcpc_device *tcpc, uint8_t event, uint8_t role)
+static inline int tcpci_notify_role_swap(struct tcpc_device *tcpc, uint8_t event, uint8_t role)
 {
 	struct tcp_notify tcp_noti;
 
@@ -361,14 +342,12 @@ static inline int tcpci_notify_role_swap(
 		&tcpc->evt_nh, event, &tcp_noti);
 }
 
-static inline int tcpci_notify_pd_state(
-	struct tcpc_device *tcpc, uint8_t connect)
+static inline int tcpci_notify_pd_state(struct tcpc_device *tcpc, uint8_t connect)
 {
 	struct tcp_notify tcp_noti;
 
 	tcp_noti.pd_state.connected = connect;
-	return srcu_notifier_call_chain(
-		&tcpc->evt_nh, TCP_NOTIFY_PD_STATE, &tcp_noti);
+	return srcu_notifier_call_chain(&tcpc->evt_nh, TCP_NOTIFY_PD_STATE, &tcp_noti);
 }
 
 static inline int tcpci_set_intrst(struct tcpc_device *tcpc, bool en)
@@ -406,8 +385,7 @@ static inline int tcpci_enable_watchdog(struct tcpc_device *tcpc, bool en)
 	return 0;
 }
 
-static inline int tcpci_source_vbus(
-	struct tcpc_device *tcpc, uint8_t type, int mv, int ma)
+static inline int tcpci_source_vbus(struct tcpc_device *tcpc, uint8_t type, int mv, int ma)
 {
 	struct tcp_notify tcp_noti;
 
@@ -440,12 +418,10 @@ static inline int tcpci_source_vbus(
 
 	tcpci_enable_watchdog(tcpc, mv != 0);
 	TCPC_DBG("source_vbus: %d mV, %d mA\r\n", mv, ma);
-	return srcu_notifier_call_chain(&tcpc->evt_nh,
-				TCP_NOTIFY_SOURCE_VBUS, &tcp_noti);
+	return srcu_notifier_call_chain(&tcpc->evt_nh,	TCP_NOTIFY_SOURCE_VBUS, &tcp_noti);
 }
 
-static inline int tcpci_sink_vbus(
-	struct tcpc_device *tcpc, uint8_t type, int mv, int ma)
+static inline int tcpci_sink_vbus(struct tcpc_device *tcpc, uint8_t type, int mv, int ma)
 {
 	struct tcp_notify tcp_noti;
 
@@ -481,8 +457,7 @@ static inline int tcpci_sink_vbus(
 	tcp_noti.vbus_state.type = type;
 
 	TCPC_DBG("sink_vbus: %d mV, %d mA\r\n", mv, ma);
-	return srcu_notifier_call_chain(&tcpc->evt_nh,
-				TCP_NOTIFY_SINK_VBUS, &tcp_noti);
+	return srcu_notifier_call_chain(&tcpc->evt_nh,	TCP_NOTIFY_SINK_VBUS, &tcp_noti);
 }
 
 static inline int tcpci_disable_vbus_control(struct tcpc_device *tcpc)
@@ -501,8 +476,7 @@ static inline int tcpci_disable_vbus_control(struct tcpc_device *tcpc)
 #endif	/* CONFIG_TYPEC_USE_DIS_VBUS_CTRL */
 }
 
-static inline int tcpci_notify_attachwait_state(
-	struct tcpc_device *tcpc, bool as_sink)
+static inline int tcpci_notify_attachwait_state(struct tcpc_device *tcpc, bool as_sink)
 {
 #ifdef CONFIG_TYPEC_NOTIFY_ATTACHWAIT
 	uint8_t notify = 0;
@@ -528,8 +502,7 @@ static inline int tcpci_notify_attachwait_state(
 
 }
 
-static inline int tcpci_enable_ext_discharge(
-	struct tcpc_device *tcpc, bool en)
+static inline int tcpci_enable_ext_discharge(struct tcpc_device *tcpc, bool en)
 {
 	int ret = 0;
 
@@ -542,8 +515,7 @@ static inline int tcpci_enable_ext_discharge(
 		tcpc->typec_ext_discharge = en;
 		tcp_noti.en_state.en = en;
 		TCPC_DBG("EXT-Discharge: %d\r\n", en);
-		ret = srcu_notifier_call_chain(
-			&tcpc->evt_nh, TCP_NOTIFY_EXT_DISCHARGE, &tcp_noti);
+		ret = srcu_notifier_call_chain(	&tcpc->evt_nh, TCP_NOTIFY_EXT_DISCHARGE, &tcp_noti);
 	}
 
 	mutex_unlock(&tcpc->access_lock);
@@ -552,8 +524,7 @@ static inline int tcpci_enable_ext_discharge(
 	return ret;
 }
 
-static inline int tcpci_enable_auto_discharge(
-	struct tcpc_device *tcpc, bool en)
+static inline int tcpci_enable_auto_discharge(struct tcpc_device *tcpc, bool en)
 {
 	int ret = 0;
 
@@ -570,8 +541,7 @@ static inline int tcpci_enable_auto_discharge(
 	return ret;
 }
 
-static inline int tcpci_enable_force_discharge(
-	struct tcpc_device *tcpc, int mv)
+static inline int tcpci_enable_force_discharge(struct tcpc_device *tcpc, int mv)
 {
 	int ret = 0;
 
@@ -592,8 +562,7 @@ static inline int tcpci_enable_force_discharge(
 	return ret;
 }
 
-static inline int tcpci_disable_force_discharge(
-	struct tcpc_device *tcpc)
+static inline int tcpci_disable_force_discharge(struct tcpc_device *tcpc)
 {
 	int ret = 0;
 
@@ -616,8 +585,7 @@ static inline int tcpci_disable_force_discharge(
 
 #ifdef CONFIG_USB_POWER_DELIVERY
 
-static inline int tcpci_notify_hard_reset_state(
-	struct tcpc_device *tcpc, uint8_t state)
+static inline int tcpci_notify_hard_reset_state(struct tcpc_device *tcpc, uint8_t state)
 {
 	struct tcp_notify tcp_noti;
 
@@ -630,12 +598,10 @@ static inline int tcpci_notify_hard_reset_state(
 	else
 		return 0;
 
-	return srcu_notifier_call_chain(&tcpc->evt_nh,
-				TCP_NOTIFY_HARD_RESET_STATE, &tcp_noti);
+	return srcu_notifier_call_chain(&tcpc->evt_nh,	TCP_NOTIFY_HARD_RESET_STATE, &tcp_noti);
 }
 
-static inline int tcpci_enter_mode(struct tcpc_device *tcpc,
-	uint16_t svid, uint8_t ops, uint32_t mode)
+static inline int tcpci_enter_mode(struct tcpc_device *tcpc,uint16_t svid, uint8_t ops, uint32_t mode)
 {
 	struct tcp_notify tcp_noti;
 
@@ -643,25 +609,21 @@ static inline int tcpci_enter_mode(struct tcpc_device *tcpc,
 	tcp_noti.mode_ctrl.ops = ops;
 	tcp_noti.mode_ctrl.mode = mode;
 
-	return srcu_notifier_call_chain(
-		&tcpc->evt_nh, TCP_NOTIFY_ENTER_MODE, &tcp_noti);
+	return srcu_notifier_call_chain(&tcpc->evt_nh, TCP_NOTIFY_ENTER_MODE, &tcp_noti);
 }
 
-static inline int tcpci_exit_mode(
-	struct tcpc_device *tcpc, uint16_t svid)
+static inline int tcpci_exit_mode(struct tcpc_device *tcpc, uint16_t svid)
 {
 	struct tcp_notify tcp_noti;
 
 	tcp_noti.mode_ctrl.svid = svid;
-	return srcu_notifier_call_chain(
-		&tcpc->evt_nh, TCP_NOTIFY_EXIT_MODE, &tcp_noti);
+	return srcu_notifier_call_chain(&tcpc->evt_nh, TCP_NOTIFY_EXIT_MODE, &tcp_noti);
 
 }
 
 #ifdef CONFIG_USB_PD_ALT_MODE
 
-static inline int tcpci_report_hpd_state(
-		struct tcpc_device *tcpc, uint32_t dp_status)
+static inline int tcpci_report_hpd_state(struct tcpc_device *tcpc, uint32_t dp_status)
 {
 	struct tcp_notify tcp_noti;
 
@@ -669,29 +631,25 @@ static inline int tcpci_report_hpd_state(
 
 	if (PD_DP_CFG_DFP_D(tcpc->pd_port.local_dp_config)) {
 		tcp_noti.ama_dp_hpd_state.irq = PD_VDO_DPSTS_HPD_IRQ(dp_status);
-		tcp_noti.ama_dp_hpd_state.state =
-					PD_VDO_DPSTS_HPD_LVL(dp_status);
+		tcp_noti.ama_dp_hpd_state.state =	PD_VDO_DPSTS_HPD_LVL(dp_status);
 
 		DP_INFO("+++ hpd_state: %d +++\r\n\r\n",
 			tcp_noti.ama_dp_hpd_state.state);
 
-		srcu_notifier_call_chain(&tcpc->evt_nh,
-			TCP_NOTIFY_AMA_DP_HPD_STATE, &tcp_noti);
+		srcu_notifier_call_chain(&tcpc->evt_nh,	TCP_NOTIFY_AMA_DP_HPD_STATE, &tcp_noti);
 	}
 
 	return 0;
 }
 
-static inline int tcpci_dp_status_update(
-	struct tcpc_device *tcpc, uint32_t dp_status)
+static inline int tcpci_dp_status_update(struct tcpc_device *tcpc, uint32_t dp_status)
 {
 	DP_INFO("Status0: 0x%x\r\n", dp_status);
 	tcpci_report_hpd_state(tcpc, dp_status);
 	return 0;
 }
 
-static inline int tcpci_dp_configure(
-	struct tcpc_device *tcpc, uint32_t dp_config)
+static inline int tcpci_dp_configure(struct tcpc_device *tcpc, uint32_t dp_config)
 {
 	struct tcp_notify tcp_noti;
 
@@ -714,26 +672,22 @@ static inline int tcpci_dp_configure(
 	tcp_noti.ama_dp_state.signal = (dp_config >> 2) & 0x0f;
 	tcp_noti.ama_dp_state.polarity = tcpc->typec_polarity;
 	tcp_noti.ama_dp_state.active = 1;
-	return srcu_notifier_call_chain(&tcpc->evt_nh,
-				TCP_NOTIFY_AMA_DP_STATE, &tcp_noti);
+	return srcu_notifier_call_chain(&tcpc->evt_nh,	TCP_NOTIFY_AMA_DP_STATE, &tcp_noti);
 }
 
 
-static inline int tcpci_dp_attention(
-	struct tcpc_device *tcpc, uint32_t dp_status)
+static inline int tcpci_dp_attention(struct tcpc_device *tcpc, uint32_t dp_status)
 {
 	/* DFP_U : Not call this function during internal flow */
 	struct tcp_notify tcp_noti;
 
 	DP_INFO("Attention: 0x%x\r\n", dp_status);
 	tcp_noti.ama_dp_attention.state = (uint8_t) dp_status;
-	srcu_notifier_call_chain(&tcpc->evt_nh,
-		TCP_NOTIFY_AMA_DP_ATTENTION, &tcp_noti);
+	srcu_notifier_call_chain(&tcpc->evt_nh,	TCP_NOTIFY_AMA_DP_ATTENTION, &tcp_noti);
 	return tcpci_report_hpd_state(tcpc, dp_status);
 }
 
-static inline int tcpci_dp_notify_status_update_done(
-	struct tcpc_device *tcpc, uint32_t dp_status, bool ack)
+static inline int tcpci_dp_notify_status_update_done(struct tcpc_device *tcpc, uint32_t dp_status, bool ack)
 {
 	/* DFP_U : Not call this function during internal flow */
 	DP_INFO("Status1: 0x%x, ack=%d\r\n", dp_status, ack);
@@ -797,8 +751,7 @@ static inline int tcpci_dc_notify_en_unlock(struct tcpc_device *tcpc)
 	struct tcp_notify tcp_noti;
 
 	DC_INFO("DirectCharge en_unlock\r\n");
-	return srcu_notifier_call_chain(&tcpc->evt_nh,
-		TCP_NOTIFY_DC_EN_UNLOCK, &tcp_noti);
+	return srcu_notifier_call_chain(&tcpc->evt_nh,	TCP_NOTIFY_DC_EN_UNLOCK, &tcp_noti);
 }
 #endif	/* CONFIG_USB_PD_ALT_MODE_RTDC */
 

@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  */
 
-#include <linux/usb/pd_core.h>
+#include <linux/usb/sypd/sp_pd_core.h>
 #include <linux/usb/sypd/sp_tcpci_event.h>
 #include <linux/usb/sypd/sp_pd_process_evt.h>
 
@@ -82,8 +82,7 @@ static inline bool pd_process_ctrl_msg_good_crc(
 	}
 }
 
-static inline bool pd_process_ctrl_msg(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_ctrl_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	switch (pd_event->msg) {
 	case PD_CTRL_GOOD_CRC:

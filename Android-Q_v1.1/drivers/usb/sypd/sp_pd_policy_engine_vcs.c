@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  */
 
-#include <linux/usb/pd_core.h>
+#include <linux/usb/sypd/sp_pd_core.h>
 #include <linux/usb/sypd/sp_pd_dpm_core.h>
 #include <linux/usb/sypd/sp_tcpci.h>
 #include <linux/usb/sypd/sp_pd_policy_engine.h>

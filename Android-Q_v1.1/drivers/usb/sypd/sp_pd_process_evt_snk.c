@@ -14,7 +14,7 @@
  * GNU General Public License for more details.
  */
 
-#include <linux/usb/pd_core.h>
+#include <linux/usb/sypd/sp_pd_core.h>
 #include <linux/usb/sypd/sp_pd_dpm_core.h>
 #include <linux/usb/sypd/sp_tcpci_event.h>
 #include <linux/usb/sypd/sp_pd_process_evt.h>
@@ -190,8 +190,7 @@ static inline bool pd_process_ctrl_msg_get_source_cap(
 	return false;
 }
 
-static inline bool pd_process_ctrl_msg(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_ctrl_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool ret = false;
 
@@ -203,8 +202,7 @@ static inline bool pd_process_ctrl_msg(
 			pd_event->msg <= PD_CTRL_VCONN_SWAP) {
 			PE_DBG("Port Partner Request First\r\n");
 			pd_port->pe_state_curr = PE_SNK_READY;
-			pd_disable_timer(
-				pd_port, PD_TIMER_SENDER_RESPONSE);
+			pd_disable_timer(pd_port, PD_TIMER_SENDER_RESPONSE);
 		}
 		break;
 	}
@@ -285,8 +283,7 @@ static inline bool pd_process_ctrl_msg(
  * [BLOCK] Porcess Data MSG
  */
 
-static inline bool pd_process_data_msg(
-		struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_data_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool ret = false;
 
@@ -305,8 +302,7 @@ static inline bool pd_process_data_msg(
 
 #ifdef CONFIG_USB_PD_REV30
 	case PD_DATA_ALERT:
-		ret = PE_MAKE_STATE_TRANSIT_SINGLE(
-				PE_SNK_READY, PE_SNK_SOURCE_ALERT_RECEIVED);
+		ret = PE_MAKE_STATE_TRANSIT_SINGLE(PE_SNK_READY, PE_SNK_SOURCE_ALERT_RECEIVED);
 		break;
 #endif	/* CONFIG_USB_PD_REV30 */
 
@@ -326,21 +322,18 @@ static inline bool pd_process_data_msg(
  */
 
 #ifdef CONFIG_USB_PD_REV30
-static inline bool pd_process_ext_msg(
-		struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_ext_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool ret = false;
 
 	switch (pd_event->msg) {
 	case PD_EXT_STATUS:
-		ret = PE_MAKE_STATE_TRANSIT_SINGLE(
-				PE_SNK_GET_SOURCE_STATUS, PE_SNK_READY);
+		ret = PE_MAKE_STATE_TRANSIT_SINGLE(PE_SNK_GET_SOURCE_STATUS, PE_SNK_READY);
 		break;
 
 #ifdef CONFIG_USB_PD_REV30_PPS_SINK
 	case PD_EXT_PPS_STATUS:
-		ret = PE_MAKE_STATE_TRANSIT_SINGLE(
-				PE_SNK_GET_PPS_STATUS, PE_SNK_READY);
+		ret = PE_MAKE_STATE_TRANSIT_SINGLE(PE_SNK_GET_PPS_STATUS, PE_SNK_READY);
 		break;
 #endif	/* CONFIG_USB_PD_REV30_PPS_SINK */
 	}
@@ -353,8 +346,7 @@ static inline bool pd_process_ext_msg(
  * [BLOCK] Porcess DPM MSG
  */
 
-static inline bool pd_process_dpm_msg(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_dpm_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool ret = false;
 
@@ -374,8 +366,7 @@ static inline bool pd_process_dpm_msg(
  * [BLOCK] Porcess HW MSG
  */
 
-static inline bool pd_process_hw_msg_tx_failed(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_hw_msg_tx_failed(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	if (pd_port->pe_state_curr == PE_SNK_READY ||
 		pd_port->tcpc_dev->pd_wait_hard_reset_complete) {
@@ -383,12 +374,10 @@ static inline bool pd_process_hw_msg_tx_failed(
 		return false;
 	}
 
-	return PE_MAKE_STATE_TRANSIT_FORCE(
-		PD_HW_MSG_TX_FAILED, PE_SNK_SEND_SOFT_RESET);
+	return PE_MAKE_STATE_TRANSIT_FORCE(PD_HW_MSG_TX_FAILED, PE_SNK_SEND_SOFT_RESET);
 }
 
-static inline bool pd_process_hw_msg(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_hw_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool ret = false;
 
@@ -402,8 +391,7 @@ static inline bool pd_process_hw_msg(
 		return true;
 
 	case PD_HW_RECV_HARD_RESET:
-		ret = pd_process_recv_hard_reset(
-			pd_port, pd_event, PE_SNK_TRANSITION_TO_DEFAULT);
+		ret = pd_process_recv_hard_reset(pd_port, pd_event, PE_SNK_TRANSITION_TO_DEFAULT);
 		break;
 
 	case PD_HW_VBUS_PRESENT:
@@ -426,8 +414,7 @@ static inline bool pd_process_hw_msg(
  * [BLOCK] Porcess PE MSG
  */
 
-static inline bool pd_process_pe_msg(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_pe_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool ret = false;
 
@@ -465,8 +452,7 @@ static inline void pd_report_typec_only_charger(struct pd_port *pd_port)
 	pd_update_connect_state(pd_port, PD_CONNECT_TYPEC_ONLY);
 }
 
-static inline bool pd_process_timer_msg(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_timer_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool ret = false;
 

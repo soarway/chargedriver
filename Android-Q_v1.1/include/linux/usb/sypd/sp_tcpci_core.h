@@ -18,7 +18,7 @@
 #include <linux/device.h>
 #include <linux/hrtimer.h>
 #include <linux/workqueue.h>
-#include <linux/wakelock.h>
+//#include <linux/wakelock.h>
 #include <linux/notifier.h>
 #include <linux/semaphore.h>
 #include <linux/spinlock.h>
@@ -28,7 +28,7 @@
 #include <linux/usb/sypd/sp_tcpci_config.h>
 
 #ifdef CONFIG_USB_POWER_DELIVERY
-#include <linux/usb/pd_core.h>
+#include <linux/usb/sypd/sp_pd_core.h>
 #endif
 
 /* The switch of log message */

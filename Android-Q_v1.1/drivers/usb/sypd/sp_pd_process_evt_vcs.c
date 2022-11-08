@@ -79,8 +79,7 @@ static inline bool pd_process_ctrl_msg_good_crc(
 	}
 }
 
-static inline bool pd_process_ctrl_msg_accept(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_ctrl_msg_accept(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	if (pd_port->pe_state_curr == PE_VCS_SEND_SWAP) {
 		PE_TRANSIT_VCS_SWAP_STATE(pd_port);
@@ -90,8 +89,7 @@ static inline bool pd_process_ctrl_msg_accept(
 	return false;
 }
 
-static inline bool pd_process_ctrl_msg(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_ctrl_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool ret = false;
 

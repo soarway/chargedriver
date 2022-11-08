@@ -6,6 +6,8 @@
         "sp_tcpci_core.h": "c",
         "sp_pd_dpm_prv.h": "c",
         "sp_tcpci_event.h": "c",
-        "sp_rt1711h.h": "c"
+        "sp_rt1711h.h": "c",
+        "sp_pd_process_evt.h": "c",
+        "sp_pd_policy_engine.h": "c"
     }
 }

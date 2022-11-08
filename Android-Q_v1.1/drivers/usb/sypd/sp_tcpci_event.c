@@ -86,8 +86,7 @@ static void __pd_free_msg(struct tcpc_device *tcpc_dev, struct pd_msg *pd_msg)
 	tcpc_dev->pd_msg_buffer_allocated &= (~mask);
 }
 
-static void __pd_free_event(
-		struct tcpc_device *tcpc_dev, struct pd_event *pd_event)
+static void __pd_free_event(struct tcpc_device *tcpc_dev, struct pd_event *pd_event)
 {
 	if (pd_event->pd_msg) {
 		__pd_free_msg(tcpc_dev, pd_event->pd_msg);
@@ -111,8 +110,7 @@ void pd_free_event(struct tcpc_device *tcpc_dev, struct pd_event *pd_event)
 
 /*----------------------------------------------------------------------------*/
 
-static bool __pd_get_event(
-	struct tcpc_device *tcpc_dev, struct pd_event *pd_event)
+static bool __pd_get_event(struct tcpc_device *tcpc_dev, struct pd_event *pd_event)
 {
 	int index = 0;
 
@@ -121,8 +119,7 @@ static bool __pd_get_event(
 
 	tcpc_dev->pd_event_count--;
 
-	*pd_event = tcpc_dev->
-		pd_event_ring_buffer[tcpc_dev->pd_event_head_index];
+	*pd_event = tcpc_dev->pd_event_ring_buffer[tcpc_dev->pd_event_head_index];
 
 	if (tcpc_dev->pd_event_count) {
 		index = tcpc_dev->pd_event_head_index + 1;
@@ -168,8 +165,7 @@ static bool __pd_put_event(struct tcpc_device *tcpc_dev,
 	return true;
 }
 
-bool pd_put_event(struct tcpc_device *tcpc_dev, const struct pd_event *pd_event,
-	bool from_port_partner)
+bool pd_put_event(struct tcpc_device *tcpc_dev, const struct pd_event *pd_event,bool from_port_partner)
 {
 	bool ret;
 
@@ -182,8 +178,7 @@ bool pd_put_event(struct tcpc_device *tcpc_dev, const struct pd_event *pd_event,
 
 /*----------------------------------------------------------------------------*/
 
-static inline void pd_get_attention_event(
-	struct tcpc_device *tcpc_dev, struct pd_event *pd_event)
+static inline void pd_get_attention_event(struct tcpc_device *tcpc_dev, struct pd_event *pd_event)
 {
 	struct pd_event attention_evt = {
 		.event_type = PD_EVT_PD_MSG,
@@ -278,8 +273,7 @@ bool pd_get_vdm_event(struct tcpc_device *tcpc_dev, struct pd_event *pd_event)
 	return false;
 }
 
-static inline bool reset_pe_vdm_state(
-		struct tcpc_device *tcpc_dev, uint32_t vdm_hdr)
+static inline bool reset_pe_vdm_state(struct tcpc_device *tcpc_dev, uint32_t vdm_hdr)
 {
 	bool vdm_reset = false;
 	struct pd_port *pd_port = &tcpc_dev->pd_port;
@@ -298,8 +292,7 @@ static inline bool reset_pe_vdm_state(
 	return vdm_reset;
 }
 
-static inline bool pd_is_init_attention_event(
-	struct tcpc_device *tcpc_dev, struct pd_event *pd_event)
+static inline bool pd_is_init_attention_event(struct tcpc_device *tcpc_dev, struct pd_event *pd_event)
 {
 	uint32_t vdm_hdr = pd_event->pd_msg->payload[0];
 
@@ -337,10 +330,7 @@ bool pd_put_vdm_event(struct tcpc_device *tcpc_dev,
 		ignore_evt = !from_port_partner;
 
 		if (from_port_partner) {
-			if (pd_event_msg_match(
-					&tcpc_dev->pd_vdm_event,
-					PD_EVT_CTRL_MSG,
-					PD_CTRL_GOOD_CRC)) {
+			if (pd_event_msg_match(	&tcpc_dev->pd_vdm_event,PD_EVT_CTRL_MSG,PD_CTRL_GOOD_CRC)) {
 				TCPC_DBG2("PostponeVDM GoodCRC\r\n");
 				tcpc_dev->pd_pending_vdm_good_crc = true;
 			}
@@ -424,8 +414,7 @@ bool pd_put_last_vdm_event(struct tcpc_device *tcpc_dev)
 
 /*----------------------------------------------------------------------------*/
 
-static bool __pd_get_deferred_tcp_event(
-	struct tcpc_device *tcpc_dev, struct tcp_dpm_event *tcp_event)
+static bool __pd_get_deferred_tcp_event(struct tcpc_device *tcpc_dev, struct tcp_dpm_event *tcp_event)
 {
 	int index = 0;
 
@@ -445,8 +434,7 @@ static bool __pd_get_deferred_tcp_event(
 	return true;
 }
 
-bool pd_get_deferred_tcp_event(
-	struct tcpc_device *tcpc_dev, struct tcp_dpm_event *tcp_event)
+bool pd_get_deferred_tcp_event(struct tcpc_device *tcpc_dev, struct tcp_dpm_event *tcp_event)
 {
 	bool ret;
 
@@ -457,8 +445,7 @@ bool pd_get_deferred_tcp_event(
 	return ret;
 }
 
-static bool __pd_put_deferred_tcp_event(
-	struct tcpc_device *tcpc_dev, const struct tcp_dpm_event *tcp_event)
+static bool __pd_put_deferred_tcp_event(struct tcpc_device *tcpc_dev, const struct tcp_dpm_event *tcp_event)
 {
 	int index;
 
@@ -473,8 +460,7 @@ static bool __pd_put_deferred_tcp_event(
 	return true;
 }
 
-bool pd_put_deferred_tcp_event(
-	struct tcpc_device *tcpc_dev, const struct tcp_dpm_event *tcp_event)
+bool pd_put_deferred_tcp_event(struct tcpc_device *tcpc_dev, const struct tcp_dpm_event *tcp_event)
 {
 	bool ret;
 
@@ -588,8 +574,7 @@ void pd_notify_tcp_event_1st_result(struct pd_port *pd_port, int ret)
 	pd_port->tcp_event_id_1st = TCP_DPM_EVT_UNKONW;
 }
 
-static void __tcp_event_buf_reset(
-	struct tcpc_device *tcpc_dev, uint8_t reason)
+static void __tcp_event_buf_reset(struct tcpc_device *tcpc_dev, uint8_t reason)
 {
 	struct tcp_dpm_event tcp_event;
 
@@ -638,8 +623,7 @@ static void __pd_event_buf_reset(struct tcpc_device *tcpc_dev, uint8_t reason)
 
 /*----------------------------------------------------------------------------*/
 
-static inline bool __pd_put_hw_event(
-	struct tcpc_device *tcpc_dev, uint8_t hw_event)
+static inline bool __pd_put_hw_event(struct tcpc_device *tcpc_dev, uint8_t hw_event)
 {
 	struct pd_event evt = {
 		.event_type = PD_EVT_HW_MSG,
@@ -650,8 +634,7 @@ static inline bool __pd_put_hw_event(
 	return __pd_put_event(tcpc_dev, &evt, false);
 }
 
-static inline bool __pd_put_pe_event(
-	struct tcpc_device *tcpc_dev, uint8_t pe_event)
+static inline bool __pd_put_pe_event(struct tcpc_device *tcpc_dev, uint8_t pe_event)
 {
 	struct pd_event evt = {
 		.event_type = PD_EVT_PE_MSG,
@@ -662,8 +645,7 @@ static inline bool __pd_put_pe_event(
 	return __pd_put_event(tcpc_dev, &evt, false);
 }
 
-bool pd_put_cc_attached_event(
-		struct tcpc_device *tcpc_dev, uint8_t type)
+bool pd_put_cc_attached_event(struct tcpc_device *tcpc_dev, uint8_t type)
 {
 	struct pd_event evt = {
 		.event_type = PD_EVT_HW_MSG,
@@ -695,8 +677,7 @@ void pd_put_cc_detached_event(struct tcpc_device *tcpc_dev)
 {
 	mutex_lock(&tcpc_dev->access_lock);
 
-	tcpci_notify_hard_reset_state(
-		tcpc_dev, TCP_HRESET_RESULT_FAIL);
+	tcpci_notify_hard_reset_state(tcpc_dev, TCP_HRESET_RESULT_FAIL);
 
 	__pd_event_buf_reset(tcpc_dev, TCP_DPM_RET_DROP_CC_DETACH);
 	__pd_put_hw_event(tcpc_dev, PD_HW_CC_DETACHED);

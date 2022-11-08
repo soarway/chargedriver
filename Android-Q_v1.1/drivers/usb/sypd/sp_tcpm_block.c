@@ -49,8 +49,7 @@ static const char * const bk_event_ret_name[] = {
 	"NAK"
 };
 
-int tcpm_dpm_bk_event_cb(
-	struct tcpc_device *tcpc, int ret, struct tcp_dpm_event *event)
+int tcpm_dpm_bk_event_cb(struct tcpc_device *tcpc, int ret, struct tcp_dpm_event *event)
 {
 	struct pd_port *pd_port = &tcpc->pd_port;
 
@@ -77,8 +76,7 @@ int tcpm_dpm_wait_bk_event(struct pd_port *pd_port, uint32_t tout_ms)
 	return TCP_DPM_RET_BK_TIMEOUT;
 }
 
-static int tcpm_put_tcp_dpm_event_bk(
-	struct tcpc_device *tcpc, uint32_t tout_ms, struct tcp_dpm_event *event)
+static int tcpm_put_tcp_dpm_event_bk(struct tcpc_device *tcpc, uint32_t tout_ms, struct tcp_dpm_event *event)
 {
 	int ret;
 	struct pd_port *pd_port = &tcpc->pd_port;
@@ -181,8 +179,7 @@ int tcpm_dpm_pd_request_bk(struct tcpc_device *tcpc, int mv, int ma)
 	return tcpm_put_tcp_dpm_event_bk(tcpc, 1000, &tcp_event);
 }
 
-int tcpm_dpm_pd_request_ex_bk(struct tcpc_device *tcpc,
-	uint8_t pos, uint32_t max, uint32_t oper)
+int tcpm_dpm_pd_request_ex_bk(struct tcpc_device *tcpc,	uint8_t pos, uint32_t max, uint32_t oper)
 {
 	struct tcp_dpm_event tcp_event = {
 		.event_id = TCP_DPM_EVT_REQUEST_EX,
@@ -235,8 +232,7 @@ int tcpm_dpm_send_uvdm_bk(struct tcpc_device *tcpc,
 		return ret;
 
 	if (wait_resp) {
-		memcpy(data, tcpc->pd_port.uvdm_data,
-			sizeof(uint32_t) * tcpc->pd_port.uvdm_cnt);
+		memcpy(data, tcpc->pd_port.uvdm_data,sizeof(uint32_t) * tcpc->pd_port.uvdm_cnt);
 	}
 
 	return TCP_DPM_RET_SUCCESS;
@@ -282,8 +278,7 @@ int tcpm_set_apdo_boundary(struct tcpc_device *tcpc, uint8_t index)
 	return TCPM_SUCCESS;
 }
 
-int tcpm_set_apdo_charging_policy_bk(
-	struct tcpc_device *tcpc, uint8_t policy, int mv, int ma)
+int tcpm_set_apdo_charging_policy_bk(struct tcpc_device *tcpc, uint8_t policy, int mv, int ma)
 {
 	int ret;
 	struct tcpm_power_cap_val cap_val;
@@ -303,8 +298,7 @@ int tcpm_set_apdo_charging_policy_bk(
 		return TCPM_SUCCESS;
 
 	if (pd_port->request_apdo_pos == 0) {
-		ret = tcpm_inquire_pd_source_apdo(tcpc,
-			TCPM_POWER_CAP_APDO_TYPE_PPS,
+		ret = tcpm_inquire_pd_source_apdo(tcpc,	TCPM_POWER_CAP_APDO_TYPE_PPS,
 			&pd_port->request_apdo_pos, &cap_val);
 
 		if (ret != TCPM_SUCCESS)
@@ -320,8 +314,7 @@ int tcpm_set_apdo_charging_policy_bk(
 	return tcpm_put_tcp_dpm_event_bk(tcpc, 1500, &tcp_event);
 }
 
-int tcpm_dpm_pd_get_status_bk(
-	struct tcpc_device *tcpc, uint8_t *status)
+int tcpm_dpm_pd_get_status_bk(struct tcpc_device *tcpc, uint8_t *status)
 {
 	int ret;
 
@@ -339,8 +332,7 @@ int tcpm_dpm_pd_get_status_bk(
 	return TCPM_SUCCESS;
 }
 
-int tcpm_dpm_pd_get_pps_status_bk(
-	struct tcpc_device *tcpc, uint8_t *pps_status)
+int tcpm_dpm_pd_get_pps_status_bk(struct tcpc_device *tcpc, uint8_t *pps_status)
 {
 	int ret;
 
@@ -353,8 +345,7 @@ int tcpm_dpm_pd_get_pps_status_bk(
 	if (ret != TCPM_SUCCESS)
 		return ret;
 
-	memcpy(pps_status,
-		tcpc->pd_port.remote_pps_status, TCPM_PD_PPSDB_SIZE);
+	memcpy(pps_status,	tcpc->pd_port.remote_pps_status, TCPM_PD_PPSDB_SIZE);
 	return TCPM_SUCCESS;
 }
 

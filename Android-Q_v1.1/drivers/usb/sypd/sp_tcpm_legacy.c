@@ -80,8 +80,7 @@ int tcpm_hard_reset(struct tcpc_device *tcpc_dev)
 	return tcpm_dpm_pd_hard_reset(tcpc_dev);
 }
 
-int tcpm_get_source_cap(
-	struct tcpc_device *tcpc_dev, struct tcpm_power_cap *cap)
+int tcpm_get_source_cap(struct tcpc_device *tcpc_dev, struct tcpm_power_cap *cap)
 {
 	if (cap == NULL)
 		return tcpm_dpm_pd_get_source_cap(tcpc_dev, NULL);
@@ -89,8 +88,7 @@ int tcpm_get_source_cap(
 	return tcpm_inquire_pd_source_cap(tcpc_dev, cap);
 }
 
-int tcpm_get_sink_cap(
-	struct tcpc_device *tcpc_dev, struct tcpm_power_cap *cap)
+int tcpm_get_sink_cap(struct tcpc_device *tcpc_dev, struct tcpm_power_cap *cap)
 {
 	if (cap == NULL)
 		return tcpm_dpm_pd_get_sink_cap(tcpc_dev, NULL);
@@ -121,8 +119,7 @@ int tcpm_discover_cable(struct tcpc_device *tcpc_dev, uint32_t *vdos)
 	return tcpm_inquire_cable_inform(tcpc_dev, vdos);
 }
 
-int tcpm_vdm_request_id(
-	struct tcpc_device *tcpc_dev, uint32_t *vdos)
+int tcpm_vdm_request_id(struct tcpc_device *tcpc_dev, uint32_t *vdos)
 {
 	if (vdos == NULL)
 		return tcpm_dpm_vdm_discover_id(tcpc_dev, NULL);
@@ -132,22 +129,19 @@ int tcpm_vdm_request_id(
 
 #ifdef CONFIG_USB_PD_ALT_MODE
 
-int tcpm_dp_attention(
-	struct tcpc_device *tcpc_dev, uint32_t dp_status)
+int tcpm_dp_attention(struct tcpc_device *tcpc_dev, uint32_t dp_status)
 {
 	return tcpm_dpm_dp_attention(tcpc_dev, dp_status, 0xffffffff, NULL);
 }
 
 #ifdef CONFIG_USB_PD_ALT_MODE_DFP
 
-int tcpm_dp_status_update(
-	struct tcpc_device *tcpc_dev, uint32_t dp_status)
+int tcpm_dp_status_update(struct tcpc_device *tcpc_dev, uint32_t dp_status)
 {
 	return tcpm_dpm_dp_status_update(tcpc_dev, dp_status, 0xffffffff, NULL);
 }
 
-int tcpm_dp_configuration(
-	struct tcpc_device *tcpc_dev, uint32_t dp_config)
+int tcpm_dp_configuration(struct tcpc_device *tcpc_dev, uint32_t dp_config)
 {
 	return tcpm_dpm_dp_config(tcpc_dev, dp_config, 0xffffffff, NULL);
 }
@@ -156,8 +150,7 @@ int tcpm_dp_configuration(
 #endif	/* CONFIG_USB_PD_ALT_MODE */
 
 #ifdef CONFIG_USB_PD_UVDM
-int tcpm_send_uvdm(struct tcpc_device *tcpc_dev,
-	uint8_t cnt, uint32_t *data, bool wait_resp)
+int tcpm_send_uvdm(struct tcpc_device *tcpc_dev, uint8_t cnt, uint32_t *data, bool wait_resp)
 {
 	return tcpm_dpm_send_uvdm(tcpc_dev, cnt, data, wait_resp, NULL);
 }
