@@ -26,7 +26,7 @@
 
 #ifdef CONFIG_USB_POWER_DELIVERY
 #include <linux/usb/sypd/sp_pd_dpm_prv.h>
-#include <linux/usb/sypd/so_tcpm.h>
+#include <linux/usb/sypd/sp_tcpm.h>
 #endif /* CONFIG_USB_POWER_DELIVERY */
 
 #define TCPC_CORE_VERSION		"1.2.1_G"
@@ -534,8 +534,8 @@ static int __init tcpc_class_init(void)
 		return PTR_ERR(tcpc_class);
 	}
 	tcpc_init_attrs(&tcpc_dev_type);
-	tcpc_class->suspend = NULL;
-	tcpc_class->resume = NULL;
+	//tcpc_class->suspend = NULL;
+	//tcpc_class->resume = NULL;
 
 	pr_info("[OBEI]TCPC class init OK\n");
 	return 0;

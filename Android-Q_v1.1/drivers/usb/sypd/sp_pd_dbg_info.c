@@ -19,8 +19,9 @@
 #include <linux/version.h>
 #include <linux/delay.h>
 #include <linux/platform_device.h>
-#include <linux/sched.h>
+#include <uapi/linux/sched/types.h>
 #include <linux/mutex.h>
+#include <linux/sched/clock.h>//uu+ for local_clock()
 #include <linux/kthread.h>
 #include <linux/usb/sypd/sp_pd_dbg_info.h>
 

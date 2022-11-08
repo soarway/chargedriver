@@ -175,6 +175,9 @@ source "drivers/usb/roles/Kconfig"
 
 source "drivers/usb/pd/Kconfig"
 
+config USB_SYPD
+	def_bool y
+
 source "drivers/usb/sypd/Kconfig"
 
 config USB_LED_TRIG

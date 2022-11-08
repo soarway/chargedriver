@@ -14,6 +14,7 @@
  * GNU General Public License for more details.
  */
 
+#include <linux/sched/clock.h>//uu+ for local_clock()
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/device.h>
@@ -29,7 +30,8 @@
 #include <linux/kthread.h>
 #include <linux/cpu.h>
 #include <linux/version.h>
-
+#include <linux/kthread.h>
+#include <uapi/linux/sched/types.h>
 #include <linux/usb/sypd/sp_pd_dbg_info.h>
 #include <linux/usb/sypd/sp_tcpci.h>
 #include <linux/usb/sypd/sp_rt1711h.h>
@@ -211,8 +213,7 @@ static int rt1711_write_device(void *client, u32 reg, int len, const void *src)
 
 	while (count) {
 		if (len > 1) {
-			ret = i2c_smbus_write_i2c_block_data(i2c,
-							reg, len, src);
+			ret = i2c_smbus_write_i2c_block_data(i2c,reg, len, src);
 			if (ret < 0)
 				count--;
 			else
@@ -263,8 +264,7 @@ static int rt1711_reg_write(struct i2c_client *i2c, u8 reg, const u8 data)
 	return ret;
 }
 
-static int rt1711_block_read(struct i2c_client *i2c,
-			u8 reg, int len, void *dst)
+static int rt1711_block_read(struct i2c_client *i2c,u8 reg, int len, void *dst)
 {
 	struct rt1711_chip *chip = i2c_get_clientdata(i2c);
 	int ret = 0;
@@ -278,8 +278,7 @@ static int rt1711_block_read(struct i2c_client *i2c,
 	return ret;
 }
 
-static int rt1711_block_write(struct i2c_client *i2c,
-			u8 reg, int len, const void *src)
+static int rt1711_block_write(struct i2c_client *i2c,u8 reg, int len, const void *src)
 {
 	struct rt1711_chip *chip = i2c_get_clientdata(i2c);
 	int ret = 0;
@@ -293,8 +292,7 @@ static int rt1711_block_write(struct i2c_client *i2c,
 	return ret;
 }
 
-static int32_t rt1711_write_word(struct i2c_client *client,
-					uint8_t reg_addr, uint16_t data)
+static int32_t rt1711_write_word(struct i2c_client *client,	uint8_t reg_addr, uint16_t data)
 {
 	int ret;
 
@@ -303,8 +301,7 @@ static int32_t rt1711_write_word(struct i2c_client *client,
 	return ret;
 }
 
-static int32_t rt1711_read_word(struct i2c_client *client,
-					uint8_t reg_addr, uint16_t *data)
+static int32_t rt1711_read_word(struct i2c_client *client,uint8_t reg_addr, uint16_t *data)
 {
 	int ret;
 
@@ -313,16 +310,14 @@ static int32_t rt1711_read_word(struct i2c_client *client,
 	return ret;
 }
 
-static inline int rt1711_i2c_write8(
-	struct tcpc_device *tcpc, u8 reg, const u8 data)
+static inline int rt1711_i2c_write8(struct tcpc_device *tcpc, u8 reg, const u8 data)
 {
 	struct rt1711_chip *chip = tcpc_get_dev_data(tcpc);
 
 	return rt1711_reg_write(chip->client, reg, data);
 }
 
-static inline int rt1711_i2c_write16(
-		struct tcpc_device *tcpc, u8 reg, const u16 data)
+static inline int rt1711_i2c_write16(struct tcpc_device *tcpc, u8 reg, const u16 data)
 {
 	struct rt1711_chip *chip = tcpc_get_dev_data(tcpc);
 
@@ -336,8 +331,7 @@ static inline int rt1711_i2c_read8(struct tcpc_device *tcpc, u8 reg)
 	return rt1711_reg_read(chip->client, reg);
 }
 
-static inline int rt1711_i2c_read16(
-	struct tcpc_device *tcpc, u8 reg)
+static inline int rt1711_i2c_read16(struct tcpc_device *tcpc, u8 reg)
 {
 	struct rt1711_chip *chip = tcpc_get_dev_data(tcpc);
 	u16 data;
@@ -442,18 +436,14 @@ static int rt1711_init_power_status_mask(struct tcpc_device *tcpc)
 {
 	const uint8_t mask = TCPC_V10_REG_POWER_STATUS_VBUS_PRES;
 
-	return rt1711_i2c_write8(tcpc,
-			TCPC_V10_REG_POWER_STATUS_MASK, mask);
+	return rt1711_i2c_write8(tcpc,TCPC_V10_REG_POWER_STATUS_MASK, mask);
 }
 
 static int rt1711_init_fault_mask(struct tcpc_device *tcpc)
 {
-	const uint8_t mask =
-		TCPC_V10_REG_FAULT_STATUS_VCONN_OV |
-		TCPC_V10_REG_FAULT_STATUS_VCONN_OC;
+	const uint8_t mask =TCPC_V10_REG_FAULT_STATUS_VCONN_OV |TCPC_V10_REG_FAULT_STATUS_VCONN_OC;
 
-	return rt1711_i2c_write8(tcpc,
-			TCPC_V10_REG_FAULT_STATUS_MASK, mask);
+	return rt1711_i2c_write8(tcpc,TCPC_V10_REG_FAULT_STATUS_MASK, mask);
 }
 
 static int rt1711_init_rt_mask(struct tcpc_device *tcpc)
@@ -488,14 +478,12 @@ static inline void rt1711_poll_ctrl(struct rt1711_chip *chip)
 		cpu_idle_poll_ctrl(true);
 	}
 
-	schedule_delayed_work(
-		&chip->poll_work, msecs_to_jiffies(40));
+	schedule_delayed_work(&chip->poll_work, msecs_to_jiffies(40));
 }
 
 static void rt1711_irq_work_handler(struct kthread_work *work)
 {
-	struct rt1711_chip *chip =
-			container_of(work, struct rt1711_chip, irq_work);
+	struct rt1711_chip *chip = container_of(work, struct rt1711_chip, irq_work);
 	int regval = 0;
 	int gpio_val;
 
@@ -543,7 +531,7 @@ static irqreturn_t rt1711_intr_handler(int irq, void *data)
 #ifdef DEBUG_GPIO
 	gpio_set_value(DEBUG_GPIO, 0);
 #endif
-	queue_kthread_work(&chip->irq_worker, &chip->irq_work);
+    kthread_queue_work(&chip->irq_worker, &chip->irq_work);//uu+
 	return IRQ_HANDLED;
 }
 
@@ -588,31 +576,26 @@ static int rt1711_init_alert(struct tcpc_device *tcpc)
 
 	chip->irq = gpio_to_irq(chip->irq_gpio);
 	if (chip->irq <= 0) {
-		pr_err("[OBEI]%s gpio to irq fail, chip->irq(%d)\n",
-						__func__, chip->irq);
+		pr_err("[OBEI]%s gpio to irq fail, chip->irq(%d)\n",__func__, chip->irq);
 		goto init_alert_err;
 	}
 
 	pr_info("[OBEI]%s : IRQ number = %d\n", __func__, chip->irq);
 
-	init_kthread_worker(&chip->irq_worker);
-	chip->irq_worker_task = kthread_run(kthread_worker_fn,
-			&chip->irq_worker, chip->tcpc_desc->name);
+    kthread_init_worker(&chip->irq_worker);//uu+
+	chip->irq_worker_task = kthread_run(kthread_worker_fn,	&chip->irq_worker, chip->tcpc_desc->name);
 	if (IS_ERR(chip->irq_worker_task)) {
 		pr_err("[OBEI]Error: Could not create tcpc task\n");
 		goto init_alert_err;
 	}
 
 	sched_setscheduler(chip->irq_worker_task, SCHED_FIFO, &param);
-	init_kthread_work(&chip->irq_work, rt1711_irq_work_handler);
-
+	//init_kthread_work(&chip->irq_work, rt1711_irq_work_handler);
+    kthread_init_work(&chip->irq_work, rt1711_irq_work_handler);//uu+
 	pr_info("[OBEI]IRQF_NO_THREAD Test\r\n");
-	ret = request_irq(chip->irq, rt1711_intr_handler,
-		IRQF_TRIGGER_FALLING | IRQF_NO_THREAD |
-		IRQF_NO_SUSPEND, name, chip);
+	ret = request_irq(chip->irq, rt1711_intr_handler,IRQF_TRIGGER_FALLING | IRQF_NO_THREAD |IRQF_NO_SUSPEND, name, chip);
 	if (ret < 0) {
-		pr_err("[OBEI]Error: failed to request irq%d (gpio = %d, ret = %d)\n",
-			chip->irq, chip->irq_gpio, ret);
+		pr_err("[OBEI]Error: failed to request irq%d (gpio = %d, ret = %d)\n",chip->irq, chip->irq_gpio, ret);
 		goto init_alert_err;
 	}
 
@@ -1549,7 +1532,7 @@ static void rt1711_shutdown(struct i2c_client *client)
 	}
 }
 
-#ifdef CONFIG_PM_RUNTIME
+//#ifdef CONFIG_PM_RUNTIME
 static int rt1711_pm_suspend_runtime(struct device *device)
 {
 	dev_dbg(device, "[OBEI]pm_runtime: suspending...\n");
@@ -1561,12 +1544,13 @@ static int rt1711_pm_resume_runtime(struct device *device)
 	dev_dbg(device, "[OBEI]pm_runtime: resuming...\n");
 	return 0;
 }
-#endif /* #ifdef CONFIG_PM_RUNTIME */
 
 static const struct dev_pm_ops rt1711_pm_ops = {
 	SET_SYSTEM_SLEEP_PM_OPS(rt1711_i2c_suspend,	rt1711_i2c_resume)
 	SET_RUNTIME_PM_OPS(rt1711_pm_suspend_runtime,rt1711_pm_resume_runtime,NULL)
 };
+//#endif /* #ifdef CONFIG_PM_RUNTIME */
+
 #define RT1711_PM_OPS	(&rt1711_pm_ops)
 #else
 #define RT1711_PM_OPS	(NULL)

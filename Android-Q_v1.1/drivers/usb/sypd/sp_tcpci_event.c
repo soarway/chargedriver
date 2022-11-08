@@ -17,10 +17,10 @@
 #include <linux/kthread.h>
 #include <linux/atomic.h>
 #include <linux/delay.h>
-#include <linux/sched.h>
+
 #include <linux/jiffies.h>
 #include <linux/version.h>
-
+#include <uapi/linux/sched/types.h>
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 9, 0))
 #include <linux/sched/rt.h>
 #endif /* #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 9, 0)) */
