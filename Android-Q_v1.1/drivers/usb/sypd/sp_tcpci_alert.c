@@ -22,15 +22,15 @@
 #include <linux/delay.h>
 #include <linux/cpu.h>
 
-#include <linux/usb/tcpci.h>
-#include <linux/usb/tcpci_typec.h>
+#include <linux/usb/sypd/sp_tcpci.h>
+#include <linux/usb/sypd/sp_tcpci_typec.h>
 
 #ifdef CONFIG_USB_POWER_DELIVERY
-#include <linux/usb/tcpci_event.h>
+#include <linux/usb/sypd/sp_tcpci_event.h>
 #endif /* CONFIG_USB_POWER_DELIVERY */
 
 #ifdef CONFIG_DUAL_ROLE_USB_INTF
-#include <linux/usb/class-dual-role.h>
+#include <linux/usb/sypd/sp_class-dual-role.h>
 #endif /* CONFIG_DUAL_ROLE_USB_INTF */
 
 /*
@@ -186,8 +186,7 @@ static int tcpci_alert_recv_msg(struct tcpc_device *tcpc_dev)
 	struct pd_msg *pd_msg;
 	enum tcpm_transmit_type type;
 
-	const uint32_t alert_rx =
-		TCPC_REG_ALERT_RX_STATUS | TCPC_REG_ALERT_RX_BUF_OVF;
+	const uint32_t alert_rx = TCPC_REG_ALERT_RX_STATUS | TCPC_REG_ALERT_RX_BUF_OVF;
 
 	pd_msg = pd_alloc_msg(tcpc_dev);
 	if (pd_msg == NULL) {
@@ -310,8 +309,7 @@ const struct tcpci_alert_handler tcpci_alert_handlers[] = {
 #ifdef CONFIG_USB_POWER_DELIVERY
 static inline bool tcpci_check_hard_reset_complete(struct tcpc_device *tcpc_dev, uint32_t alert_status)
 {
-	if ((alert_status & TCPC_REG_ALERT_HRESET_SUCCESS)
-			== TCPC_REG_ALERT_HRESET_SUCCESS) {
+	if ((alert_status & TCPC_REG_ALERT_HRESET_SUCCESS)	== TCPC_REG_ALERT_HRESET_SUCCESS) {
 		pd_put_sent_hard_reset_event(tcpc_dev);
 		return true;
 	}
@@ -340,8 +338,7 @@ static inline int __tcpci_alert(struct tcpc_device *tcpc_dev)
 		TCPC_INFO("Alert:0x%04x\r\n", alert_status);
 #endif /* CONFIG_USB_PD_DBG_ALERT_STATUS */
 
-	tcpci_alert_status_clear(tcpc_dev,
-		alert_status & (~TCPC_REG_ALERT_RX_MASK));
+	tcpci_alert_status_clear(tcpc_dev,	alert_status & (~TCPC_REG_ALERT_RX_MASK));
 
 	if (tcpc_dev->typec_role == TYPEC_ROLE_UNKNOWN)
 		return 0;
@@ -391,12 +388,14 @@ int tcpci_alert(struct tcpc_device *tcpc_dev)
 
 static inline void tcpci_attach_wake_lock(struct tcpc_device *tcpc)
 {
-#ifdef CONFIG_TCPC_ATTACH_WAKE_LOCK_TOUT
-	wake_lock_timeout(&tcpc->attach_wake_lock,
-		CONFIG_TCPC_ATTACH_WAKE_LOCK_TOUT * HZ);
-#else
-	wake_lock(&tcpc->attach_wake_lock);
-#endif	/* CONFIG_TCPC_ATTACH_WAKE_LOCK_TOUT */
+#ifdef OLD_WAKE_LOCK
+	#ifdef CONFIG_TCPC_ATTACH_WAKE_LOCK_TOUT
+		wake_lock_timeout(&tcpc->attach_wake_lock, CONFIG_TCPC_ATTACH_WAKE_LOCK_TOUT * HZ);
+	#else
+		wake_lock(&tcpc->attach_wake_lock);
+	#endif	/* CONFIG_TCPC_ATTACH_WAKE_LOCK_TOUT */
+#endif
+
 }
 
 int tcpci_set_wake_lock(struct tcpc_device *tcpc, bool pd_lock, bool user_lock)
@@ -423,7 +422,9 @@ int tcpci_set_wake_lock(struct tcpc_device *tcpc, bool pd_lock, bool user_lock)
 			TCPC_DBG("wake_lock=0\r\n");
 			if (tcpc->typec_watchdog)
 				tcpci_set_intrst(tcpc, false);
+			#ifdef OLD_WAKE_LOCK
 			wake_unlock(&tcpc->attach_wake_lock);
+			#endif
 		}
 		return 1;
 	}
@@ -444,13 +445,17 @@ static inline int tcpci_set_wake_lock_pd(struct tcpc_device *tcpc, bool pd_lock)
 	else if (wake_lock_pd > 0)
 		wake_lock_pd--;
 
+	#ifdef OLD_WAKE_LOCK
 	if (wake_lock_pd == 0)
 		wake_lock_timeout(&tcpc->dettach_temp_wake_lock, 5 * HZ);
+	#endif
 
 	tcpci_set_wake_lock(tcpc, wake_lock_pd, tcpc->wake_lock_user);
 
+	#ifdef OLD_WAKE_LOCK
 	if (wake_lock_pd == 1)
 		wake_unlock(&tcpc->dettach_temp_wake_lock);
+	#endif
 
 	tcpc->wake_lock_pd = wake_lock_pd;
 	mutex_unlock(&tcpc->access_lock);

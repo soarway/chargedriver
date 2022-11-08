@@ -20,7 +20,7 @@
 #ifdef CONFIG_USB_POWER_DELIVERY
 #ifdef CONFIG_USB_PD_BLOCK_TCPM
 
-#include <linux/usb/tcpm.h>
+#include <linux/usb/sypd/sp_tcpm.h>
 
 extern int tcpm_dpm_pd_power_swap_bk(struct tcpc_device *tcpc, uint8_t role);
 extern int tcpm_dpm_pd_data_swap_bk(struct tcpc_device *tcpc, uint8_t role);

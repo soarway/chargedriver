@@ -282,6 +282,7 @@ struct tcpc_ops {
  * tcpc device
  */
 
+
 struct tcpc_device {
 	struct i2c_client *client;
 	struct tcpc_ops *ops;
@@ -290,8 +291,10 @@ struct tcpc_device {
 	struct device dev;
 	bool wake_lock_user;
 	uint8_t wake_lock_pd;
+	#ifdef OLD_WAKE_LOCK
 	struct wake_lock attach_wake_lock;
 	struct wake_lock dettach_temp_wake_lock;
+	#endif
 
 	/* For tcpc timer & event */
 	uint32_t timer_handle_index;

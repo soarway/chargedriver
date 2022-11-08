@@ -35,7 +35,7 @@
 #include <linux/usb/sypd/sp_rt1711h.h>
 
 #ifdef CONFIG_RT_REGMAP
-#include <linux/misc/rt-regmap.h>
+#include <linux/usb/sypd/sp_rt-regmap.h>
 #endif /* CONFIG_RT_REGMAP */
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 9, 0))
@@ -44,9 +44,12 @@
 
 /* #define DEBUG_GPIO	66 */
 
-#define RT1711H_DRV_VERSION	"1.2.1_G"
+#define RT1711H_DRV_VERSION	"1.2.1"
 
 #define RT1711H_IRQ_WAKE_TIME	(500) /* ms */
+
+
+
 
 struct rt1711_chip {
 	struct i2c_client *client;
@@ -61,7 +64,10 @@ struct rt1711_chip {
 	struct kthread_worker irq_worker;
 	struct kthread_work irq_work;
 	struct task_struct *irq_worker_task;
+
+	#ifdef OLD_WAKE_LOCK
 	struct wake_lock irq_wake_lock;
+	#endif
 
 	atomic_t poll_count;
 	struct delayed_work	poll_work;
@@ -364,8 +370,7 @@ static int rt1711_regmap_init(struct rt1711_chip *chip)
 	props->register_num = RT1711_CHIP_REGMAP_SIZE;
 	props->rm = rt1711_chip_regmap;
 
-	props->rt_regmap_mode = RT_MULTI_BYTE | RT_CACHE_DISABLE |
-				RT_IO_PASS_THROUGH | RT_DBG_GENERAL;
+	props->rt_regmap_mode = RT_MULTI_BYTE | RT_CACHE_DISABLE | RT_IO_PASS_THROUGH | RT_DBG_GENERAL;
 	snprintf(name, sizeof(name), "rt1711-%02x", chip->client->addr);
 
 	len = strlen(name);
@@ -379,8 +384,7 @@ static int rt1711_regmap_init(struct rt1711_chip *chip)
 	strlcpy((char *)props->aliases, name, strlen(name)+1);
 	props->io_log_en = 0;
 
-	chip->m_dev = rt_regmap_device_register(props,
-			&rt1711_regmap_fops, chip->dev, chip->client, chip);
+	chip->m_dev = rt_regmap_device_register(props, &rt1711_regmap_fops, chip->dev, chip->client, chip);
 	if (!chip->m_dev) {
 		dev_err(chip->dev, "[OBEI]rt1711 chip rt_regmap register fail\n");
 		return -EINVAL;
@@ -521,8 +525,7 @@ static void rt1711_irq_work_handler(struct kthread_work *work)
 
 static void rt1711_poll_work(struct work_struct *work)
 {
-	struct rt1711_chip *chip = container_of(
-		work, struct rt1711_chip, poll_work.work);
+	struct rt1711_chip *chip = container_of(work, struct rt1711_chip, poll_work.work);
 
 	if (atomic_dec_and_test(&chip->poll_count))
 		cpu_idle_poll_ctrl(false);
@@ -532,7 +535,10 @@ static irqreturn_t rt1711_intr_handler(int irq, void *data)
 {
 	struct rt1711_chip *chip = data;
 
+	#ifdef OLD_WAKE_LOCK
 	wake_lock_timeout(&chip->irq_wake_lock, RT1711H_IRQ_WAKE_TIME);
+	#endif
+
 
 #ifdef DEBUG_GPIO
 	gpio_set_value(DEBUG_GPIO, 0);
@@ -1449,7 +1455,10 @@ static int rt1711_i2c_probe(struct i2c_client *client,	const struct i2c_device_i
 	sema_init(&chip->suspend_lock, 1);
 	i2c_set_clientdata(client, chip);
 	INIT_DELAYED_WORK(&chip->poll_work, rt1711_poll_work);
+
+	#ifdef OLD_WAKE_LOCK
 	wake_lock_init(&chip->irq_wake_lock, WAKE_LOCK_SUSPEND,	"rt1711h_irq_wakelock");
+	#endif
 
 	chip->chip_id = chip_id;
 	pr_info("[OBEI]rt1711h_chipID = 0x%0x\n", chip_id);

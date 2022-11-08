@@ -25,11 +25,11 @@
 #include <linux/sched/rt.h>
 #endif /* #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 9, 0)) */
 
-#include <linux/usb/tcpci_event.h>
-#include <linux/usb/tcpci_typec.h>
-#include <linux/usb/tcpci.h>
+#include <linux/usb/sypd/sp_tcpci_event.h>
+#include <linux/usb/sypd/sp_tcpci_typec.h>
+#include <linux/usb/sypd/sp_tcpci.h>
 
-#include <linux/usb/pd_policy_engine.h>
+#include <linux/usb/sypd/sp_pd_policy_engine.h>
 
 #ifdef CONFIG_USB_PD_POSTPONE_VDM
 static void postpone_vdm_event(struct tcpc_device *tcpc_dev)

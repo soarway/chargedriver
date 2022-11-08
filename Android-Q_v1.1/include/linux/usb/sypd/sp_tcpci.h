@@ -375,8 +375,13 @@ static inline int tcpci_enable_watchdog(struct tcpc_device *tcpc, bool en)
 		tcpc->ops->set_watchdog(tcpc, en);
 
 #ifdef CONFIG_TCPC_INTRST_EN
+#ifdef OLD_WAKE_LOCK
 	if (!en || wake_lock_active(&tcpc->attach_wake_lock))
 		tcpci_set_intrst(tcpc, en);
+#else
+	if (!en))
+		tcpci_set_intrst(tcpc, en);
+#endif
 #endif	/* CONFIG_TCPC_INTRST_EN */
 
 	mutex_unlock(&tcpc->access_lock);

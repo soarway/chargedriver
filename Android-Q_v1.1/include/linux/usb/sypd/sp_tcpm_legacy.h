@@ -20,7 +20,7 @@
 #ifdef CONFIG_USB_POWER_DELIVERY
 #ifdef CONFIG_USB_PD_LEGACY_TCPM
 
-#include <linux/usb/tcpm.h>
+#include <linux/usb/sypd/sp_tcpm.h>
 
 /* Request TCPM to send PD Request */
 

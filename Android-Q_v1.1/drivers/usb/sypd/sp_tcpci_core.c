@@ -21,12 +21,12 @@
 #include <linux/slab.h>
 #include <linux/list.h>
 
-#include <linux/usb/tcpci.h>
-#include <linux/usb/tcpci_typec.h>
+#include <linux/usb/sypd/sp_tcpci.h>
+#include <linux/usb/sypd/sp_tcpci_typec.h>
 
 #ifdef CONFIG_USB_POWER_DELIVERY
 #include <linux/usb/sypd/sp_pd_dpm_prv.h>
-#include <linux/usb/tcpm.h>
+#include <linux/usb/sypd/so_tcpm.h>
 #endif /* CONFIG_USB_POWER_DELIVERY */
 
 #define TCPC_CORE_VERSION		"1.2.1_G"
@@ -365,8 +365,10 @@ struct tcpc_device *tcpc_device_register(struct device *parent,
 	/* If system support "WAKE_LOCK_IDLE",
 	 * please use it instead of "WAKE_LOCK_SUSPEND"
 	 */
+	#ifdef OLD_WAKE_LOCK
 	wake_lock_init(&tcpc->attach_wake_lock, WAKE_LOCK_SUSPEND,"tcpc_attach_wakelock");
 	wake_lock_init(&tcpc->dettach_temp_wake_lock, WAKE_LOCK_SUSPEND,"tcpc_detach_wakelock");
+	#endif
 
 	tcpci_timer_init(tcpc);
 #ifdef CONFIG_USB_POWER_DELIVERY
@@ -478,9 +480,11 @@ void tcpc_device_unregister(struct device *dev, struct tcpc_device *tcpc)
 		return;
 
 	tcpc_typec_deinit(tcpc);
-
+	
+#ifdef OLD_WAKE_LOCK
 	wake_lock_destroy(&tcpc->dettach_temp_wake_lock);
 	wake_lock_destroy(&tcpc->attach_wake_lock);
+#endif
 
 #ifdef CONFIG_DUAL_ROLE_USB_INTF
 	devm_dual_role_instance_unregister(&tcpc->dev, tcpc->dr_usb);
