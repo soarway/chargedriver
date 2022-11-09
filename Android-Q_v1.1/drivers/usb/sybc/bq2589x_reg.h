@@ -1,6 +1,6 @@
 
-#ifndef __BQ2589X_HEADER__
-#define __BQ2589X_HEADER__
+#ifndef __BQ2589X_SY_HEADER__
+#define __BQ2589X_SY_HEADER__
 
 /* Register 00h */
 #define BQ2589X_REG_00      		0x00

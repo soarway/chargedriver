@@ -77,12 +77,9 @@ static int rt_chg_handle_source_vbus(struct tcp_notify *tcp_noti, int enable)
 	return 0;
 }
 
-static int chg_get_prop(struct power_supply *psy,
-		enum power_supply_property psp,
-		union power_supply_propval *val)
+static int chg_get_prop(struct power_supply *psy,enum power_supply_property psp,union power_supply_propval *val)
 {
-	struct rt_charger_info *info =
-		dev_get_drvdata(psy->dev->parent);
+	struct rt_charger_info *info = dev_get_drvdata(psy->dev->parent);
 
 	switch (psp) {
 	case POWER_SUPPLY_PROP_STATUS:
@@ -97,12 +94,9 @@ static int chg_get_prop(struct power_supply *psy,
 	return 0;
 }
 
-static int chg_set_prop(struct power_supply *psy,
-		enum power_supply_property psp,
-		const union power_supply_propval *val)
+static int chg_set_prop(struct power_supply *psy,enum power_supply_property psp,const union power_supply_propval *val)
 {
-	struct rt_charger_info *info =
-		dev_get_drvdata(psy->dev->parent);
+	struct rt_charger_info *info = dev_get_drvdata(psy->dev->parent);
 
 	switch (psp) {
 	case POWER_SUPPLY_PROP_STATUS:

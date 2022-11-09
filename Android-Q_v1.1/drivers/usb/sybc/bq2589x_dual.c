@@ -892,6 +892,7 @@ static int bq2589x_charge_status(struct bq2589x *bq)
 	bq2589x_read_byte(bq, &val, BQ2589X_REG_0B);
 	val &= BQ2589X_CHRG_STAT_MASK;
 	val >>= BQ2589X_CHRG_STAT_SHIFT;
+	
 	switch (val) {
 	case BQ2589X_CHRG_STAT_FASTCHG:
 		return POWER_SUPPLY_CHARGE_TYPE_FAST;
@@ -911,9 +912,7 @@ static enum power_supply_property bq2589x_charger_props[] = {
 };
 
 
-static int bq2589x_usb_get_property(struct power_supply *psy,
-				enum power_supply_property psp,
-				union power_supply_propval *val)
+static int bq2589x_usb_get_property(struct power_supply *psy,enum power_supply_property psp,union power_supply_propval *val)
 {
 
 	struct bq2589x *bq = container_of(psy, struct bq2589x, usb);
@@ -936,9 +935,7 @@ static int bq2589x_usb_get_property(struct power_supply *psy,
 	return 0;
 }
 
-static int bq2589x_wall_get_property(struct power_supply *psy,
-			enum power_supply_property psp,
-			union power_supply_propval *val)
+static int bq2589x_wall_get_property(struct power_supply *psy,enum power_supply_property psp,union power_supply_propval *val)
 {
 
 	struct bq2589x *bq = container_of(psy, struct bq2589x, wall);
@@ -965,12 +962,13 @@ static int bq2589x_psy_register(struct bq2589x *bq)
 {
 	int ret;
 
-	bq->usb.name = "bq2589x-usb";
-	bq->usb.type = POWER_SUPPLY_TYPE_USB;
-	bq->usb.properties = bq2589x_charger_props;
-	bq->usb.num_properties = ARRAY_SIZE(bq2589x_charger_props);
-	bq->usb.get_property = bq2589x_usb_get_property;
-	bq->usb.external_power_changed = NULL;
+	
+	bq->usb.desc->name = "bq2589x-usb";
+	bq->usb.desc->type = POWER_SUPPLY_TYPE_USB;
+	bq->usb.desc->properties = bq2589x_charger_props;
+	bq->usb.desc->num_properties = ARRAY_SIZE(bq2589x_charger_props);
+	bq->usb.desc->get_property = bq2589x_usb_get_property;
+	bq->usb.desc->external_power_changed = NULL;
 
 	ret = power_supply_register(bq->dev, &bq->usb);
 	if (ret < 0) {
@@ -979,12 +977,12 @@ static int bq2589x_psy_register(struct bq2589x *bq)
 	}
 
 
-	bq->wall.name = "bq2589x-Wall";
-	bq->wall.type = POWER_SUPPLY_TYPE_MAINS;
-	bq->wall.properties = bq2589x_charger_props;
-	bq->wall.num_properties = ARRAY_SIZE(bq2589x_charger_props);
-	bq->wall.get_property = bq2589x_wall_get_property;
-	bq->wall.external_power_changed = NULL;
+	bq->wall.desc->name = "bq2589x-Wall";
+	bq->wall.desc->type = POWER_SUPPLY_TYPE_MAINS;
+	bq->wall.desc->properties = bq2589x_charger_props;
+	bq->wall.desc->num_properties = ARRAY_SIZE(bq2589x_charger_props);
+	bq->wall.desc->get_property = bq2589x_wall_get_property;
+	bq->wall.desc->external_power_changed = NULL;
 
 	ret = power_supply_register(bq->dev, &bq->wall);
 	if (ret < 0) {
@@ -1005,8 +1003,7 @@ static void bq2589x_psy_unregister(struct bq2589x *bq)
 	power_supply_unregister(&bq->wall);
 }
 
-static ssize_t bq2589x_show_registers(struct device *dev,
-				struct device_attribute *attr, char *buf)
+static ssize_t bq2589x_show_registers(struct device *dev, struct device_attribute *attr, char *buf)
 {
 	u8 addr;
 	u8 val;
@@ -1105,8 +1102,8 @@ static int bq2589x_read_batt_rsoc(struct bq2589x *bq)
 	if (!bq->batt_psy) 
 		bq->batt_psy = power_supply_get_by_name("battery");
 
-	if (bq->batt_psy) {
-		bq->batt_psy->get_property(bq->batt_psy,POWER_SUPPLY_PROP_CAPACITY,&ret);
+	if (bq->batt_psy && bq->batt_psy->desc) {
+		bq->batt_psy->desc->get_property(bq->batt_psy,POWER_SUPPLY_PROP_CAPACITY,&ret);
 		return ret.intval;
 	} else {
 		return 50;
@@ -1453,8 +1450,7 @@ static irqreturn_t bq2589x_charger1_interrupt(int irq, void *data)
 
 
 #define GPIO_IRQ    80
-static int bq2589x_charger1_probe(struct i2c_client *client,
-			   const struct i2c_device_id *id)
+static int bq2589x_charger1_probe(struct i2c_client *client,  const struct i2c_device_id *id)
 {
 	struct bq2589x *bq;
 	int irqn;
@@ -1631,8 +1627,7 @@ static irqreturn_t bq2589x_charger2_interrupt(int irq, void *data)
 
 #endif
 
-static int bq2589x_charger2_probe(struct i2c_client *client,
-			   const struct i2c_device_id *id)
+static int bq2589x_charger2_probe(struct i2c_client *client,  const struct i2c_device_id *id)
 {
 	struct bq2589x *bq;
 
