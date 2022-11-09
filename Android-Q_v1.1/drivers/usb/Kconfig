@@ -177,8 +177,10 @@ source "drivers/usb/pd/Kconfig"
 
 config USB_SYPD
 	def_bool y
-
+config USB_SYBC
+	def_bool y
 source "drivers/usb/sypd/Kconfig"
+source "drivers/usb/sybc/Kconfig"
 
 config USB_LED_TRIG
 	bool "USB LED Triggers"

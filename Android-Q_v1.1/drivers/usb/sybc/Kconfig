@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# USB Power Delivery driver configuration
+#
+menu "USB BQ2589X Power Delivery"
+
+config USB_SYBC_BQ2589X
+	tristate "BQ2589X support"
+	default m
+	help
+	  Say Y here to enable BQ2589X support.
+	  
+endmenu
