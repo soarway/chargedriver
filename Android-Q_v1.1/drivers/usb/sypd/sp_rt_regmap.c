@@ -26,7 +26,7 @@
 #include <linux/seq_file.h>
 #include <linux/semaphore.h>
 
-#include <linux/usb/sypd/sp_rt-regmap.h>
+#include <linux/usb/sypd/sp_rt_regmap.h>
 
 struct rt_regmap_ops {
 	int (*regmap_block_write)(struct rt_regmap_device *rd, u32 reg,	 int bytes, const void *data);

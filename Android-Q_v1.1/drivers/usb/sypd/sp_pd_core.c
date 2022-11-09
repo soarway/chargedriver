@@ -25,7 +25,7 @@
 #include <linux/usb/sypd/sp_pd_policy_engine.h>
 
 #ifdef CONFIG_DUAL_ROLE_USB_INTF
-#include <linux/usb/class-dual-role.h>
+#include <linux/usb/sypd/sp_class_dual_role.h>
 #endif /* CONFIG_DUAL_ROLE_USB_INTF */
 
 /* From DTS */

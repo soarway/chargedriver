@@ -24,7 +24,7 @@
 #include <linux/delay.h>
 
 #ifdef CONFIG_DUAL_ROLE_USB_INTF
-#include <linux/usb/sypd/sp_class-dual-role.h>
+#include <linux/usb/sypd/sp_class_dual_role.h>
 #endif /* CONFIG_DUAL_ROLE_USB_INTF */
 
 #include <linux/usb/sypd/sp_tcpci_core.h>
@@ -167,9 +167,8 @@ static inline int tcpci_set_cc(struct tcpc_device *tcpc, int pull)
 #endif /* CONFIG_TYPEC_CHECK_LEGACY_CABLE */
 
 	if (pull & TYPEC_CC_DRP) {
-		tcpc->typec_remote_cc[0] =
-		tcpc->typec_remote_cc[1] =
-			TYPEC_CC_DRP_TOGGLING;
+		tcpc->typec_remote_cc[0] = 
+		tcpc->typec_remote_cc[1] = TYPEC_CC_DRP_TOGGLING;
 	}
 
 	tcpc->typec_local_cc = pull;
@@ -288,14 +287,12 @@ static inline int tcpci_set_rx_enable(struct tcpc_device *tcpc, uint8_t enable)
 	return tcpc->ops->set_rx_enable(tcpc, enable);
 }
 
-static inline int tcpci_get_message(struct tcpc_device *tcpc,
-	uint32_t *payload, uint16_t *head, enum tcpm_transmit_type *type)
+static inline int tcpci_get_message(struct tcpc_device *tcpc,uint32_t *payload, uint16_t *head, enum tcpm_transmit_type *type)
 {
 	return tcpc->ops->get_message(tcpc, payload, head, type);
 }
 
-static inline int tcpci_transmit(struct tcpc_device *tcpc,
-	enum tcpm_transmit_type type, uint16_t header, const uint32_t *data)
+static inline int tcpci_transmit(struct tcpc_device *tcpc,enum tcpm_transmit_type type, uint16_t header, const uint32_t *data)
 {
 	return tcpc->ops->transmit(tcpc, type, header, data);
 }
@@ -707,13 +704,11 @@ static inline int tcpci_dp_notify_config_start(struct tcpc_device *tcpc)
 	DP_INFO("ConfigStart\r\n");
 	tcp_noti.ama_dp_state.sel_config = SW_USB;
 	tcp_noti.ama_dp_state.active = 0;
-	srcu_notifier_call_chain(&tcpc->evt_nh,
-		TCP_NOTIFY_AMA_DP_STATE, &tcp_noti);
+	srcu_notifier_call_chain(&tcpc->evt_nh,	TCP_NOTIFY_AMA_DP_STATE, &tcp_noti);
 	return 0;
 }
 
-static inline int tcpci_dp_notify_config_done(struct tcpc_device *tcpc,
-	uint32_t local_cfg, uint32_t remote_cfg, bool ack)
+static inline int tcpci_dp_notify_config_done(struct tcpc_device *tcpc,	uint32_t local_cfg, uint32_t remote_cfg, bool ack)
 {
 	/* DFP_U : If DP success,
 	 * internal flow will enter this function finally

@@ -8,6 +8,7 @@
         "sp_tcpci_event.h": "c",
         "sp_rt1711h.h": "c",
         "sp_pd_process_evt.h": "c",
-        "sp_pd_policy_engine.h": "c"
+        "sp_pd_policy_engine.h": "c",
+        "sp_rt_regmap.h": "c"
     }
 }

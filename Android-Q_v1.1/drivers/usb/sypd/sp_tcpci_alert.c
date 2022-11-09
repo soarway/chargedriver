@@ -30,7 +30,7 @@
 #endif /* CONFIG_USB_POWER_DELIVERY */
 
 #ifdef CONFIG_DUAL_ROLE_USB_INTF
-#include <linux/usb/sypd/sp_class-dual-role.h>
+#include <linux/usb/sypd/sp_class_dual_role.h>
 #endif /* CONFIG_DUAL_ROLE_USB_INTF */
 
 /*

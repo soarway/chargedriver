@@ -37,7 +37,7 @@
 #include <linux/usb/sypd/sp_rt1711h.h>
 
 #ifdef CONFIG_RT_REGMAP
-#include <linux/usb/sypd/sp_rt-regmap.h>
+#include <linux/usb/sypd/sp_rt_regmap.h>
 #endif /* CONFIG_RT_REGMAP */
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 9, 0))

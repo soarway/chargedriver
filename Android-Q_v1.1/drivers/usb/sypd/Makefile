@@ -1,10 +1,10 @@
-obj-$(CONFIG_RT_REGMAP)		+= sp_rt-regmap.o
+obj-$(CONFIG_RT_REGMAP)		+= sp_rt_regmap.o
 
 obj-$(CONFIG_SWITCH)		+= sp_switch_class.o
 obj-$(CONFIG_SWITCH_GPIO)	+= sp_switch_gpio.o
 obj-$(CONFIG_SWITCH_HD3SS460)		+= sp_switch_hd3ss460.o
 
-obj-$(CONFIG_DUAL_ROLE_USB_INTF)	+= sp_class-dual-role.o sp_tcpci_dual_role.o
+obj-$(CONFIG_DUAL_ROLE_USB_INTF)	+= sp_class_dual_role.o sp_tcpci_dual_role.o
 
 
 obj-$(CONFIG_TCPC_RT1711H)		+= sp_tcpc_rt1711h.o

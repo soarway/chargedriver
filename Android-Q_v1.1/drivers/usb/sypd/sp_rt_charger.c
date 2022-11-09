@@ -20,7 +20,7 @@
 #include <linux/gpio.h>
 #include <linux/of_gpio.h>
 #include <linux/workqueue.h>
-#include <linux/usb/sypd/sp_class-dual-role.h>
+#include <linux/usb/sypd/sp_class_dual_role.h>
 #include <linux/usb/sypd/sp_tcpm.h>
 #include <linux/usb/sypd/sp_tcpci.h>
 

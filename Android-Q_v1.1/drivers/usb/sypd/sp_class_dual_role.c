@@ -15,7 +15,7 @@
  */
 #include <linux/ctype.h>
 #include <linux/device.h>
-#include <linux/usb/sypd/sp_class-dual-role.h>
+#include <linux/usb/sypd/sp_class_dual_role.h>
 #include <linux/err.h>
 #include <linux/init.h>
 #include <linux/module.h>
@@ -23,12 +23,8 @@
 #include <linux/stat.h>
 #include <linux/types.h>
 #define DUAL_ROLE_NOTIFICATION_TIMEOUT 2000
-static ssize_t dual_role_store_property(struct device *dev,
-					struct device_attribute *attr,
-					const char *buf, size_t count);
-static ssize_t dual_role_show_property(struct device *dev,
-				       struct device_attribute *attr,
-				       char *buf);
+static ssize_t dual_role_store_property(struct device *dev,	struct device_attribute *attr,const char *buf, size_t count);
+static ssize_t dual_role_show_property(struct device *dev, struct device_attribute *attr, char *buf);
 #define DUAL_ROLE_ATTR(_name)				\
 {							\
 	.attr = { .name = #_name },			\
