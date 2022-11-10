@@ -595,11 +595,9 @@ extern void power_supply_put(struct power_supply *psy);
 extern struct power_supply *power_supply_get_by_phandle(struct device_node *np,	const char *property);
 extern struct power_supply *devm_power_supply_get_by_phandle(struct device *dev, const char *property);
 #else /* !CONFIG_OF */
-static inline struct power_supply *
-power_supply_get_by_phandle(struct device_node *np, const char *property)
+static inline struct power_supply *  power_supply_get_by_phandle(struct device_node *np, const char *property)
 { return NULL; }
-static inline struct power_supply *
-devm_power_supply_get_by_phandle(struct device *dev, const char *property)
+static inline struct power_supply *  devm_power_supply_get_by_phandle(struct device *dev, const char *property)
 { return NULL; }
 #endif /* CONFIG_OF */
 
@@ -620,14 +618,10 @@ extern int power_supply_set_property(struct power_supply *psy, enum power_supply
 extern int power_supply_property_is_writeable(struct power_supply *psy,	enum power_supply_property psp);
 extern void power_supply_external_power_changed(struct power_supply *psy);
 
-extern struct power_supply *__must_check
-power_supply_register(struct device *parent, const struct power_supply_desc *desc, const struct power_supply_config *cfg);
-extern struct power_supply *__must_check
-power_supply_register_no_ws(struct device *parent, const struct power_supply_desc *desc, const struct power_supply_config *cfg);
-extern struct power_supply *__must_check
-devm_power_supply_register(struct device *parent, const struct power_supply_desc *desc, const struct power_supply_config *cfg);
-extern struct power_supply *__must_check
-devm_power_supply_register_no_ws(struct device *parent, const struct power_supply_desc *desc, const struct power_supply_config *cfg);
+extern struct power_supply *__must_check  power_supply_register(struct device *parent, const struct power_supply_desc *desc, const struct power_supply_config *cfg);
+extern struct power_supply *__must_check  power_supply_register_no_ws(struct device *parent, const struct power_supply_desc *desc, const struct power_supply_config *cfg);
+extern struct power_supply *__must_check  devm_power_supply_register(struct device *parent, const struct power_supply_desc *desc, const struct power_supply_config *cfg);
+extern struct power_supply *__must_check  devm_power_supply_register_no_ws(struct device *parent, const struct power_supply_desc *desc, const struct power_supply_config *cfg);
 extern void power_supply_unregister(struct power_supply *psy);
 extern int  power_supply_powers(struct power_supply *psy, struct device *dev);
 

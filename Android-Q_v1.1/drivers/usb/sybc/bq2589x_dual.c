@@ -98,8 +98,8 @@ struct bq2589x {
 
 
 
-	struct power_supply usb;
-	struct power_supply wall;
+	struct power_supply *usb;
+	struct power_supply *wall;
 	struct power_supply *batt_psy;
 
 
@@ -892,7 +892,7 @@ static int bq2589x_charge_status(struct bq2589x *bq)
 	bq2589x_read_byte(bq, &val, BQ2589X_REG_0B);
 	val &= BQ2589X_CHRG_STAT_MASK;
 	val >>= BQ2589X_CHRG_STAT_SHIFT;
-	
+
 	switch (val) {
 	case BQ2589X_CHRG_STAT_FASTCHG:
 		return POWER_SUPPLY_CHARGE_TYPE_FAST;
@@ -915,7 +915,8 @@ static enum power_supply_property bq2589x_charger_props[] = {
 static int bq2589x_usb_get_property(struct power_supply *psy,enum power_supply_property psp,union power_supply_propval *val)
 {
 
-	struct bq2589x *bq = container_of(psy, struct bq2589x, usb);
+	//struct bq2589x *bq = container_of(psy, struct bq2589x, usb);
+	struct bq2589x *bq = power_supply_get_drvdata(psy);
 	u8 type = bq2589x_get_vbus_type(bq);
 
 	switch (psp) {
@@ -938,7 +939,8 @@ static int bq2589x_usb_get_property(struct power_supply *psy,enum power_supply_p
 static int bq2589x_wall_get_property(struct power_supply *psy,enum power_supply_property psp,union power_supply_propval *val)
 {
 
-	struct bq2589x *bq = container_of(psy, struct bq2589x, wall);
+	//struct bq2589x *bq = container_of(psy, struct bq2589x, wall);
+	struct bq2589x *bq = power_supply_get_drvdata(psy);
 	u8 type = bq2589x_get_vbus_type(bq);
 
 	switch (psp) {
@@ -958,49 +960,84 @@ static int bq2589x_wall_get_property(struct power_supply *psy,enum power_supply_
 	return 0;
 }
 
+static char *bq2589x_charger_supplied_to_usb[] = {
+	"usb",
+};
+static char *bq2589x_charger_supplied_to_wall[] = {
+	"battery",
+};
+static const struct power_supply_desc bq2589x_power_supply_desc_usb = {
+	.name = "bq2589x-usb",
+	.type = POWER_SUPPLY_TYPE_USB,
+	.properties = bq2589x_charger_props,
+	.num_properties = ARRAY_SIZE(bq2589x_charger_props),
+	.get_property = bq2589x_usb_get_property,
+};
+
+static const struct power_supply_desc bq2589x_power_supply_desc_wall = {
+	.name = "bq2589x-Wall",
+	.type = POWER_SUPPLY_TYPE_MAINS,
+	.properties = bq2589x_charger_props,
+	.num_properties = ARRAY_SIZE(bq2589x_charger_props),
+	.get_property = bq2589x_wall_get_property,
+};
+
+
 static int bq2589x_psy_register(struct bq2589x *bq)
 {
 	int ret;
 
 	
-	bq->usb.desc->name = "bq2589x-usb";
-	bq->usb.desc->type = POWER_SUPPLY_TYPE_USB;
-	bq->usb.desc->properties = bq2589x_charger_props;
-	bq->usb.desc->num_properties = ARRAY_SIZE(bq2589x_charger_props);
-	bq->usb.desc->get_property = bq2589x_usb_get_property;
-	bq->usb.desc->external_power_changed = NULL;
+	// bq->usb.name = "bq2589x-usb";
+	// bq->usb.type = POWER_SUPPLY_TYPE_USB;
+	// bq->usb.properties = bq2589x_charger_props;
+	// bq->usb.num_properties = ARRAY_SIZE(bq2589x_charger_props);
+	// bq->usb.get_property = bq2589x_usb_get_property;
+	// bq->usb.external_power_changed = NULL;
+//power_supply_register(struct device *parent, struct power_supply *psy);
+//power_supply_register(struct device *parent, const struct power_supply_desc *desc, const struct power_supply_config *cfg);
+	struct power_supply_config psy_cfg1 = { .drv_data = bq, };
+	struct power_supply_config psy_cfg2 = { .drv_data = bq, };
 
-	ret = power_supply_register(bq->dev, &bq->usb);
-	if (ret < 0) {
+	psy_cfg1.supplied_to = bq2589x_charger_supplied_to_usb;
+	psy_cfg1.num_supplicants = ARRAY_SIZE(bq2589x_charger_supplied_to_usb);
+
+	psy_cfg2.supplied_to = bq2589x_charger_supplied_to_wall;
+	psy_cfg2.num_supplicants = ARRAY_SIZE(bq2589x_charger_supplied_to_wall);
+
+	bq->usb = power_supply_register(bq->dev, &bq2589x_power_supply_desc_usb, &psy_cfg1);
+
+	//bq->usb = power_supply_register(bq->dev, &bq->usb);
+	if (bq->usb == NULL) {
 		dev_err(bq->dev, "%s:failed to register usb psy:%d\n", __func__, ret);
 		return ret;
 	}
 
 
-	bq->wall.desc->name = "bq2589x-Wall";
-	bq->wall.desc->type = POWER_SUPPLY_TYPE_MAINS;
-	bq->wall.desc->properties = bq2589x_charger_props;
-	bq->wall.desc->num_properties = ARRAY_SIZE(bq2589x_charger_props);
-	bq->wall.desc->get_property = bq2589x_wall_get_property;
-	bq->wall.desc->external_power_changed = NULL;
-
-	ret = power_supply_register(bq->dev, &bq->wall);
-	if (ret < 0) {
-		dev_err(bq->dev, "%s:failed to register wall psy:%d\n", __func__, ret);
+	// bq->wall.name = "bq2589x-Wall";
+	// bq->wall.type = POWER_SUPPLY_TYPE_MAINS;
+	// bq->wall.properties = bq2589x_charger_props;
+	// bq->wall.num_properties = ARRAY_SIZE(bq2589x_charger_props);
+	// bq->wall.get_property = bq2589x_wall_get_property;
+	// bq->wall.external_power_changed = NULL;
+//power_supply_register(struct device *parent, const struct power_supply_desc *desc, const struct power_supply_config *cfg);
+	bq->wall = power_supply_register(bq->dev, &bq2589x_power_supply_desc_wall, &psy_cfg2);
+	if (bq->wall == NULL) {
+		dev_err(bq->dev, "%s:failed to register _wall_ psy:%d\n", __func__, ret);
 		goto fail_1;
 	}
 
 	return 0;
 
 fail_1:
-	power_supply_unregister(&bq->usb);
+	power_supply_unregister(bq->usb);
 	return ret;
 }
 
 static void bq2589x_psy_unregister(struct bq2589x *bq)
 {
-	power_supply_unregister(&bq->usb);
-	power_supply_unregister(&bq->wall);
+	power_supply_unregister(bq->usb);
+	power_supply_unregister(bq->wall);
 }
 
 static ssize_t bq2589x_show_registers(struct device *dev, struct device_attribute *attr, char *buf)
@@ -1095,12 +1132,15 @@ static int bq2589x_detect_device(struct bq2589x *bq)
 }
 
 
+
 static int bq2589x_read_batt_rsoc(struct bq2589x *bq)
 {
 	union power_supply_propval ret = {0,};
 
-	if (!bq->batt_psy) 
-		bq->batt_psy = power_supply_get_by_name("battery");
+	if (!bq->batt_psy) {
+		return 50;
+	}
+	
 
 	if (bq->batt_psy && bq->batt_psy->desc) {
 		bq->batt_psy->desc->get_property(bq->batt_psy,POWER_SUPPLY_PROP_CAPACITY,&ret);

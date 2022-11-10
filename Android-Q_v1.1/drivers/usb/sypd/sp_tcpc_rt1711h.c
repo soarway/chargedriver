@@ -374,8 +374,10 @@ static int rt1711_regmap_init(struct rt1711_chip *chip)
 	if ((!props->name) || (!props->aliases))
 		return -ENOMEM;
 
-	strlcpy((char *)props->name, name, strlen(name)+1);
-	strlcpy((char *)props->aliases, name, strlen(name)+1);
+	//strcpy((char *)props->name, name, strlen(name)+1);
+	//strcpy((char *)props->aliases, name, strlen(name)+1);
+	memcpy((char *)props->name,    name, len+1);
+	memcpy((char *)props->aliases, name, len+1);
 	props->io_log_en = 0;
 
 	chip->m_dev = rt_regmap_device_register(props, &rt1711_regmap_fops, chip->dev, chip->client, chip);
@@ -1335,7 +1337,8 @@ static int rt1711_tcpcdev_init(struct rt1711_chip *chip, struct device *dev)
 	if (!desc->name)
 		return -ENOMEM;
 
-	strlcpy((char *)desc->name, name, strlen(name)+1);
+	//strlcpy((char *)desc->name, name, strlen(name)+1);
+	memcpy((char *)desc->name, name, len+1);
 
 	chip->tcpc_desc = desc;
 
