@@ -9,7 +9,7 @@ find ./kernel/msm-4.19/drivers/ -name "Kconfig" |-exec cat {} \;
 
 find ./kernel/msm-4.19/drivers/usb/ -name "*.c" -exec echo {} \; -exec grep -w  "of_find_node_by_name" {} \;
 
-find ./vendor/qcom/proprietary/devicetree-4.19/ -name "*.dtsi" -exec echo {} \; -exec grep -w  "usb_x1" {} \;
+find ./vendor/qcom/proprietary/devicetree-4.19/ -name "*.dtsi" -exec echo {} \; -exec grep -w  "displayport" {} \;
 
 cp -r ./vendor/qcom/proprietary/devicetree-4.19/qcom/  /mnt/hgfs/Android-Q_v1.1/
 cp -r ./kernel/msm-4.19/drivers/                       /mnt/hgfs/Android-Q_v1.1/
@@ -24,6 +24,7 @@ cp -r   /mnt/hgfs/Android-Q_v1.1/qcom/         /home/Open-Q_865_Android-Q_v1.1/v
 cp -r   /mnt/hgfs/Android-Q_v1.1/drivers/      /home/Open-Q_865_Android-Q_v1.1/kernel/msm-4.19/
 cp -r   /mnt/hgfs/Android-Q_v1.1/include/      /home/Open-Q_865_Android-Q_v1.1/kernel/msm-4.19/
 
+./out/host/linux-x86/bin/dtc  ./vendor/qcom/proprietary/devicetree-4.19/qcom/kona.dtsi
 
 头文件
 RT1711H                     BA41
