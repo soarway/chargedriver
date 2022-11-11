@@ -7,6 +7,10 @@ find  ./kernel/msm-4.19/drivers/ -name "Kconfig" -exec echo {} \; -exec grep -w 
 find ./kernel/msm-4.19/drivers/ -name "Kconfig" |xargs cat | xargs -w grep "USB_PD"
 find ./kernel/msm-4.19/drivers/ -name "Kconfig" |-exec cat {} \;
 
+find ./kernel/msm-4.19/drivers/usb/ -name "*.c" -exec echo {} \; -exec grep -w  "of_find_node_by_name" {} \;
+
+find ./vendor/qcom/proprietary/devicetree-4.19/ -name "*.dtsi" -exec echo {} \; -exec grep -w  "usb_x1" {} \;
+
 cp -r ./vendor/qcom/proprietary/devicetree-4.19/qcom/  /mnt/hgfs/Android-Q_v1.1/
 cp -r ./kernel/msm-4.19/drivers/                       /mnt/hgfs/Android-Q_v1.1/
 cp -r ./kernel/msm-4.19/include/                       /mnt/hgfs/Android-Q_v1.1/

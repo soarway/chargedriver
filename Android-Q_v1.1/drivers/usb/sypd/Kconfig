@@ -1,18 +1,18 @@
 config RT_REGMAP
-	bool "Richtek Regmap"
+	tristate "Richtek Regmap"
 	select DEBUG_FS
-	default n
+	default m
 	help
 	  Say Y to enable Richtek Register Map (misc)
 
 config DUAL_ROLE_USB_INTF
-	bool "Dual Role Class Device"
+	tristate "Dual Role Class Device"
 	default y
 	help
 	  Say Y to enable USB DUAL_ROLE Class
 
 config TCPC_CLASS
-	bool "TypeC Port Controller Device Class"
+	tristate "TypeC Port Controller Device Class"
 	default y
 	help
 	  Say Y to enable
@@ -20,18 +20,9 @@ config TCPC_CLASS
 	  Controller Device
 	  Class
 
-config USB_POWER_DELIVERY
-	bool "Support USB power delivery Function"
-	default y
-	help
-	  Say Y to enable
-	  USB
-	  Power Delivery
-	  support
-
 
 config TCPC_RT1711H
-	bool "Richtek RT1711H TypeC port Controller Driver"
+	tristate "Richtek RT1711H TypeC port Controller Driver"
 	depends on TCPC_CLASS
 	default y
 	help
@@ -39,6 +30,17 @@ config TCPC_RT1711H
 	  Richtek RT1711H
 	  TypeC port Controller
 	  Driver
+
+
+config USB_POWER_DELIVERY
+	tristate "Support USB power delivery Function"
+	default y
+	help
+	  Say Y to enable
+	  USB
+	  Power Delivery
+	  support
+
 
 config USB_PD_VBUS_STABLE_TOUT
 	int "PD VBUS Stable Timeout"

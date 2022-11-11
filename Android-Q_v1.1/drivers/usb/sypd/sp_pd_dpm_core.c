@@ -1510,8 +1510,7 @@ void pd_dpm_vcs_evaluate_swap(struct pd_port *pd_port)
 	struct tcpc_device *tcpc = pd_port->tcpc_dev;
 
 	/* Don't want always supply Vconn, so reject it. */
-	if (!pd_port->vconn_source &&
-		tcpc->tcpc_vconn_supply != TCPC_VCONN_SUPPLY_ALWAYS)
+	if (!pd_port->vconn_source && tcpc->tcpc_vconn_supply != TCPC_VCONN_SUPPLY_ALWAYS)
 		accept = false;
 #endif	/* CONFIG_TCPC_VCONN_SUPPLY_MODE */
 

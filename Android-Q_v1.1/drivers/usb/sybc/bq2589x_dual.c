@@ -1697,6 +1697,7 @@ static int bq2589x_charger2_probe(struct i2c_client *client,  const struct i2c_d
     /*initialize bq2589x, disable charger 2 by default*/
 	if (client->dev.of_node)
 		 bq2589x_parse_dt(&client->dev, g_bq2);
+		 
 	ret = bq2589x_init_device(g_bq2);
 	if (ret)
 		dev_err(bq->dev, "%s:Failed to initialize bq2589x charger\n", __func__);
@@ -1765,7 +1766,7 @@ static struct i2c_driver bq2589x_charger2_driver = {
 	.probe		= bq2589x_charger2_probe,
 	.shutdown   = bq2589x_charger2_shutdown,
 };
-
+/*  //先注释掉，避免编译不通过
 static struct i2c_board_info __initdata i2c_bq2589x_charger1[] = {
 	{
 		I2C_BOARD_INFO("bq2589x-1", 0x6A),
@@ -1778,12 +1779,13 @@ static struct i2c_board_info __initdata i2c_bq2589x_charger2[] = {
 		I2C_BOARD_INFO("bq2589x-2", 0x6B),
 	},
 };
-
+*/
 static int __init bq2589x_charger_init(void)
 {
 
-	i2c_register_board_info(0, i2c_bq2589x_charger1, ARRAY_SIZE(i2c_bq2589x_charger1));
-	i2c_register_board_info(0, i2c_bq2589x_charger2, ARRAY_SIZE(i2c_bq2589x_charger2));
+	//先注释掉下面2行代码，避免编译不通过
+	//i2c_register_board_info(0, i2c_bq2589x_charger1, ARRAY_SIZE(i2c_bq2589x_charger1));
+	//i2c_register_board_info(0, i2c_bq2589x_charger2, ARRAY_SIZE(i2c_bq2589x_charger2));
 
 	if (i2c_add_driver(&bq2589x_charger2_driver))
 		printk("[OBEI]%s, failed to register bq2589x_charger2_driver.\n", __func__);

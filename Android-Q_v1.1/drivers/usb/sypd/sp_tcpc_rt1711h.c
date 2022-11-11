@@ -1293,8 +1293,7 @@ static int rt1711_tcpcdev_init(struct rt1711_chip *chip, struct device *dev)
 		desc->role_def = TYPEC_ROLE_DRP;
 	}
 
-	if (of_property_read_u32(
-		np, "rt-tcpc,notifier_supply_num", &val) >= 0) {
+	if (of_property_read_u32(np, "rt-tcpc,notifier_supply_num", &val) >= 0) {
 		if (val < 0)
 			desc->notifier_supply_num = 0;
 		else
