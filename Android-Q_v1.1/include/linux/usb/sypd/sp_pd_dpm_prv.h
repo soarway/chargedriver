@@ -121,8 +121,7 @@ static inline void dpm_vdm_get_svid_ops(struct pd_event *pd_event, uint16_t *svi
 		*ops = PD_VDO_OPOS(vdm_hdr);
 }
 
-static inline bool dpm_register_svdm_ops(struct pd_port *pd_port,
-	struct svdm_svid_data *svid_data, const struct svdm_svid_ops *ops)
+static inline bool dpm_register_svdm_ops(struct pd_port *pd_port,struct svdm_svid_data *svid_data, const struct svdm_svid_ops *ops)
 {
 	bool ret = true;
 

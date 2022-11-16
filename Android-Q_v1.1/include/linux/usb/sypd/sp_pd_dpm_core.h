@@ -134,8 +134,7 @@ void pd_dpm_inform_alert(struct pd_port *pd_port, struct pd_event *pd_event);
 void pd_dpm_inform_status(struct pd_port *pd_port, struct pd_event *pd_event);
 
 #ifdef CONFIG_USB_PD_REV30_PPS_SINK
-void pd_dpm_inform_pps_status(
-	struct pd_port *pd_port, struct pd_event *pd_event);
+void pd_dpm_inform_pps_status(struct pd_port *pd_port, struct pd_event *pd_event);
 #endif	/* CONFIG_USB_PD_REV30_PPS_SINK */
 
 #endif	/* CONFIG_USB_PD_REV30 */

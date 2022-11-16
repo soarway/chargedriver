@@ -87,9 +87,7 @@ extern int dual_role_get_property(struct dual_role_phy_instance *dual_role,
 extern int dual_role_set_property(struct dual_role_phy_instance *dual_role,
 				  enum dual_role_property prop,
 				  const unsigned int *val);
-extern int dual_role_property_is_writeable(struct dual_role_phy_instance
-					   *dual_role,
-					   enum dual_role_property prop);
+extern int dual_role_property_is_writeable(struct dual_role_phy_instance   *dual_role, enum dual_role_property prop);
 extern void *dual_role_get_drvdata(struct dual_role_phy_instance *dual_role);
 #else /* CONFIG_DUAL_ROLE_USB_INTF */
 static void dual_role_instance_changed(struct dual_role_phy_instance  *dual_role){}

@@ -214,31 +214,22 @@ extern int rt_regmap_cache_init(struct rt_regmap_device *rd);
 
 extern int rt_regmap_cache_reload(struct rt_regmap_device *rd);
 
-extern int rt_regmap_block_write(struct rt_regmap_device *rd, u32 reg,
-					int bytes, const void *rc);
-extern int rt_asyn_regmap_block_write(struct rt_regmap_device *rd, u32 reg,
-					int bytes, const void *rc);
-extern int rt_regmap_block_read(struct rt_regmap_device *rd, u32 reg,
-					int bytes, void *dst);
+extern int rt_regmap_block_write(struct rt_regmap_device *rd, u32 reg,int bytes, const void *rc);
+extern int rt_asyn_regmap_block_write(struct rt_regmap_device *rd, u32 reg,	int bytes, const void *rc);
+extern int rt_regmap_block_read(struct rt_regmap_device *rd, u32 reg,int bytes, void *dst);
 
-extern int _rt_regmap_reg_read(struct rt_regmap_device *rd,
-					struct rt_reg_data *rrd);
-extern int _rt_regmap_reg_write(struct rt_regmap_device *rd,
-					struct rt_reg_data *rrd);
-extern int _rt_asyn_regmap_reg_write(struct rt_regmap_device *rd,
-					struct rt_reg_data *rrd);
-extern int _rt_regmap_update_bits(struct rt_regmap_device *rd,
-					struct rt_reg_data *rrd);
+extern int _rt_regmap_reg_read(struct rt_regmap_device *rd,	struct rt_reg_data *rrd);
+extern int _rt_regmap_reg_write(struct rt_regmap_device *rd,struct rt_reg_data *rrd);
+extern int _rt_asyn_regmap_reg_write(struct rt_regmap_device *rd,struct rt_reg_data *rrd);
+extern int _rt_regmap_update_bits(struct rt_regmap_device *rd,struct rt_reg_data *rrd);
 
-static inline int rt_regmap_reg_read(struct rt_regmap_device *rd,
-					struct rt_reg_data *rrd, u32 reg)
+static inline int rt_regmap_reg_read(struct rt_regmap_device *rd,struct rt_reg_data *rrd, u32 reg)
 {
 	rrd->reg = reg;
 	return _rt_regmap_reg_read(rd, rrd);
 };
 
-static inline int rt_regmap_reg_write(struct rt_regmap_device *rd,
-			struct rt_reg_data *rrd, u32 reg, const u32 data)
+static inline int rt_regmap_reg_write(struct rt_regmap_device *rd,struct rt_reg_data *rrd, u32 reg, const u32 data)
 {
 	rrd->reg = reg;
 	rrd->rt_data.data_u32 = data;

@@ -179,6 +179,7 @@ static const rt_register_map_t rt1711_chip_regmap[] = {
 
 #endif /* CONFIG_RT_REGMAP */
 
+//读寄存器信息
 static int rt1711_read_device(void *client, u32 reg, int len, void *dst)
 {
 	struct i2c_client *i2c = (struct i2c_client *)client;
@@ -204,7 +205,7 @@ static int rt1711_read_device(void *client, u32 reg, int len, void *dst)
 	}
 	return ret;
 }
-
+//写寄存器信息
 static int rt1711_write_device(void *client, u32 reg, int len, const void *src)
 {
 	const u8 *data;

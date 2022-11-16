@@ -95,16 +95,14 @@ void switch_set_state(struct switch_dev *sdev, int state)
 			if (length > 0) {
 				if (prop_buf[length - 1] == '\n')
 					prop_buf[length - 1] = 0;
-				snprintf(name_buf, sizeof(name_buf),
-					"SWITCH_NAME=%s", prop_buf);
+				snprintf(name_buf, sizeof(name_buf),"SWITCH_NAME=%s", prop_buf);
 				envp[env_offset++] = name_buf;
 			}
 			length = state_show(sdev->dev, NULL, prop_buf);
 			if (length > 0) {
 				if (prop_buf[length - 1] == '\n')
 					prop_buf[length - 1] = 0;
-				snprintf(state_buf, sizeof(state_buf),
-					"SWITCH_STATE=%s", prop_buf);
+				snprintf(state_buf, sizeof(state_buf),"SWITCH_STATE=%s", prop_buf);
 				envp[env_offset++] = state_buf;
 			}
 			envp[env_offset] = NULL;
@@ -142,13 +140,11 @@ int switch_dev_register(struct switch_dev *sdev)
 	}
 
 	sdev->index = atomic_inc_return(&device_count);
-	sdev->dev = device_create(switch_class, NULL,
-		MKDEV(0, sdev->index), NULL, sdev->name);
+	sdev->dev = device_create(switch_class, NULL, MKDEV(0, sdev->index), NULL, sdev->name);
 	if (IS_ERR(sdev->dev))
 		return PTR_ERR(sdev->dev);
 	support_set_state = sdev->set_state ? true : false;
-	ret = device_create_file(sdev->dev,
-		support_set_state ? &dev_attr_state_ro : &dev_attr_state_rw);
+	ret = device_create_file(sdev->dev,	support_set_state ? &dev_attr_state_ro : &dev_attr_state_rw);
 	if (ret < 0)
 		goto err_create_file_1;
 	ret = device_create_file(sdev->dev, &dev_attr_name);
@@ -175,8 +171,7 @@ void switch_dev_unregister(struct switch_dev *sdev)
 
 	support_set_state = sdev->set_state ? true : false;
 	device_remove_file(sdev->dev, &dev_attr_name);
-	device_remove_file(sdev->dev,
-		support_set_state ? &dev_attr_state_ro : &dev_attr_state_rw);
+	device_remove_file(sdev->dev, support_set_state ? &dev_attr_state_ro : &dev_attr_state_rw);
 	dev_set_drvdata(sdev->dev, NULL);
 	device_destroy(switch_class, MKDEV(0, sdev->index));
 }

@@ -173,9 +173,8 @@ DECL_PE_STATE_REACTION(PD_TIMER_SOURCE_START);
 /*
  * [BLOCK] Porcess Ctrl MSG
  */
-
-static inline bool pd_process_ctrl_msg_good_crc(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+//处理控制消息 good_CRC
+static inline bool pd_process_ctrl_msg_good_crc(struct pd_port *pd_port, struct pd_event *pd_event)
 
 {
 	switch (pd_port->pe_state_curr) {
@@ -201,9 +200,8 @@ static inline bool pd_process_ctrl_msg_good_crc(
 		return PE_MAKE_STATE_TRANSIT(PD_CTRL_MSG_GOOD_CRC);
 	}
 }
-
-static inline bool pd_process_ctrl_msg_get_sink_cap(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+//处理控制消息 获取sink_cap
+static inline bool pd_process_ctrl_msg_get_sink_cap(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	if (pd_port->pe_state_curr != PE_SRC_READY)
 		return false;
@@ -216,7 +214,7 @@ static inline bool pd_process_ctrl_msg_get_sink_cap(
 	pd_send_ctrl_msg(pd_port, TCPC_TX_SOP, PD_CTRL_REJECT);
 	return false;
 }
-
+//处理控制消息
 static inline bool pd_process_ctrl_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool ret = false;

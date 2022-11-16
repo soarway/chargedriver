@@ -139,8 +139,7 @@ bool pd_get_event(struct tcpc_device *tcpc_dev, struct pd_event *pd_event)
 	return ret;
 }
 
-static bool __pd_put_event(struct tcpc_device *tcpc_dev,
-	const struct pd_event *pd_event, bool from_port_partner)
+static bool __pd_put_event(struct tcpc_device *tcpc_dev,const struct pd_event *pd_event, bool from_port_partner)
 {
 	int index;
 
@@ -304,16 +303,14 @@ static inline bool pd_is_init_attention_event(struct tcpc_device *tcpc_dev, stru
 	return false;
 }
 
-bool pd_put_vdm_event(struct tcpc_device *tcpc_dev,
-		struct pd_event *pd_event, bool from_port_partner)
+bool pd_put_vdm_event(struct tcpc_device *tcpc_dev,	struct pd_event *pd_event, bool from_port_partner)
 {
 	bool ignore_evt = false;
 	struct pd_msg *pd_msg = pd_event->pd_msg;
 
 	mutex_lock(&tcpc_dev->access_lock);
 
-	if (from_port_partner &&
-		pd_is_init_attention_event(tcpc_dev, pd_event)) {
+	if (from_port_partner && pd_is_init_attention_event(tcpc_dev, pd_event)) {
 		TCPC_DBG("AttEvt\r\n");
 		ignore_evt = true;
 		tcpc_dev->pd_pending_vdm_attention = true;
@@ -423,8 +420,7 @@ static bool __pd_get_deferred_tcp_event(struct tcpc_device *tcpc_dev, struct tcp
 
 	tcpc_dev->tcp_event_count--;
 
-	*tcp_event = tcpc_dev->
-		tcp_event_ring_buffer[tcpc_dev->tcp_event_head_index];
+	*tcp_event = tcpc_dev->tcp_event_ring_buffer[tcpc_dev->tcp_event_head_index];
 
 	if (tcpc_dev->tcp_event_count) {
 		index = tcpc_dev->tcp_event_head_index + 1;

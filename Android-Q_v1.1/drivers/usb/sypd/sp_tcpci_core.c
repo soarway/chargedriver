@@ -293,9 +293,9 @@ static int tcpc_match_device_by_name(struct device *dev, void *data)
 struct tcpc_device *tcpc_dev_get_by_name(const char *name)
 {
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 9, 0))
-	struct device *dev = class_find_device(tcpc_class,	NULL, (const void *)name, tcpc_match_device_by_name);
+	struct device *dev = class_find_device(tcpc_class,NULL, (const void *)name, tcpc_match_device_by_name);
 #else
-	struct device *dev = class_find_device(tcpc_class,	NULL, (void *)name, tcpc_match_device_by_name);
+	struct device *dev = class_find_device(tcpc_class,NULL, (void *)name, tcpc_match_device_by_name);
 #endif
 	return dev ? dev_get_drvdata(dev) : NULL;
 }

@@ -53,8 +53,7 @@ struct dpm_rdo_info_t {
 #define DPM_APDO_TYPE_PPS		(TCPM_POWER_CAP_APDO_TYPE_PPS)
 #define DPM_APDO_TYPE_PPS_CF	(TCPM_POWER_CAP_APDO_TYPE_PPS_CF)
 
-extern void dpm_extract_pdo_info(
-			uint32_t pdo, struct dpm_pdo_info_t *info);
+extern void dpm_extract_pdo_info(uint32_t pdo, struct dpm_pdo_info_t *info);
 
 extern bool dpm_find_match_req_info(struct dpm_rdo_info_t *req_info,
 	uint32_t snk_pdo, int cnt, uint32_t *src_pdos,
