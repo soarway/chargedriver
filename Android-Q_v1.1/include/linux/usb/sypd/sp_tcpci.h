@@ -39,6 +39,9 @@
 #endif /* CONFIG_USB_POWER_DELIVERY */
 
 #define PE_STATE_FULL_NAME	0
+#ifndef CONFIG_USB_POWER_DELIVERY
+#define CONFIG_USB_POWER_DELIVERY 1
+#endif
 
 /* provide to TCPC interface */
 extern int tcpci_report_usb_port_changed(struct tcpc_device *tcpc);
@@ -335,8 +338,7 @@ static inline int tcpci_notify_role_swap(struct tcpc_device *tcpc, uint8_t event
 	struct tcp_notify tcp_noti;
 
 	tcp_noti.swap_state.new_role = role;
-	return srcu_notifier_call_chain(
-		&tcpc->evt_nh, event, &tcp_noti);
+	return srcu_notifier_call_chain(&tcpc->evt_nh, event, &tcp_noti);
 }
 
 static inline int tcpci_notify_pd_state(struct tcpc_device *tcpc, uint8_t connect)
@@ -469,8 +471,7 @@ static inline int tcpci_disable_vbus_control(struct tcpc_device *tcpc)
 
 	TCPC_DBG("disable_vbus\r\n");
 	tcpci_enable_watchdog(tcpc, false);
-	return srcu_notifier_call_chain(
-		&tcpc->evt_nh, TCP_NOTIFY_DIS_VBUS_CTRL, &tcp_noti);
+	return srcu_notifier_call_chain(&tcpc->evt_nh, TCP_NOTIFY_DIS_VBUS_CTRL, &tcp_noti);
 #else
 	tcpci_sink_vbus(tcpc, TCP_VBUS_CTRL_REMOVE, TCPC_VBUS_SINK_0V, 0);
 	tcpci_source_vbus(tcpc, TCP_VBUS_CTRL_REMOVE, TCPC_VBUS_SOURCE_0V, 0);
@@ -738,8 +739,7 @@ static inline int tcpci_notify_uvdm(struct tcpc_device *tcpc, bool ack)
 		tcp_noti.uvdm_msg.uvdm_data = pd_port->uvdm_data;
 	}
 
-	srcu_notifier_call_chain(&tcpc->evt_nh,
-		TCP_NOTIFY_UVDM, &tcp_noti);
+	srcu_notifier_call_chain(&tcpc->evt_nh, TCP_NOTIFY_UVDM, &tcp_noti);
 
 	return 0;
 }
@@ -764,8 +764,7 @@ static inline int tcpci_notify_pps_ready(struct tcpc_device *tcpc)
 {
 	struct tcp_notify tcp_noti;
 
-	return srcu_notifier_call_chain(&tcpc->evt_nh,
-		TCP_NOTIFY_PPS_READY, &tcp_noti);
+	return srcu_notifier_call_chain(&tcpc->evt_nh, TCP_NOTIFY_PPS_READY, &tcp_noti);
 }
 #endif	/* CONFIG_USB_PD_REV30_PPS_SINK */
 

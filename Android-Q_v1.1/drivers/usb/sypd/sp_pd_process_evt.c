@@ -952,8 +952,7 @@ static inline bool pe_is_valid_pd_msg(struct pd_port *pd_port, struct pd_event *
 
 	if ((pd_port->msg_id_rx_init[sop_type]) &&
 		(pd_port->msg_id_rx[sop_type] == msg_id)) {
-		PE_INFO("Repeat msg: %c:%d:%d\r\n",	(pd_event->event_type == PD_EVT_CTRL_MSG) ? 'C' : 'D',
-			pd_event->msg, msg_id);
+		PE_INFO("Repeat msg: %c:%d:%d\r\n",	(pd_event->event_type == PD_EVT_CTRL_MSG) ? 'C' : 'D', pd_event->msg, msg_id);
 		return false;
 	}
 

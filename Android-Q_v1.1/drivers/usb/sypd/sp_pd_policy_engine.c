@@ -386,8 +386,7 @@ static const char *const pe_state_name[] = {
 #endif	/* PE_STATE_FULL_NAME */
 
 struct pe_state_actions {
-	void (*entry_action)
-		(struct pd_port *pd_port, struct pd_event *pd_event);
+	void (*entry_action)(struct pd_port *pd_port, struct pd_event *pd_event);
 	/* const void (*exit_action)
 	 * (struct pd_port *pd_port, struct pd_event *pd_event);
 	 */
@@ -440,8 +439,7 @@ void pe_error_recovery_entry(struct pd_port *pd_port, struct pd_event *pd_event)
 }
 
 #ifdef CONFIG_USB_PD_RECV_HRESET_COUNTER
-void pe_over_recv_hreset_limit_entry(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+void pe_over_recv_hreset_limit_entry(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	PE_INFO("OverHResetLimit++\r\n");
 	pe_idle_reset_data(pd_port);
@@ -461,16 +459,14 @@ void pe_bist_test_data_exit(struct pd_port *pd_port, struct pd_event *pd_event)
 	pd_enable_bist_test_mode(pd_port, false);
 }
 
-void pe_bist_carrier_mode_2_entry(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+void pe_bist_carrier_mode_2_entry(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	pd_send_bist_mode2(pd_port);
 	pd_enable_timer(pd_port, PD_TIMER_BIST_CONT_MODE);
 	pd_free_pd_event(pd_port, pd_event);
 }
 
-void pe_bist_carrier_mode_2_exit(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+void pe_bist_carrier_mode_2_exit(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	pd_disable_timer(pd_port, PD_TIMER_BIST_CONT_MODE);
 	pd_disable_bist_mode2(pd_port);
@@ -685,8 +681,7 @@ static const struct pe_state_actions pe_state_actions[] = {
 };
 
 /* pd_state_action_fcn_t pe_get_exit_action(uint8_t pe_state) */
-void (*pe_get_exit_action(uint8_t pe_state))
-		(struct pd_port *, struct pd_event *)
+void (*pe_get_exit_action(uint8_t pe_state))(struct pd_port *, struct pd_event *)
 {
 	void (*retval)(struct pd_port *, struct pd_event *) = NULL;
 
@@ -771,8 +766,7 @@ void (*pe_get_exit_action(uint8_t pe_state))
 	return retval;
 }
 
-static inline void print_state(
-	struct pd_port *pd_port, bool vdm_evt, uint8_t state)
+static inline void print_state(struct pd_port *pd_port, bool vdm_evt, uint8_t state)
 {
 	/*
 	 * Source (P, Provider), Sink (C, Consumer)
@@ -792,8 +786,7 @@ static inline void print_state(
 #endif	/* PE_DBG_ENABLE */
 }
 
-static void pd_pe_state_change(
-	struct pd_port *pd_port, struct pd_event *pd_event, bool vdm_evt)
+static void pd_pe_state_change(struct pd_port *pd_port, struct pd_event *pd_event, bool vdm_evt)
 {
 	void (*prev_exit_action)(struct pd_port *, struct pd_event *);
 	void (*next_entry_action)(struct pd_port *, struct pd_event *);
@@ -870,8 +863,7 @@ static inline int pd_put_dpm_ack_immediately(struct pd_port *pd_port, bool vdm_e
 	return 1;
 }
 
-static inline bool pd_try_get_tcp_deferred_event(
-	struct tcpc_device *tcpc_dev, struct pd_event *pd_event, bool *vdm_evt)
+static inline bool pd_try_get_tcp_deferred_event(struct tcpc_device *tcpc_dev, struct pd_event *pd_event, bool *vdm_evt)
 {
 	struct pd_port *pd_port = &tcpc_dev->pd_port;
 
@@ -897,8 +889,7 @@ static inline bool pd_try_get_tcp_deferred_event(
 	return true;
 }
 
-static inline bool pd_try_get_vdm_event(
-	struct tcpc_device *tcpc_dev, struct pd_event *pd_event)
+static inline bool pd_try_get_vdm_event(struct tcpc_device *tcpc_dev, struct pd_event *pd_event)
 {
 	bool vdm_evt = false;
 	struct pd_port *pd_port = &tcpc_dev->pd_port;
@@ -926,8 +917,7 @@ static inline bool pd_try_get_vdm_event(
 	return vdm_evt;
 }
 
-static inline bool pd_try_get_next_event(
-	struct tcpc_device *tcpc_dev, struct pd_event *pd_event, bool *vdm_evt)
+static inline bool pd_try_get_next_event(struct tcpc_device *tcpc_dev, struct pd_event *pd_event, bool *vdm_evt)
 {
 	struct pd_port *pd_port = &tcpc_dev->pd_port;
 	*vdm_evt = false;

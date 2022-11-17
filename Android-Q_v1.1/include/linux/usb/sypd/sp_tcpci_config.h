@@ -18,6 +18,9 @@
 /* default config */
 
 #define CONFIG_PD_DBG_INFO
+#ifndef CONFIG_USB_POWER_DELIVERY
+#define CONFIG_USB_POWER_DELIVERY 1
+#endif
 
 /* #define CONFIG_TYPEC_USE_DIS_VBUS_CTRL */
 #define CONFIG_TYPEC_POWER_CTRL_INIT

@@ -1123,7 +1123,7 @@ static int rt1711_transmit(struct tcpc_device *tcpc,enum tcpm_transmit_type type
 		if (data_cnt > 0)
 			memcpy(temp+3, (uint8_t *)data, data_cnt);
 
-		rv = rt1711_block_write(chip->client,TCPC_V10_REG_TX_BYTE_CNT,packet_cnt+1, (uint8_t *)temp);
+		rv = rt1711_block_write(chip->client,TCPC_V10_REG_TX_BYTE_CNT, packet_cnt+1, (uint8_t *)temp);
 		if (rv < 0)
 			return rv;
 	}

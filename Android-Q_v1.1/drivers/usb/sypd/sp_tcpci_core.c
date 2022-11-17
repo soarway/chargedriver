@@ -465,8 +465,7 @@ int register_tcp_dev_notifier(struct tcpc_device *tcp_dev, struct notifier_block
 }
 EXPORT_SYMBOL(register_tcp_dev_notifier);
 
-int unregister_tcp_dev_notifier(struct tcpc_device *tcp_dev,
-				struct notifier_block *nb)
+int unregister_tcp_dev_notifier(struct tcpc_device *tcp_dev, struct notifier_block *nb)
 {
 	return srcu_notifier_chain_unregister(&tcp_dev->evt_nh, nb);
 }

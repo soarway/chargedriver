@@ -232,14 +232,10 @@ struct tcpc_ops {
 #endif	/* CONFIG_TYPEC_CAP_AUTO_DISCHARGE */
 
 #ifdef CONFIG_USB_POWER_DELIVERY
-	int (*set_msg_header)(struct tcpc_device *tcpc,
-			int power_role, int data_role, uint8_t pd_rev);
+	int (*set_msg_header)(struct tcpc_device *tcpc, int power_role, int data_role, uint8_t pd_rev);
 	int (*set_rx_enable)(struct tcpc_device *tcpc, uint8_t enable);
-	int (*get_message)(struct tcpc_device *tcpc, uint32_t *payload,
-			uint16_t *head, enum tcpm_transmit_type *type);
-	int (*transmit)(struct tcpc_device *tcpc,
-			enum tcpm_transmit_type type,
-			uint16_t header, const uint32_t *data);
+	int (*get_message)(struct tcpc_device *tcpc, uint32_t *payload, uint16_t *head, enum tcpm_transmit_type *type);
+	int (*transmit)(struct tcpc_device *tcpc, enum tcpm_transmit_type type, uint16_t header, const uint32_t *data);
 	int (*set_bist_test_mode)(struct tcpc_device *tcpc, bool en);
 	int (*set_bist_carrier_mode)(struct tcpc_device *tcpc, uint8_t pattern);
 

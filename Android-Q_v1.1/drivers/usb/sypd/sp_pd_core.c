@@ -128,8 +128,7 @@ static void pd_core_power_flags_init(struct pd_port *pd_port)
 	struct device_node *np;
 	int i;
 	struct pd_port_power_capabilities *snk_cap = &pd_port->local_snk_cap;
-	struct pd_port_power_capabilities *src_cap =
-				&pd_port->local_src_cap_default;
+	struct pd_port_power_capabilities *src_cap = &pd_port->local_src_cap_default;
 
 	np = of_find_node_by_name(pd_port->tcpc_dev->dev.of_node, "dpm_caps");
 
@@ -207,8 +206,7 @@ int pd_core_init(struct tcpc_device *tcpc_dev)
 	return 0;
 }
 
-void pd_extract_rdo_power(uint32_t rdo, uint32_t pdo,
-			uint32_t *op_curr, uint32_t *max_curr)
+void pd_extract_rdo_power(uint32_t rdo, uint32_t pdo, uint32_t *op_curr, uint32_t *max_curr)
 {
 	uint32_t op_power, max_power, vmin;
 
@@ -261,8 +259,7 @@ uint32_t pd_reset_pdo_power(uint32_t pdo, uint32_t imax)
 
 uint32_t pd_get_cable_curr_lvl(struct pd_port *pd_port)
 {
-	return PD_VDO_CABLE_CURR(
-		pd_port->cable_vdos[VDO_DISCOVER_ID_CABLE]);
+	return PD_VDO_CABLE_CURR(pd_port->cable_vdos[VDO_DISCOVER_ID_CABLE]);
 }
 
 uint32_t pd_get_cable_current_limit(struct pd_port *pd_port)
@@ -336,9 +333,7 @@ int pd_set_rx_enable(struct pd_port *pd_port, uint8_t enable)
 int pd_enable_vbus_valid_detection(struct pd_port *pd_port, bool wait_valid)
 {
 	PE_DBG("WaitVBUS=%d\r\n", wait_valid);
-	pd_notify_pe_wait_vbus_once(pd_port,
-		wait_valid ? PD_WAIT_VBUS_VALID_ONCE :
-					PD_WAIT_VBUS_INVALID_ONCE);
+	pd_notify_pe_wait_vbus_once(pd_port, wait_valid ? PD_WAIT_VBUS_VALID_ONCE : PD_WAIT_VBUS_INVALID_ONCE);
 	return 0;
 }
 
@@ -364,8 +359,7 @@ static inline int pd_update_msg_header(struct pd_port *pd_port)
 	uint8_t pd_rev = PD_REV20;
 #endif	/* CONFIG_USB_PD_REV30 */
 
-	return tcpci_set_msg_header(pd_port->tcpc_dev,
-			pd_port->power_role, pd_port->data_role, pd_rev);
+	return tcpci_set_msg_header(pd_port->tcpc_dev, pd_port->power_role, pd_port->data_role, pd_rev);
 }
 
 int pd_set_data_role(struct pd_port *pd_port, uint8_t dr)
@@ -439,8 +433,7 @@ int pd_set_vconn(struct pd_port *pd_port, int enable)
 	dual_role_instance_changed(pd_port->tcpc_dev->dr_usb);
 #endif /* CONFIG_DUAL_ROLE_USB_INTF */
 
-	tcpci_notify_role_swap(pd_port->tcpc_dev,
-				TCP_NOTIFY_VCONN_SWAP, enable);
+	tcpci_notify_role_swap(pd_port->tcpc_dev, TCP_NOTIFY_VCONN_SWAP, enable);
 	return tcpci_set_vconn(pd_port->tcpc_dev, enable);
 }
 
@@ -569,8 +562,7 @@ int pd_send_ctrl_msg(struct pd_port *pd_port, uint8_t sop_type, uint8_t msg)
 	return pd_send_message(pd_port, sop_type, msg, false, 0, NULL);
 }
 
-int pd_send_data_msg(struct pd_port *pd_port,
-		uint8_t sop_type, uint8_t msg, uint8_t cnt, uint32_t *payload)
+int pd_send_data_msg(struct pd_port *pd_port, uint8_t sop_type, uint8_t msg, uint8_t cnt, uint32_t *payload)
 {
 	return pd_send_message(pd_port, sop_type, msg, false, cnt, payload);
 }
@@ -594,8 +586,7 @@ int pd_send_ext_msg(struct pd_port *pd_port,
 
 int pd_send_status(struct pd_port *pd_port)
 {
-	return pd_send_ext_msg(pd_port, TCPC_TX_SOP, PD_EXT_STATUS,
-			false, 0, PD_SDB_SIZE, pd_port->local_status);
+	return pd_send_ext_msg(pd_port, TCPC_TX_SOP, PD_EXT_STATUS,	false, 0, PD_SDB_SIZE, pd_port->local_status);
 }
 
 #endif	/* CONFIG_USB_PD_REV30 */
