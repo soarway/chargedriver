@@ -60,8 +60,7 @@ DECL_PE_STATE_REACTION(PD_TIMER_SENDER_RESPONSE);
  * [BLOCK] Porcess PD Ctrl MSG
  */
 
-static inline bool pd_process_ctrl_msg_good_crc(
-		struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_ctrl_msg_good_crc(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	switch (pd_port->pe_state_curr) {
 	case PE_DRS_DFP_UFP_REJECT_DR_SWAP:
@@ -105,8 +104,7 @@ static inline bool pd_process_ctrl_msg(struct pd_port *pd_port, struct pd_event 
  * [BLOCK] Porcess DPM MSG
  */
 
-static inline bool pd_process_dpm_msg(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_dpm_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool ret = false;
 
@@ -126,8 +124,7 @@ static inline bool pd_process_dpm_msg(
  * [BLOCK] Porcess Timer MSG
  */
 
-static inline bool pd_process_timer_msg(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_timer_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool ret = false;
 

@@ -319,8 +319,7 @@ static void tcpc_device_release(struct device *dev)
 
 static void tcpc_init_work(struct work_struct *work);
 
-struct tcpc_device *tcpc_device_register(struct device *parent,
-	struct tcpc_desc *tcpc_desc, struct tcpc_ops *ops, void *drv_data)
+struct tcpc_device *tcpc_device_register(struct device *parent,	struct tcpc_desc *tcpc_desc, struct tcpc_ops *ops, void *drv_data)
 {
 	struct tcpc_device *tcpc;
 	int ret = 0;

@@ -25,8 +25,8 @@
 #define DUAL_ROLE_NOTIFICATION_TIMEOUT 2000
 static ssize_t dual_role_store_property(struct device *dev,	struct device_attribute *attr,const char *buf, size_t count);
 static ssize_t dual_role_show_property(struct device *dev, struct device_attribute *attr, char *buf);
-#define DUAL_ROLE_ATTR(_name)				\
-{							\
+#define DUAL_ROLE_ATTR(_name)			\
+{										\
 	.attr = { .name = #_name },			\
 	.show = dual_role_show_property,		\
 	.store = dual_role_store_property,		\
@@ -179,9 +179,7 @@ static int devm_dual_role_match(struct device *dev, void *res, void *data)
 		return 0;
 	return *r == data;
 }
-void devm_dual_role_instance_unregister(struct device *dev,
-					struct dual_role_phy_instance
-					*dual_role)
+void devm_dual_role_instance_unregister(struct device *dev, struct dual_role_phy_instance *dual_role)
 {
 	int rc;
 	rc = devres_release(dev, devm_dual_role_release, devm_dual_role_match, dual_role);
@@ -265,9 +263,7 @@ static ssize_t dual_role_show_property(struct device *dev, struct device_attribu
 	} else
 		return -EIO;
 }
-static ssize_t dual_role_store_property(struct device *dev,
-					struct device_attribute *attr,
-					const char *buf, size_t count)
+static ssize_t dual_role_store_property(struct device *dev,struct device_attribute *attr,const char *buf, size_t count)
 {
 	ssize_t ret;
 	struct dual_role_phy_instance *dual_role = dev_get_drvdata(dev);
@@ -304,8 +300,7 @@ static ssize_t dual_role_store_property(struct device *dev,
 			ret = -ENOTSUPP;
 			goto error;
 		}
-		if (!strncmp(*(text_array + i), dup_buf,
-			     strlen(*(text_array + i)))) {
+		if (!strncmp(*(text_array + i), dup_buf, strlen(*(text_array + i)))) {
 			value = i;
 			break;
 		}

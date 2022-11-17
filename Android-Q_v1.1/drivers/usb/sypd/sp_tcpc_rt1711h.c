@@ -231,7 +231,7 @@ static int rt1711_write_device(void *client, u32 reg, int len, const void *src)
 	}
 	return ret;
 }
-
+//读寄存器， 长度1
 static int rt1711_reg_read(struct i2c_client *i2c, u8 reg)
 {
 	struct rt1711_chip *chip = i2c_get_clientdata(i2c);
@@ -241,7 +241,7 @@ static int rt1711_reg_read(struct i2c_client *i2c, u8 reg)
 #ifdef CONFIG_RT_REGMAP
 	ret = rt_regmap_block_read(chip->m_dev, reg, 1, &val);
 #else
-	ret = rt1711_read_device(chip->client, reg, 1, &val);
+	ret = rt1711_read_device(chip->client, reg, 1, &val);//调用封装的函数
 #endif /* CONFIG_RT_REGMAP */
 	if (ret < 0) {
 		dev_err(chip->dev, "[OBEI]rt1711 reg read fail\n");
@@ -249,7 +249,7 @@ static int rt1711_reg_read(struct i2c_client *i2c, u8 reg)
 	}
 	return val;
 }
-
+//写寄存器 长度1
 static int rt1711_reg_write(struct i2c_client *i2c, u8 reg, const u8 data)
 {
 	struct rt1711_chip *chip = i2c_get_clientdata(i2c);
@@ -258,27 +258,27 @@ static int rt1711_reg_write(struct i2c_client *i2c, u8 reg, const u8 data)
 #ifdef CONFIG_RT_REGMAP
 	ret = rt_regmap_block_write(chip->m_dev, reg, 1, &data);
 #else
-	ret = rt1711_write_device(chip->client, reg, 1, &data);
+	ret = rt1711_write_device(chip->client, reg, 1, &data);//调用封装的函数
 #endif /* CONFIG_RT_REGMAP */
 	if (ret < 0)
 		dev_err(chip->dev, "[OBEI]rt1711 reg write fail\n");
 	return ret;
 }
-
-static int rt1711_block_read(struct i2c_client *i2c,u8 reg, int len, void *dst)
+//读寄存器 长度len
+static int rt1711_block_read(struct i2c_client *i2c, u8 reg, int len, void *dst)
 {
 	struct rt1711_chip *chip = i2c_get_clientdata(i2c);
 	int ret = 0;
 #ifdef CONFIG_RT_REGMAP
 	ret = rt_regmap_block_read(chip->m_dev, reg, len, dst);
 #else
-	ret = rt1711_read_device(chip->client, reg, len, dst);
+	ret = rt1711_read_device(chip->client, reg, len, dst);//调用封装的函数
 #endif /* #ifdef CONFIG_RT_REGMAP */
 	if (ret < 0)
 		dev_err(chip->dev, "[OBEI]rt1711 block read fail\n");
 	return ret;
 }
-
+//写寄存器，长度len
 static int rt1711_block_write(struct i2c_client *i2c,u8 reg, int len, const void *src)
 {
 	struct rt1711_chip *chip = i2c_get_clientdata(i2c);
@@ -286,28 +286,28 @@ static int rt1711_block_write(struct i2c_client *i2c,u8 reg, int len, const void
 #ifdef CONFIG_RT_REGMAP
 	ret = rt_regmap_block_write(chip->m_dev, reg, len, src);
 #else
-	ret = rt1711_write_device(chip->client, reg, len, src);
+	ret = rt1711_write_device(chip->client, reg, len, src);//调用封装的函数
 #endif /* #ifdef CONFIG_RT_REGMAP */
 	if (ret < 0)
 		dev_err(chip->dev, "[OBEI]rt1711 block write fail\n");
 	return ret;
 }
-
+//写寄存器，长度2
 static int32_t rt1711_write_word(struct i2c_client *client,	uint8_t reg_addr, uint16_t data)
 {
 	int ret;
 
 	/* don't need swap */
-	ret = rt1711_block_write(client, reg_addr, 2, (uint8_t *)&data);
+	ret = rt1711_block_write(client, reg_addr, 2, (uint8_t *)&data);//调用封装的函数
 	return ret;
 }
-
+//读寄存器，长度2
 static int32_t rt1711_read_word(struct i2c_client *client,uint8_t reg_addr, uint16_t *data)
 {
 	int ret;
 
 	/* don't need swap */
-	ret = rt1711_block_read(client, reg_addr, 2, (uint8_t *)data);
+	ret = rt1711_block_read(client, reg_addr, 2, (uint8_t *)data);//调用封装的函数
 	return ret;
 }
 
@@ -315,21 +315,21 @@ static inline int rt1711_i2c_write8(struct tcpc_device *tcpc, u8 reg, const u8 d
 {
 	struct rt1711_chip *chip = tcpc_get_dev_data(tcpc);
 
-	return rt1711_reg_write(chip->client, reg, data);
+	return rt1711_reg_write(chip->client, reg, data);//调用封装的函数
 }
 
 static inline int rt1711_i2c_write16(struct tcpc_device *tcpc, u8 reg, const u16 data)
 {
 	struct rt1711_chip *chip = tcpc_get_dev_data(tcpc);
 
-	return rt1711_write_word(chip->client, reg, data);
+	return rt1711_write_word(chip->client, reg, data);//调用封装的函数
 }
 
 static inline int rt1711_i2c_read8(struct tcpc_device *tcpc, u8 reg)
 {
 	struct rt1711_chip *chip = tcpc_get_dev_data(tcpc);
 
-	return rt1711_reg_read(chip->client, reg);
+	return rt1711_reg_read(chip->client, reg);//调用封装的函数
 }
 
 static inline int rt1711_i2c_read16(struct tcpc_device *tcpc, u8 reg)
@@ -338,7 +338,7 @@ static inline int rt1711_i2c_read16(struct tcpc_device *tcpc, u8 reg)
 	u16 data;
 	int ret;
 
-	ret = rt1711_read_word(chip->client, reg, &data);
+	ret = rt1711_read_word(chip->client, reg, &data);//调用封装的函数
 	if (ret < 0)
 		return ret;
 	return data;
@@ -350,7 +350,7 @@ static struct rt_regmap_fops rt1711_regmap_fops = {
 	.write_device = rt1711_write_device,
 };
 #endif /* CONFIG_RT_REGMAP */
-
+//REGMAP注册
 static int rt1711_regmap_init(struct rt1711_chip *chip)
 {
 #ifdef CONFIG_RT_REGMAP
@@ -389,7 +389,7 @@ static int rt1711_regmap_init(struct rt1711_chip *chip)
 #endif
 	return 0;
 }
-
+//REGMAP取消注册
 static int rt1711_regmap_deinit(struct rt1711_chip *chip)
 {
 #ifdef CONFIG_RT_REGMAP
@@ -397,7 +397,7 @@ static int rt1711_regmap_deinit(struct rt1711_chip *chip)
 #endif
 	return 0;
 }
-
+//软件设置设备重启
 static inline int rt1711_software_reset(struct tcpc_device *tcpc)
 {
 	int ret = rt1711_i2c_write8(tcpc, RT1711H_REG_SWRESET, 1);
@@ -408,12 +408,12 @@ static inline int rt1711_software_reset(struct tcpc_device *tcpc)
 	usleep_range(1000, 2000);
 	return 0;
 }
-
+//往寄存器0x23写命令
 static inline int rt1711_command(struct tcpc_device *tcpc, uint8_t cmd)
 {
 	return rt1711_i2c_write8(tcpc, TCPC_V10_REG_COMMAND, cmd);
 }
-
+//修改alert的mask值
 static int rt1711_init_alert_mask(struct tcpc_device *tcpc)
 {
 	uint16_t mask;
@@ -434,21 +434,21 @@ static int rt1711_init_alert_mask(struct tcpc_device *tcpc)
 
 	return rt1711_write_word(chip->client, TCPC_V10_REG_ALERT_MASK, mask);
 }
-
+//修改状态的mask值
 static int rt1711_init_power_status_mask(struct tcpc_device *tcpc)
 {
 	const uint8_t mask = TCPC_V10_REG_POWER_STATUS_VBUS_PRES;
 
 	return rt1711_i2c_write8(tcpc,TCPC_V10_REG_POWER_STATUS_MASK, mask);
 }
-
+//修改错误的mask值
 static int rt1711_init_fault_mask(struct tcpc_device *tcpc)
 {
 	const uint8_t mask =TCPC_V10_REG_FAULT_STATUS_VCONN_OV |TCPC_V10_REG_FAULT_STATUS_VCONN_OC;
 
 	return rt1711_i2c_write8(tcpc,TCPC_V10_REG_FAULT_STATUS_MASK, mask);
 }
-
+//初始化mask
 static int rt1711_init_rt_mask(struct tcpc_device *tcpc)
 {
 	uint8_t rt_mask = 0;
@@ -471,7 +471,7 @@ static int rt1711_init_rt_mask(struct tcpc_device *tcpc)
 
 	return rt1711_i2c_write8(tcpc, RT1711H_REG_RT_MASK, rt_mask);
 }
-
+//轮询控制：取消work，然后在调用work
 static inline void rt1711_poll_ctrl(struct rt1711_chip *chip)
 {
 	cancel_delayed_work_sync(&chip->poll_work);
@@ -483,7 +483,7 @@ static inline void rt1711_poll_ctrl(struct rt1711_chip *chip)
 
 	schedule_delayed_work(&chip->poll_work, msecs_to_jiffies(40));
 }
-
+//中断控制器函数
 static void rt1711_irq_work_handler(struct kthread_work *work)
 {
 	struct rt1711_chip *chip = container_of(work, struct rt1711_chip, irq_work);
@@ -513,7 +513,7 @@ static void rt1711_irq_work_handler(struct kthread_work *work)
 	gpio_set_value(DEBUG_GPIO, 1);
 #endif
 }
-
+//pool_work的执行函数
 static void rt1711_poll_work(struct work_struct *work)
 {
 	struct rt1711_chip *chip = container_of(work, struct rt1711_chip, poll_work.work);
@@ -521,7 +521,7 @@ static void rt1711_poll_work(struct work_struct *work)
 	if (atomic_dec_and_test(&chip->poll_count))
 		cpu_idle_poll_ctrl(false);
 }
-
+//中断处理函数
 static irqreturn_t rt1711_intr_handler(int irq, void *data)
 {
 	struct rt1711_chip *chip = data;
@@ -537,7 +537,7 @@ static irqreturn_t rt1711_intr_handler(int irq, void *data)
     kthread_queue_work(&chip->irq_worker, &chip->irq_work);//uu+
 	return IRQ_HANDLED;
 }
-
+//初始化alert
 static int rt1711_init_alert(struct tcpc_device *tcpc)
 {
 	struct rt1711_chip *chip = tcpc_get_dev_data(tcpc);
@@ -608,7 +608,7 @@ init_alert_err:
 	return -EINVAL;
 
 }
-
+//清除alert状态
 int rt1711_alert_status_clear(struct tcpc_device *tcpc, uint32_t mask)
 {
 	int ret;
@@ -637,26 +637,23 @@ int rt1711_alert_status_clear(struct tcpc_device *tcpc, uint32_t mask)
 
 	return 0;
 }
-
-static int rt1711h_set_clock_gating(struct tcpc_device *tcpc_dev,
-									bool en)
+//设置时钟
+static int rt1711h_set_clock_gating(struct tcpc_device *tcpc_dev, bool en)
 {
 	int ret = 0;
 
 #ifdef CONFIG_TCPC_CLOCK_GATING
-	uint8_t clk2 = RT1711H_REG_CLK_DIV_600K_EN
-		| RT1711H_REG_CLK_DIV_300K_EN | RT1711H_REG_CLK_CK_300K_EN;
+	uint8_t clk2 = RT1711H_REG_CLK_DIV_600K_EN | RT1711H_REG_CLK_DIV_300K_EN | RT1711H_REG_CLK_CK_300K_EN;
 
 	uint8_t clk3 = RT1711H_REG_CLK_DIV_2P4M_EN;
 
 	if (!en) {
-		clk2 |=
-			RT1711H_REG_CLK_BCLK2_EN | RT1711H_REG_CLK_BCLK_EN;
-		clk3 |=
-			RT1711H_REG_CLK_CK_24M_EN | RT1711H_REG_CLK_PCLK_EN;
+		clk2 |=	RT1711H_REG_CLK_BCLK2_EN | RT1711H_REG_CLK_BCLK_EN;
+		clk3 |=	RT1711H_REG_CLK_CK_24M_EN | RT1711H_REG_CLK_PCLK_EN;
 	}
 
 	if (en) {
+		//清除alert状态
 		ret = rt1711_alert_status_clear(tcpc_dev,
 			TCPC_REG_ALERT_RX_STATUS |
 			TCPC_REG_ALERT_RX_HARD_RST |
@@ -671,9 +668,8 @@ static int rt1711h_set_clock_gating(struct tcpc_device *tcpc_dev,
 
 	return ret;
 }
-
-static inline int rt1711h_init_cc_params(
-			struct tcpc_device *tcpc, uint8_t cc_res)
+//初始化CC参数
+static inline int rt1711h_init_cc_params(struct tcpc_device *tcpc, uint8_t cc_res)
 {
 	int rv = 0;
 
@@ -701,7 +697,7 @@ static inline int rt1711h_init_cc_params(
 
 	return rv;
 }
-
+//tcpc初始化
 static int rt1711_tcpc_init(struct tcpc_device *tcpc, bool sw_reset)
 {
 	int ret;
@@ -717,23 +713,18 @@ static int rt1711_tcpc_init(struct tcpc_device *tcpc, bool sw_reset)
 	}
 
 	/* CK_300K from 320K, SHIPPING off, AUTOIDLE enable, TIMEOUT = 32ms */
-	rt1711_i2c_write8(tcpc, RT1711H_REG_IDLE_CTRL,
-		RT1711H_REG_IDLE_SET(0, 1, 1, 2));
+	rt1711_i2c_write8(tcpc, RT1711H_REG_IDLE_CTRL, RT1711H_REG_IDLE_SET(0, 1, 1, 2));
 
 #ifdef CONFIG_TCPC_I2CRST_EN
-	rt1711_i2c_write8(tcpc,
-		RT1711H_REG_I2CRST_CTRL,
-		RT1711H_REG_I2CRST_SET(true, 0x0f));
+	rt1711_i2c_write8(tcpc,	RT1711H_REG_I2CRST_CTRL, RT1711H_REG_I2CRST_SET(true, 0x0f));
 #endif	/* CONFIG_TCPC_I2CRST_EN */
 
 	/* UFP Both RD setting */
 	/* DRP = 0, RpVal = 0 (Default), Rd, Rd */
-	rt1711_i2c_write8(tcpc, TCPC_V10_REG_ROLE_CTRL,
-		TCPC_V10_REG_ROLE_CTRL_RES_SET(0, 0, CC_RD, CC_RD));
+	rt1711_i2c_write8(tcpc, TCPC_V10_REG_ROLE_CTRL, TCPC_V10_REG_ROLE_CTRL_RES_SET(0, 0, CC_RD, CC_RD));
 
 	if (chip->chip_id == RT1711H_DID_A) {
-		rt1711_i2c_write8(tcpc, TCPC_V10_REG_FAULT_CTRL,
-			TCPC_V10_REG_FAULT_CTRL_DIS_VCONN_OV);
+		rt1711_i2c_write8(tcpc, TCPC_V10_REG_FAULT_CTRL, TCPC_V10_REG_FAULT_CTRL_DIS_VCONN_OV);
 	}
 
 	/*
@@ -757,8 +748,7 @@ static int rt1711_tcpc_init(struct tcpc_device *tcpc, bool sw_reset)
 	if (!(tcpc->tcpc_flags & TCPC_FLAGS_RETRY_CRC_DISCARD))
 		retry_discard_old = true;
 
-	rt1711_i2c_write8(tcpc, RT1711H_REG_PHY_CTRL1,
-		RT1711H_REG_PHY_CTRL1_SET(retry_discard_old, 7, 0, 1));
+	rt1711_i2c_write8(tcpc, RT1711H_REG_PHY_CTRL1, RT1711H_REG_PHY_CTRL1_SET(retry_discard_old, 7, 0, 1));
 
 	tcpci_alert_status_clear(tcpc, 0xffffffff);
 
@@ -769,7 +759,12 @@ static int rt1711_tcpc_init(struct tcpc_device *tcpc, bool sw_reset)
 
 	return 0;
 }
-
+//错误状态 将第5位清零
+/*
+Low power mode enable 
+0b : Low power mode RD (default) 
+1b : Low power mode RP
+*/
 static inline int rt1711_fault_status_vconn_ov(struct tcpc_device *tcpc)
 {
 	int ret;
@@ -781,7 +776,7 @@ static inline int rt1711_fault_status_vconn_ov(struct tcpc_device *tcpc)
 	ret &= ~RT1711H_REG_DISCHARGE_EN;
 	return rt1711_i2c_write8(tcpc, RT1711H_REG_BMC_CTRL, ret);
 }
-
+//错误状态清0 0x1F = FAULT_STATUS 寄存器
 int rt1711_fault_status_clear(struct tcpc_device *tcpc, uint8_t status)
 {
 	int ret;
@@ -792,7 +787,7 @@ int rt1711_fault_status_clear(struct tcpc_device *tcpc, uint8_t status)
 	rt1711_i2c_write8(tcpc, TCPC_V10_REG_FAULT_STATUS, status);
 	return 0;
 }
-
+//0x10  0x11 寄存器都是alert状态
 int rt1711_get_alert_status(struct tcpc_device *tcpc, uint32_t *alert)
 {
 	int ret;
@@ -801,6 +796,7 @@ int rt1711_get_alert_status(struct tcpc_device *tcpc, uint32_t *alert)
 	uint8_t v2;
 #endif
 
+	//读取2个字节
 	ret = rt1711_i2c_read16(tcpc, TCPC_V10_REG_ALERT);
 	if (ret < 0)
 		return ret;
@@ -808,19 +804,19 @@ int rt1711_get_alert_status(struct tcpc_device *tcpc, uint32_t *alert)
 	*alert = (uint16_t) ret;
 
 #ifdef CONFIG_TCPC_VSAFE0V_DETECT_IC
+	//读取1个字节
 	ret = rt1711_i2c_read8(tcpc, RT1711H_REG_RT_INT);
 	if (ret < 0)
 		return ret;
 
 	v2 = (uint8_t) ret;
-	*alert |= v2 << 16;
+	*alert |= v2 << 16;  //把RT1711H_REG_RT_INT的内容放到第3个字节
 #endif
 
 	return 0;
 }
-
-static int rt1711_get_power_status(
-		struct tcpc_device *tcpc, uint16_t *pwr_status)
+//获取电源状态
+static int rt1711_get_power_status(struct tcpc_device *tcpc, uint16_t *pwr_status)
 {
 	int ret;
 
@@ -843,7 +839,7 @@ static int rt1711_get_power_status(
 #endif
 	return 0;
 }
-
+//获取错误状态
 int rt1711_get_fault_status(struct tcpc_device *tcpc, uint8_t *status)
 {
 	int ret;
@@ -854,7 +850,7 @@ int rt1711_get_fault_status(struct tcpc_device *tcpc, uint8_t *status)
 	*status = (uint8_t) ret;
 	return 0;
 }
-
+//获取CC值
 static int rt1711_get_cc(struct tcpc_device *tcpc, int *cc1, int *cc2)
 {
 	int status, role_ctrl, cc_role;
@@ -900,12 +896,11 @@ static int rt1711_get_cc(struct tcpc_device *tcpc, int *cc1, int *cc2)
 	if (*cc2 != TYPEC_CC_VOLT_OPEN)
 		*cc2 |= (act_as_sink << 2);
 
-	rt1711h_init_cc_params(tcpc,
-		(uint8_t)tcpc->typec_polarity ? *cc2 : *cc1);
+	rt1711h_init_cc_params(tcpc, (uint8_t)tcpc->typec_polarity ? *cc2 : *cc1);
 
 	return 0;
 }
-
+//设置CC值
 static int rt1711_set_cc(struct tcpc_device *tcpc, int pull)
 {
 	int ret;
@@ -915,11 +910,9 @@ static int rt1711_set_cc(struct tcpc_device *tcpc, int pull)
 	RT1711_INFO("\n");
 	pull = TYPEC_CC_PULL_GET_RES(pull);
 	if (pull == TYPEC_CC_DRP) {
-		data = TCPC_V10_REG_ROLE_CTRL_RES_SET(
-				1, rp_lvl, TYPEC_CC_RD, TYPEC_CC_RD);
+		data = TCPC_V10_REG_ROLE_CTRL_RES_SET(1, rp_lvl, TYPEC_CC_RD, TYPEC_CC_RD);
 
-		ret = rt1711_i2c_write8(
-			tcpc, TCPC_V10_REG_ROLE_CTRL, data);
+		ret = rt1711_i2c_write8(tcpc, TCPC_V10_REG_ROLE_CTRL, data);
 
 		if (ret == 0)
 			ret = rt1711_command(tcpc, TCPM_CMD_LOOK_CONNECTION);
@@ -935,13 +928,12 @@ static int rt1711_set_cc(struct tcpc_device *tcpc, int pull)
 
 	return 0;
 }
-
+//设置极性
 static int rt1711_set_polarity(struct tcpc_device *tcpc, int polarity)
 {
 	int data;
 
-	data = rt1711h_init_cc_params(tcpc,
-		tcpc->typec_remote_cc[polarity]);
+	data = rt1711h_init_cc_params(tcpc, tcpc->typec_remote_cc[polarity]);
 	if (data)
 		return data;
 
@@ -979,8 +971,7 @@ static int rt1711_set_vconn(struct tcpc_device *tcpc, int enable)
 		return rv;
 
 #ifndef CONFIG_TCPC_IDLE_MODE
-	rv = rt1711_i2c_write8(tcpc, RT1711H_REG_IDLE_CTRL,
-		RT1711H_REG_IDLE_SET(0, 1, enable ? 0 : 1, 2));
+	rv = rt1711_i2c_write8(tcpc, RT1711H_REG_IDLE_CTRL,	RT1711H_REG_IDLE_SET(0, 1, enable ? 0 : 1, 2));
 #endif /* CONFIG_TCPC_IDLE_MODE */
 
 	return rv;
@@ -997,8 +988,7 @@ static int rt1711_is_low_power_mode(struct tcpc_device *tcpc_dev)
 	return (rv & RT1711H_REG_BMCIO_LPEN) != 0;
 }
 
-static int rt1711_set_low_power_mode(
-		struct tcpc_device *tcpc_dev, bool en, int pull)
+static int rt1711_set_low_power_mode(struct tcpc_device *tcpc_dev, bool en, int pull)
 {
 	int rv = 0;
 	uint8_t data;
@@ -1009,8 +999,7 @@ static int rt1711_set_low_power_mode(
 		if (pull & TYPEC_CC_RP)
 			data |= RT1711H_REG_BMCIO_LPRPRD;
 	} else
-		data = RT1711H_REG_BMCIO_BG_EN |
-			RT1711H_REG_VBUS_DET_EN | RT1711H_REG_BMCIO_OSC_EN;
+		data = RT1711H_REG_BMCIO_BG_EN | RT1711H_REG_VBUS_DET_EN | RT1711H_REG_BMCIO_OSC_EN;
 
 	rv = rt1711_i2c_write8(tcpc_dev, RT1711H_REG_BMC_CTRL, data);
 	return rv;
@@ -1030,8 +1019,7 @@ int rt1711h_set_watchdog(struct tcpc_device *tcpc_dev, bool en)
 #ifdef CONFIG_TCPC_INTRST_EN
 int rt1711h_set_intrst(struct tcpc_device *tcpc_dev, bool en)
 {
-	return rt1711_i2c_write8(tcpc_dev,
-		RT1711H_REG_INTRST_CTRL, RT1711H_REG_INTRST_SET(en, 3));
+	return rt1711_i2c_write8(tcpc_dev,RT1711H_REG_INTRST_CTRL, RT1711H_REG_INTRST_SET(en, 3));
 }
 #endif	/* CONFIG_TCPC_INTRST_EN */
 
@@ -1041,13 +1029,9 @@ static int rt1711_tcpc_deinit(struct tcpc_device *tcpc_dev)
 	rt1711_set_cc(tcpc_dev, TYPEC_CC_DRP);
 	rt1711_set_cc(tcpc_dev, TYPEC_CC_OPEN);
 
-	rt1711_i2c_write8(tcpc_dev,
-		RT1711H_REG_I2CRST_CTRL,
-		RT1711H_REG_I2CRST_SET(true, 4));
+	rt1711_i2c_write8(tcpc_dev,RT1711H_REG_I2CRST_CTRL,RT1711H_REG_I2CRST_SET(true, 4));
 
-	rt1711_i2c_write8(tcpc_dev,
-		RT1711H_REG_INTRST_CTRL,
-		RT1711H_REG_INTRST_SET(true, 0));
+	rt1711_i2c_write8(tcpc_dev,RT1711H_REG_INTRST_CTRL,RT1711H_REG_INTRST_SET(true, 0));
 #else
 	rt1711_i2c_write8(tcpc_dev, RT1711H_REG_SWRESET, 1);
 #endif	/* CONFIG_TCPC_SHUTDOWN_CC_DETACH */
@@ -1056,14 +1040,11 @@ static int rt1711_tcpc_deinit(struct tcpc_device *tcpc_dev)
 }
 
 #ifdef CONFIG_USB_POWER_DELIVERY
-static int rt1711_set_msg_header(
-	struct tcpc_device *tcpc, int power_role, int data_role, uint8_t pd_rev)
+static int rt1711_set_msg_header(struct tcpc_device *tcpc, int power_role, int data_role, uint8_t pd_rev)
 {
-	uint8_t msg_hdr = TCPC_V10_REG_MSG_HDR_INFO_SET(
-		data_role, power_role, pd_rev);
+	uint8_t msg_hdr = TCPC_V10_REG_MSG_HDR_INFO_SET(data_role, power_role, pd_rev);
 
-	return rt1711_i2c_write8(
-		tcpc, TCPC_V10_REG_MSG_HDR_INFO, msg_hdr);
+	return rt1711_i2c_write8(tcpc, TCPC_V10_REG_MSG_HDR_INFO, msg_hdr);
 }
 
 static int rt1711_set_rx_enable(struct tcpc_device *tcpc, uint8_t enable)
@@ -1082,18 +1063,15 @@ static int rt1711_set_rx_enable(struct tcpc_device *tcpc, uint8_t enable)
 	return ret;
 }
 
-static int rt1711_get_message(struct tcpc_device *tcpc, uint32_t *payload,
-			uint16_t *msg_head, enum tcpm_transmit_type *frame_type)
+static int rt1711_get_message(struct tcpc_device *tcpc, uint32_t *payload, uint16_t *msg_head, enum tcpm_transmit_type *frame_type)
 {
 	struct rt1711_chip *chip = tcpc_get_dev_data(tcpc);
 	int rv;
 	uint8_t type, cnt = 0;
 	uint8_t buf[4];
-	const uint16_t alert_rx =
-		TCPC_V10_REG_ALERT_RX_STATUS|TCPC_V10_REG_RX_OVERFLOW;
+	const uint16_t alert_rx = TCPC_V10_REG_ALERT_RX_STATUS|TCPC_V10_REG_RX_OVERFLOW;
 
-	rv = rt1711_block_read(chip->client,
-			TCPC_V10_REG_RX_BYTE_CNT, 4, buf);
+	rv = rt1711_block_read(chip->client, TCPC_V10_REG_RX_BYTE_CNT, 4, buf);
 	cnt = buf[0];
 	type = buf[1];
 	*msg_head = *(uint16_t *)&buf[2];
@@ -1101,8 +1079,7 @@ static int rt1711_get_message(struct tcpc_device *tcpc, uint32_t *payload,
 	/* TCPC 1.0 ==> no need to subtract the size of msg_head */
 	if (rv >= 0 && cnt > 3) {
 		cnt -= 3; /* MSG_HDR */
-		rv = rt1711_block_read(chip->client, TCPC_V10_REG_RX_DATA, cnt,
-				(uint8_t *) payload);
+		rv = rt1711_block_read(chip->client, TCPC_V10_REG_RX_DATA, cnt,	(uint8_t *) payload);
 	}
 
 	*frame_type = (enum tcpm_transmit_type) type;
@@ -1114,8 +1091,7 @@ static int rt1711_get_message(struct tcpc_device *tcpc, uint32_t *payload,
 	return rv;
 }
 
-static int rt1711_set_bist_carrier_mode(
-	struct tcpc_device *tcpc, uint8_t pattern)
+static int rt1711_set_bist_carrier_mode(struct tcpc_device *tcpc, uint8_t pattern)
 {
 	/* Don't support this function */
 	return 0;
@@ -1127,13 +1103,11 @@ static int rt1711_set_bist_carrier_mode(
 #ifdef CONFIG_USB_PD_RETRY_CRC_DISCARD
 static int rt1711_retransmit(struct tcpc_device *tcpc)
 {
-	return rt1711_i2c_write8(tcpc, TCPC_V10_REG_TRANSMIT,
-			TCPC_V10_REG_TRANSMIT_SET(TCPC_TX_SOP));
+	return rt1711_i2c_write8(tcpc, TCPC_V10_REG_TRANSMIT,TCPC_V10_REG_TRANSMIT_SET(TCPC_TX_SOP));
 }
 #endif
 
-static int rt1711_transmit(struct tcpc_device *tcpc,
-	enum tcpm_transmit_type type, uint16_t header, const uint32_t *data)
+static int rt1711_transmit(struct tcpc_device *tcpc,enum tcpm_transmit_type type, uint16_t header, const uint32_t *data)
 {
 	struct rt1711_chip *chip = tcpc_get_dev_data(tcpc);
 	int rv;
@@ -1149,15 +1123,12 @@ static int rt1711_transmit(struct tcpc_device *tcpc,
 		if (data_cnt > 0)
 			memcpy(temp+3, (uint8_t *)data, data_cnt);
 
-		rv = rt1711_block_write(chip->client,
-				TCPC_V10_REG_TX_BYTE_CNT,
-				packet_cnt+1, (uint8_t *)temp);
+		rv = rt1711_block_write(chip->client,TCPC_V10_REG_TX_BYTE_CNT,packet_cnt+1, (uint8_t *)temp);
 		if (rv < 0)
 			return rv;
 	}
 
-	rv = rt1711_i2c_write8(tcpc, TCPC_V10_REG_TRANSMIT,
-			TCPC_V10_REG_TRANSMIT_SET(type));
+	rv = rt1711_i2c_write8(tcpc, TCPC_V10_REG_TRANSMIT,	TCPC_V10_REG_TRANSMIT_SET(type));
 	return rv;
 }
 
@@ -1216,7 +1187,7 @@ static struct tcpc_ops rt1711_tcpc_ops = {
 	.retransmit = rt1711_retransmit,
 #endif	/* CONFIG_USB_PD_RETRY_CRC_DISCARD */
 };
-
+//解析设备树
 static int rt_parse_device_tree(struct rt1711_chip *chip, struct device *dev)
 {
 	struct device_node *np = dev->of_node;
@@ -1236,6 +1207,7 @@ static int rt_parse_device_tree(struct rt1711_chip *chip, struct device *dev)
  * If your platform cannot not pass this check function, please config
  * PD_DBG_INFO, this will provide the threaded debug message for you.
  */
+//检测printk函数的性能
 #if TCPC_ENABLE_ANYMSG
 static void check_printk_performance(void)
 {
@@ -1274,6 +1246,7 @@ static void check_printk_performance(void)
 }
 #endif /* TCPC_ENABLE_ANYMSG */
 
+//从设备树中读取数据，并注册设备
 static int rt1711_tcpcdev_init(struct rt1711_chip *chip, struct device *dev)
 {
 	struct tcpc_desc *desc;
@@ -1361,7 +1334,7 @@ static int rt1711_tcpcdev_init(struct rt1711_chip *chip, struct device *dev)
 
 #define RICHTEK_1711_VID	0x29cf
 #define RICHTEK_1711_PID	0x1711
-
+//从及存储中读取VID, PID, DID
 static inline int rt1711h_check_revision(struct i2c_client *client)
 {
 	u16 vid, pid, did;
@@ -1404,7 +1377,7 @@ static inline int rt1711h_check_revision(struct i2c_client *client)
 
 	return did;
 }
-
+//驱动匹配的加载函数
 static int rt1711_i2c_probe(struct i2c_client *client,	const struct i2c_device_id *id)
 {
 	struct rt1711_chip *chip;

@@ -148,15 +148,11 @@ static inline bool pd_make_pe_state_transit_single(struct pd_port *pd_port,
 	return false;
 }
 
-bool pd_make_pe_state_transit(struct pd_port *pd_port, uint8_t curr_state,
-	const struct pe_state_reaction *state_reaction);
+bool pd_make_pe_state_transit(struct pd_port *pd_port, uint8_t curr_state,const struct pe_state_reaction *state_reaction);
 
-bool pd_make_pe_state_transit_virt(struct pd_port *pd_port, uint8_t curr_state,
-	const struct pe_state_reaction *state_reaction);
+bool pd_make_pe_state_transit_virt(struct pd_port *pd_port, uint8_t curr_state,const struct pe_state_reaction *state_reaction);
 
-bool pd_make_pe_state_transit_force(struct pd_port *pd_port,
-	uint8_t curr_state, uint8_t force_state,
-	const struct pe_state_reaction *state_reaction);
+bool pd_make_pe_state_transit_force(struct pd_port *pd_port,uint8_t curr_state, uint8_t force_state,const struct pe_state_reaction *state_reaction);
 
 bool pd_process_event(struct pd_port *pd_port, struct pd_event *pd_event, bool vdm_evt);
 

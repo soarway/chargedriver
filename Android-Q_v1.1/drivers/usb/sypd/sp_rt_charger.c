@@ -46,8 +46,7 @@ static int chg_enable_vbus(struct rt_charger_info *info, int enable)
 {
 	//pd_dbg_info("%s enable = %d\n", __func__, enable);
 	gpio_set_value(info->vbus_gpio, enable);
-	info->status = enable ?
-		POWER_SUPPLY_STATUS_CHARGING : POWER_SUPPLY_STATUS_DISCHARGING;
+	info->status = enable ?	POWER_SUPPLY_STATUS_CHARGING : POWER_SUPPLY_STATUS_DISCHARGING;
 	return 0;
 }
 
@@ -148,8 +147,7 @@ static int rtchg_init_vbus(struct rt_charger_info *info)
  * User should control the Power here when you got SOURCE_VBUS notification
  * and SINK_VBUS notification
  */
-static int chg_tcp_notifer_call(struct notifier_block *nb,
-				unsigned long event, void *data)
+static int chg_tcp_notifer_call(struct notifier_block *nb,unsigned long event, void *data)
 {
 	struct tcp_notify *tcp_noti = data;
 
@@ -165,8 +163,7 @@ static int chg_tcp_notifer_call(struct notifier_block *nb,
 		break;
 	case TCP_NOTIFY_SOURCE_VBUS:
 		/* Implement source vbus behavior here */
-		rt_chg_handle_source_vbus(
-			tcp_noti, (tcp_noti->vbus_state.mv > 0) ? 1 : 0);
+		rt_chg_handle_source_vbus(tcp_noti, (tcp_noti->vbus_state.mv > 0) ? 1 : 0);
 		break;
 	case TCP_NOTIFY_SINK_VBUS:
 		/* Implement sink vubs behavior here */
@@ -185,8 +182,7 @@ void test_set_flag(int en)
 
 void dwork_func(struct work_struct *work)
 {
-	struct rt_charger_info *info =
-		container_of(work, struct rt_charger_info, dwork.work);
+	struct rt_charger_info *info =	container_of(work, struct rt_charger_info, dwork.work);
 
 	if (test_flag)
 		pr_info("[OBEI]WHATWHATWHATWHATWHATWHATWWWWWWWHATHATHATHATHATHATHAT\n");

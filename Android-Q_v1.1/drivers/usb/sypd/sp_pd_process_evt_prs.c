@@ -118,8 +118,7 @@ DECL_PE_STATE_REACTION(PD_TIMER_PS_SOURCE_OFF);
  * [BLOCK] Porcess PD Ctrl MSG
  */
 
-static inline bool pd_process_ctrl_msg_good_crc(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_ctrl_msg_good_crc(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	switch (pd_port->pe_state_curr) {
 	case PE_PRS_SRC_SNK_WAIT_SOURCE_ON:

@@ -175,8 +175,7 @@ DECL_PE_STATE_REACTION(PD_TIMER_SINK_REQUEST);
  * [BLOCK] Porcess Ctrl MSG
  */
 
-static inline bool pd_process_ctrl_msg_get_source_cap(
-		struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_ctrl_msg_get_source_cap(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	if (pd_port->pe_state_curr != PE_SNK_READY)
 		return false;
@@ -198,8 +197,7 @@ static inline bool pd_process_ctrl_msg(struct pd_port *pd_port, struct pd_event 
 	switch (pd_port->pe_state_curr) {
 	case PE_SNK_GET_SOURCE_CAP:
 	case PE_DR_SNK_GET_SINK_CAP:
-		if (pd_event->msg >= PD_CTRL_GET_SOURCE_CAP &&
-			pd_event->msg <= PD_CTRL_VCONN_SWAP) {
+		if (pd_event->msg >= PD_CTRL_GET_SOURCE_CAP && pd_event->msg <= PD_CTRL_VCONN_SWAP) {
 			PE_DBG("Port Partner Request First\r\n");
 			pd_port->pe_state_curr = PE_SNK_READY;
 			pd_disable_timer(pd_port, PD_TIMER_SENDER_RESPONSE);
@@ -244,8 +242,7 @@ static inline bool pd_process_ctrl_msg(struct pd_port *pd_port, struct pd_event 
 			if (pd_port->explicit_contract)
 				PE_TRANSIT_STATE(pd_port, PE_SNK_READY);
 			else
-				PE_TRANSIT_STATE(pd_port,
-					PE_SNK_WAIT_FOR_CAPABILITIES);
+				PE_TRANSIT_STATE(pd_port, PE_SNK_WAIT_FOR_CAPABILITIES);
 
 			return true;
 		}

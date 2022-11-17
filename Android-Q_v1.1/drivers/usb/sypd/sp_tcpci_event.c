@@ -1162,11 +1162,10 @@ static int tcpc_event_thread(void *param)
 	sched_setscheduler(current, SCHED_FIFO, &sch_param);
 
 	while (true) {
-		wait_event_interruptible(tcpc_dev->event_loop_wait_que,
-				atomic_read(&tcpc_dev->pending_event) |
-				tcpc_dev->event_loop_thead_stop);
+		wait_event_interruptible(tcpc_dev->event_loop_wait_que,	atomic_read(&tcpc_dev->pending_event) | tcpc_dev->event_loop_thead_stop);
 		if (kthread_should_stop() || tcpc_dev->event_loop_thead_stop)
 			break;
+
 		do {
 			atomic_dec_if_positive(&tcpc_dev->pending_event);
 		} while (pd_policy_engine_run(tcpc_dev));
@@ -1177,8 +1176,7 @@ static int tcpc_event_thread(void *param)
 
 int tcpci_event_init(struct tcpc_device *tcpc_dev)
 {
-	tcpc_dev->event_task = kthread_create(tcpc_event_thread, tcpc_dev,
-			"tcpc_event_%s.%p", dev_name(&tcpc_dev->dev), tcpc_dev);
+	tcpc_dev->event_task = kthread_create(tcpc_event_thread, tcpc_dev, "tcpc_event_%s.%p", dev_name(&tcpc_dev->dev), tcpc_dev);
 	tcpc_dev->event_loop_thead_stop = false;
 
 	init_waitqueue_head(&tcpc_dev->event_loop_wait_que);

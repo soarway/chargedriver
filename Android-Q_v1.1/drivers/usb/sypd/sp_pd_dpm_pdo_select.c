@@ -133,8 +133,7 @@ static bool dpm_select_pdo_from_vsafe5v(
   */
 
 #ifdef CONFIG_USB_PD_ALT_MODE_RTDC
-static bool dpm_select_pdo_from_direct_charge(
-	struct dpm_select_info_t *select_info,
+static bool dpm_select_pdo_from_direct_charge(struct dpm_select_info_t *select_info,
 	struct dpm_pdo_info_t *sink, struct dpm_pdo_info_t *source)
 {
 	int uw;
@@ -167,9 +166,7 @@ static bool dpm_select_pdo_from_direct_charge(
   * Select PDO from Custom
   */
 
-static bool dpm_select_pdo_from_custom(
-	struct dpm_select_info_t *select_info,
-	struct dpm_pdo_info_t *sink, struct dpm_pdo_info_t *source)
+static bool dpm_select_pdo_from_custom(struct dpm_select_info_t *select_info,struct dpm_pdo_info_t *sink, struct dpm_pdo_info_t *source)
 {
 	/* TODO */
 	return dpm_select_pdo_from_vsafe5v(select_info, sink, source);
@@ -179,8 +176,7 @@ static bool dpm_select_pdo_from_custom(
   * Select PDO from Max Power
   */
 
-static inline bool dpm_is_valid_pdo_pair(struct dpm_pdo_info_t *sink,
-	struct dpm_pdo_info_t *source, uint32_t policy)
+static inline bool dpm_is_valid_pdo_pair(struct dpm_pdo_info_t *sink,struct dpm_pdo_info_t *source, uint32_t policy)
 {
 	if (sink->vmax < source->vmax)
 		return false;
@@ -194,9 +190,7 @@ static inline bool dpm_is_valid_pdo_pair(struct dpm_pdo_info_t *sink,
 	return true;
 }
 
-static bool dpm_select_pdo_from_max_power(
-	struct dpm_select_info_t *select_info,
-	struct dpm_pdo_info_t *sink, struct dpm_pdo_info_t *source)
+static bool dpm_select_pdo_from_max_power(struct dpm_select_info_t *select_info,struct dpm_pdo_info_t *sink, struct dpm_pdo_info_t *source)
 {
 	bool overload;
 	int uw;
@@ -235,11 +229,9 @@ static bool dpm_select_pdo_from_max_power(
  */
 
 #ifdef CONFIG_USB_PD_REV30_PPS_SINK
-static bool dpm_select_pdo_from_pps(struct dpm_select_info_t *select_info,
-		struct dpm_pdo_info_t *sink, struct dpm_pdo_info_t *source)
+static bool dpm_select_pdo_from_pps(struct dpm_select_info_t *select_info,struct dpm_pdo_info_t *sink, struct dpm_pdo_info_t *source)
 {
-	if (sink->type != DPM_PDO_TYPE_FIXED ||
-			source->type != DPM_PDO_TYPE_APDO)
+	if (sink->type != DPM_PDO_TYPE_FIXED || source->type != DPM_PDO_TYPE_APDO)
 		return false;
 
 	if (!(source->apdo_type & DPM_APDO_TYPE_PPS))
@@ -261,12 +253,9 @@ static bool dpm_select_pdo_from_pps(struct dpm_select_info_t *select_info,
   * Select PDO from defined rule ...
   */
 
-typedef bool (*dpm_select_pdo_fun)(struct dpm_select_info_t *select_info,
-	struct dpm_pdo_info_t *sink, struct dpm_pdo_info_t *source);
+typedef bool (*dpm_select_pdo_fun)(struct dpm_select_info_t *select_info,struct dpm_pdo_info_t *sink, struct dpm_pdo_info_t *source);
 
-bool dpm_find_match_req_info(struct dpm_rdo_info_t *req_info,
-		uint32_t snk_pdo, int cnt, uint32_t *src_pdos,
-		int min_uw, uint32_t policy)
+bool dpm_find_match_req_info(struct dpm_rdo_info_t *req_info,uint32_t snk_pdo, int cnt, uint32_t *src_pdos,int min_uw, uint32_t policy)
 {
 	int i;
 	struct dpm_select_info_t select;

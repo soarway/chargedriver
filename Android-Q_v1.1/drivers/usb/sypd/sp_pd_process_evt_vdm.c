@@ -259,8 +259,7 @@ DECL_PE_STATE_REACTION(PD_TIMER_UVDM_RESPONSE);
  * [BLOCK] Porcess Ctrl MSG
  */
 
-static inline bool pd_process_ctrl_msg_good_crc(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_ctrl_msg_good_crc(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 #ifdef CONFIG_USB_PD_ALT_MODE
 #ifdef CONFIG_USB_PD_DBG_DP_UFP_U_AUTO_ATTENTION
@@ -319,8 +318,7 @@ static inline bool pd_process_ctrl_msg_good_crc(
 	return false;
 }
 
-static inline bool pd_process_ctrl_msg(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_ctrl_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool ret = false;
 

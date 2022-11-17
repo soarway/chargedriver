@@ -833,8 +833,7 @@ static void pd_pe_state_change(
 		pd_port->pe_pd_state = new_state;
 }
 
-static int pd_handle_event(
-	struct pd_port *pd_port, struct pd_event *pd_event, bool vdm_evt)
+static int pd_handle_event(struct pd_port *pd_port, struct pd_event *pd_event, bool vdm_evt)
 {
 	if (vdm_evt) {
 		if (pd_port->reset_vdm_state &&
@@ -856,8 +855,7 @@ static int pd_handle_event(
 	return 1;
 }
 
-static inline int pd_put_dpm_ack_immediately(
-	struct pd_port *pd_port, bool vdm_evt)
+static inline int pd_put_dpm_ack_immediately(struct pd_port *pd_port, bool vdm_evt)
 {
 	struct pd_event pd_event = {
 		.event_type = PD_EVT_DPM_MSG,

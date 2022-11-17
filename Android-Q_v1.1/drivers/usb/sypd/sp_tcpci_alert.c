@@ -329,7 +329,7 @@ static inline int __tcpci_alert(struct tcpc_device *tcpc_dev)
 	int rv, i;
 	uint32_t alert_status;
 
-	rv = tcpci_get_alert_status(tcpc_dev, &alert_status);
+	rv = tcpci_get_alert_status(tcpc_dev, &alert_status);//rt1711_get_alert_status
 	if (rv)
 		return rv;
 

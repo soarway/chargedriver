@@ -1004,7 +1004,7 @@ static inline bool pe_is_valid_pd_msg_role(struct pd_port *pd_port, struct pd_ev
 
 	return ret;
 }
-
+//解析PD消息的EVENT类型
 static inline bool pe_translate_pd_msg_event(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	struct pd_msg *pd_msg;
@@ -1192,7 +1192,7 @@ bool pd_process_event(struct pd_port *pd_port,	struct pd_event *pd_event, bool v
 #if PE_EVT_INFO_VDM_DIS
 	if (!vdm_evt)
 #endif
-		print_event(pd_port, pd_event);
+		print_event(pd_port, pd_event);//打印事件
 
 	switch (pd_event->event_type) {
 	case PD_EVT_CTRL_MSG:
@@ -1238,7 +1238,7 @@ bool pd_process_event(struct pd_port *pd_port,	struct pd_event *pd_event, bool v
 	if (ret)
 		return true;
 
-	if (pd_port->power_role == PD_ROLE_SINK)
+	if (pd_port->power_role == PD_ROLE_SINK)//判断角色
 		ret = pd_process_event_snk(pd_port, pd_event);
 	else
 		ret = pd_process_event_src(pd_port, pd_event);
