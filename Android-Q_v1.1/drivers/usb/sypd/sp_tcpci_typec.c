@@ -1623,22 +1623,19 @@ static inline bool typec_is_cc_attach(struct tcpc_device *tcpc_dev)
 	switch (tcpc_dev->typec_attach_old) {
 	case TYPEC_ATTACHED_SNK:
 	case TYPEC_ATTACHED_SRC:
-		if ((cc_res != TYPEC_CC_VOLT_OPEN) &&
-				(cc_res != TYPEC_CC_VOLT_RA))
+		if ((cc_res != TYPEC_CC_VOLT_OPEN) && (cc_res != TYPEC_CC_VOLT_RA))
 			cc_attach = true;
 		break;
 #ifdef CONFIG_TYPEC_CAP_CUSTOM_SRC
 	case TYPEC_ATTACHED_CUSTOM_SRC:
-		if ((cc_res != TYPEC_CC_VOLT_OPEN) &&
-				(cc_res != TYPEC_CC_VOLT_RA))
+		if ((cc_res != TYPEC_CC_VOLT_OPEN) && (cc_res != TYPEC_CC_VOLT_RA))
 			cc_attach = true;
 		break;
 #endif	/* CONFIG_TYPEC_CAP_CUSTOM_SRC */
 
 #ifdef CONFIG_TYPEC_CAP_DBGACC_SNK
 	case TYPEC_ATTACHED_DBGACC_SNK:
-		if ((cc_res != TYPEC_CC_VOLT_OPEN) &&
-				(cc_res != TYPEC_CC_VOLT_RA))
+		if ((cc_res != TYPEC_CC_VOLT_OPEN) && (cc_res != TYPEC_CC_VOLT_RA))
 			cc_attach = true;
 		break;
 #endif	/* CONFIG_TYPEC_CAP_DBGACC_SNK */
@@ -1717,8 +1714,7 @@ static inline bool typec_check_false_ra_detach(struct tcpc_device *tcpc_dev)
 
 	if (drp) {
 		tcpci_set_cc(tcpc_dev, TYPEC_CC_DRP);
-		tcpci_alert_status_clear(tcpc_dev,
-			TCPC_REG_ALERT_EXT_RA_DETACH);
+		tcpci_alert_status_clear(tcpc_dev, TCPC_REG_ALERT_EXT_RA_DETACH);
 	}
 
 	return tcpc_dev->typec_cable_only;
@@ -1735,16 +1731,13 @@ int tcpc_typec_enter_lpm_again(struct tcpc_device *tcpc_dev)
 
 	tcpc_dev->typec_lpm = true;
 
-	tcpci_set_low_power_mode(tcpc_dev, true,
-		(tcpc_dev->typec_role !=  TYPEC_ROLE_SRC) ?
-		TYPEC_CC_DRP : TYPEC_CC_RP);
+	tcpci_set_low_power_mode(tcpc_dev, true,(tcpc_dev->typec_role !=  TYPEC_ROLE_SRC) ? TYPEC_CC_DRP : TYPEC_CC_RP);
 
 	return 0;
 }
 
 #ifdef CONFIG_TYPEC_CAP_TRY_SINK
-static inline int typec_handle_try_sink_cc_change(
-	struct tcpc_device *tcpc_dev)
+static inline int typec_handle_try_sink_cc_change(struct tcpc_device *tcpc_dev)
 {
 	if (!tcpc_dev->typec_drp_try_timeout) {
 		TYPEC_DBG("[Try.SNK] Ignore CC_Alert\r\n");
@@ -1773,22 +1766,19 @@ static inline int typec_get_rp_present_flag(struct tcpc_device *tcpc_dev)
 	return rp_flag;
 }
 
-static inline bool typec_is_ignore_cc_change(
-	struct tcpc_device *tcpc_dev, uint8_t rp_present)
+static inline bool typec_is_ignore_cc_change(struct tcpc_device *tcpc_dev, uint8_t rp_present)
 {
 	if (tcpc_dev->typec_state == typec_errorrecovery)
 		return true;
 
 #ifdef CONFIG_TYPEC_CHECK_LEGACY_CABLE
-	if (tcpc_dev->typec_legacy_cable &&
-		typec_legacy_handle_cc_change(tcpc_dev)) {
+	if (tcpc_dev->typec_legacy_cable &&	typec_legacy_handle_cc_change(tcpc_dev)) {
 		return true;
 	}
 #endif	/* CONFIG_TYPEC_CHECK_LEGACY_CABLE */
 
 #ifdef CONFIG_USB_POWER_DELIVERY
-	if (tcpc_dev->typec_state == typec_attachwait_snk &&
-		typec_get_rp_present_flag(tcpc_dev) == rp_present) {
+	if (tcpc_dev->typec_state == typec_attachwait_snk && typec_get_rp_present_flag(tcpc_dev) == rp_present) {
 		TYPEC_DBG("[AttachWait] Ignore RpLvl Alert\r\n");
 		return true;
 	}
@@ -1846,8 +1836,7 @@ int tcpc_typec_handle_cc_change(struct tcpc_device *tcpc_dev)
 	if (typec_is_ignore_cc_change(tcpc_dev, rp_present))
 		return 0;
 
-	if (tcpc_dev->typec_state == typec_attachwait_snk
-		|| tcpc_dev->typec_state == typec_attachwait_src)
+	if (tcpc_dev->typec_state == typec_attachwait_snk || tcpc_dev->typec_state == typec_attachwait_src)
 		typec_wait_ps_change(tcpc_dev, TYPEC_WAIT_PS_DISABLE);
 
 	if (typec_is_cc_attach(tcpc_dev))
@@ -1875,8 +1864,7 @@ static inline int typec_handle_drp_try_timeout(struct tcpc_device *tcpc_dev)
 		return 0;
 	}
 
-	if (typec_check_cc1(TYPEC_CC_VOLT_RD) ||
-		typec_check_cc2(TYPEC_CC_VOLT_RD)) {
+	if (typec_check_cc1(TYPEC_CC_VOLT_RD) || typec_check_cc2(TYPEC_CC_VOLT_RD)) {
 		src_detect = true;
 	}
 
@@ -1928,8 +1916,7 @@ static inline int typec_handle_debounce_timeout(struct tcpc_device *tcpc_dev)
 
 #ifdef CONFIG_USB_POWER_DELIVERY
 
-static inline int typec_handle_error_recovery_timeout(
-						struct tcpc_device *tcpc_dev)
+static inline int typec_handle_error_recovery_timeout(struct tcpc_device *tcpc_dev)
 {
 	tcpc_dev->pd_wait_pe_idle = false;
 	tcpc_dev->typec_attach_new = TYPEC_UNATTACHED;

@@ -5,6 +5,6 @@
 
 config USB_SYBC_BQ2589X
 	tristate "BQ2589X class support"
-	default m
+	default y
 	help
 	  Say Y here to enable BQ2589X class support. 

@@ -1107,6 +1107,7 @@ static int rt1711_retransmit(struct tcpc_device *tcpc)
 }
 #endif
 
+//数据传输
 static int rt1711_transmit(struct tcpc_device *tcpc,enum tcpm_transmit_type type, uint16_t header, const uint32_t *data)
 {
 	struct rt1711_chip *chip = tcpc_get_dev_data(tcpc);
@@ -1541,7 +1542,7 @@ static const struct i2c_device_id rt1711_id_table[] = {
 MODULE_DEVICE_TABLE(i2c, rt1711_id_table);
 
 static const struct of_device_id rt_match_table[] = {
-	{.compatible = "richtek,rt1711",},
+	{.compatible = "BA41",},
 	{.compatible = "richtek,rt1715",},
 	{.compatible = "richtek,rt1716",},
 	{},

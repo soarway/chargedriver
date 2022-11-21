@@ -1282,8 +1282,7 @@ static void bq2589x_monitor_workfunc(struct work_struct *work)
 	if (ret == 0 && (status & BQ2589X_IDPM_STAT_MASK))
 		dev_info(bq->dev, "%s:IINDPM occurred\n", __func__);
 		
-	if (bq->vbus_type == BQ2589X_VBUS_USB_DCP && bq->vbus_volt > pe.high_volt_level &&
-	    bq->rsoc > 95 && !pe.tune_down_volt) {
+	if (bq->vbus_type == BQ2589X_VBUS_USB_DCP && bq->vbus_volt > pe.high_volt_level && bq->rsoc > 95 && !pe.tune_down_volt) {
 		pe.tune_down_volt = true;
 		pe.tune_up_volt = false;
 		pe.target_volt = pe.low_volt_level;

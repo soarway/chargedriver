@@ -1853,13 +1853,13 @@ static void bq2589x_charger2_shutdown(struct i2c_client *client)
 }
 
 static struct of_device_id bq2589x_charger1_match_table[] = {
-	{.compatible = "ti,bq2589x-1",},
+	{.compatible = "BA70",},
 	{},
 };
 
 
 static const struct i2c_device_id bq2589x_charger1_id[] = {
-	{ "bq2589x-1", BQ25890 },
+	{ "BA70", BQ25890 },
 	{},
 };
 
@@ -1867,7 +1867,7 @@ MODULE_DEVICE_TABLE(i2c, bq2589x_charger1_id);
 
 static struct i2c_driver bq2589x_charger1_driver = {
 	.driver		= {
-		.name	= "bq2589x-1",
+		.name	= "BA70",
 		.of_match_table = bq2589x_charger1_match_table,
 	},
 	.id_table	= bq2589x_charger1_id,
@@ -1900,10 +1900,10 @@ static struct i2c_driver bq2589x_charger2_driver = {
 	.probe		= bq2589x_charger2_probe,
 	.shutdown   = bq2589x_charger2_shutdown,
 };
-/*  //先注释掉，避免编译不通过
+  //先注释掉，避免编译不通过
 static struct i2c_board_info __initdata i2c_bq2589x_charger1[] = {
 	{
-		I2C_BOARD_INFO("bq2589x-1", 0x6A),
+		I2C_BOARD_INFO("BA70", 0x7D),
 	},
 };
 
@@ -1913,13 +1913,13 @@ static struct i2c_board_info __initdata i2c_bq2589x_charger2[] = {
 		I2C_BOARD_INFO("bq2589x-2", 0x6B),
 	},
 };
-*/
+
 static int __init bq2589x_charger_init(void)
 {
 
 	//先注释掉下面2行代码，避免编译不通过
-	//i2c_register_board_info(0, i2c_bq2589x_charger1, ARRAY_SIZE(i2c_bq2589x_charger1));
-	//i2c_register_board_info(0, i2c_bq2589x_charger2, ARRAY_SIZE(i2c_bq2589x_charger2));
+	i2c_register_board_info(0, i2c_bq2589x_charger1, ARRAY_SIZE(i2c_bq2589x_charger1));
+	i2c_register_board_info(0, i2c_bq2589x_charger2, ARRAY_SIZE(i2c_bq2589x_charger2));
 
 	if (i2c_add_driver(&bq2589x_charger2_driver))
 		printk("[OBEI]%s, failed to register bq2589x_charger2_driver.\n", __func__);

@@ -1779,6 +1779,7 @@ send:
 		usbpd_set_state(pd, PE_SEND_SOFT_RESET);
 }
 
+//DFP 和 UFP 角色交换
 static void dr_swap(struct usbpd *pd)
 {
 	reset_vdm_state(pd);
@@ -1815,8 +1816,7 @@ static void vconn_swap(struct usbpd *pd)
 	int ret;
 
 	if (pd->vconn_enabled) {
-		pd_phy_update_frame_filter(FRAME_FILTER_EN_SOP |
-					   FRAME_FILTER_EN_HARD_RESET);
+		pd_phy_update_frame_filter(FRAME_FILTER_EN_SOP | FRAME_FILTER_EN_HARD_RESET);
 
 		pd->current_state = PE_VCS_WAIT_FOR_VCONN;
 		kick_sm(pd, VCONN_ON_TIME);
@@ -1836,9 +1836,7 @@ static void vconn_swap(struct usbpd *pd)
 
 		pd->vconn_enabled = true;
 
-		pd_phy_update_frame_filter(FRAME_FILTER_EN_SOP |
-					   FRAME_FILTER_EN_SOPI |
-					   FRAME_FILTER_EN_HARD_RESET);
+		pd_phy_update_frame_filter(FRAME_FILTER_EN_SOP|FRAME_FILTER_EN_SOPI |FRAME_FILTER_EN_HARD_RESET);
 
 		/*
 		 * Small delay to ensure Vconn has ramped up. This is well
@@ -1866,6 +1864,7 @@ static int enable_vbus(struct usbpd *pd)
 	 * VBUS before enabling it as a source. If so poll here
 	 * until it goes below VSafe0V (0.8V) before proceeding.
 	 */
+	//获取当前电压值，只有当电压校友0.8V时，跳出循环，继续下一步的处理
 	while (count--) {
 		ret = power_supply_get_property(pd->usb_psy,POWER_SUPPLY_PROP_VOLTAGE_NOW, &val);
 		if (ret || val.intval <= 800000)
@@ -1894,6 +1893,7 @@ static int enable_vbus(struct usbpd *pd)
 	 * Check to make sure VBUS voltage reaches above Vsafe5Vmin (4.75v)
 	 * before proceeding.
 	 */
+	//检测电压值大于4.75V
 	while (count--) {
 		ret = power_supply_get_property(pd->usb_psy,POWER_SUPPLY_PROP_VOLTAGE_NOW, &val);
 		if (ret || val.intval >= 4750000) /*vsafe5Vmin*/
@@ -2439,7 +2439,7 @@ static void enter_state_snk_startup(struct usbpd *pd)
 
 	if (pd->current_dr == DR_NONE || pd->current_dr == DR_UFP) {
 		pd->current_dr = DR_UFP;
-
+		//设置为UFP
 		ret = power_supply_get_property(pd->usb_psy,POWER_SUPPLY_PROP_REAL_TYPE, &val);
 		if (!ret) {
 			usbpd_dbg(&pd->dev, "type:%d\n", val.intval);
@@ -2461,6 +2461,7 @@ static void enter_state_snk_startup(struct usbpd *pd)
 	if (usbpd_startup_common(pd, &phy_params))
 		return;
 
+	//设置最大电压值
 	pd->current_voltage = pd->requested_voltage = 5000000;
 	val.intval = pd->requested_voltage; /* set max range to 5V */
 	power_supply_set_property(pd->usb_psy,POWER_SUPPLY_PROP_PD_VOLTAGE_MAX, &val);
@@ -3144,34 +3145,35 @@ static void usbpd_set_state(struct usbpd *pd, enum usbpd_state next_state)
 static const struct usbpd_state_handler state_handlers[] = {
 	[PE_UNKNOWN] = {NULL, handle_state_unknown},
 	[PE_ERROR_RECOVERY] = {enter_state_error_recovery, NULL},
-	[PE_SRC_DISABLED] = {enter_state_src_disabled, NULL},
-	[PE_SRC_STARTUP] = {enter_state_src_startup, handle_state_src_startup},
+	[PE_SRC_DISABLED]   = {enter_state_src_disabled, NULL},
+	[PE_SRC_STARTUP]    = {enter_state_src_startup, handle_state_src_startup},
 	[PE_SRC_STARTUP_WAIT_FOR_VDM_RESP] = {NULL,	handle_state_src_startup_wait_for_vdm_resp},
-	[PE_SRC_SEND_CAPABILITIES] = {enter_state_src_send_capabilities,handle_state_src_send_capabilities},
-	[PE_SRC_SEND_CAPABILITIES_WAIT] = {NULL,handle_state_src_send_capabilities_wait},
-	[PE_SRC_NEGOTIATE_CAPABILITY] = {enter_state_src_negotiate_capability,NULL},
-	[PE_SRC_READY] = {enter_state_src_ready, handle_state_src_ready},
-	[PE_SRC_HARD_RESET] = {enter_state_hard_reset, NULL},
-	[PE_SRC_SOFT_RESET] = {NULL, handle_state_soft_reset},
+	[PE_SRC_SEND_CAPABILITIES]         = {enter_state_src_send_capabilities,handle_state_src_send_capabilities},
+	[PE_SRC_SEND_CAPABILITIES_WAIT]    = {NULL,handle_state_src_send_capabilities_wait},
+	[PE_SRC_NEGOTIATE_CAPABILITY]      = {enter_state_src_negotiate_capability,NULL},
+	[PE_SRC_READY]                     = {enter_state_src_ready, handle_state_src_ready},
+	[PE_SRC_HARD_RESET]                = {enter_state_hard_reset, NULL},
+	[PE_SRC_SOFT_RESET]                = {NULL, handle_state_soft_reset},
 	[PE_SRC_TRANSITION_TO_DEFAULT] = {NULL,	handle_state_src_transition_to_default},
-	[PE_SNK_STARTUP] = {enter_state_snk_startup,handle_state_snk_startup},
+
+	[PE_SNK_STARTUP]   = {enter_state_snk_startup,handle_state_snk_startup},
 	[PE_SNK_DISCOVERY] = {NULL, handle_state_snk_discovery},
 	[PE_SNK_WAIT_FOR_CAPABILITIES] = {enter_state_snk_wait_for_capabilities, handle_state_snk_wait_for_capabilities},
 	[PE_SNK_EVALUATE_CAPABILITY] = {enter_state_snk_evaluate_capability, NULL},
-	[PE_SNK_SELECT_CAPABILITY] = {enter_state_snk_select_capability,handle_state_snk_select_capability},
-	[PE_SNK_TRANSITION_SINK] = {enter_state_snk_transition_sink,handle_state_snk_transition_sink},
-	[PE_SNK_READY] = {enter_state_snk_ready, handle_state_snk_ready},
-	[PE_SNK_HARD_RESET] = {enter_state_hard_reset, NULL},
-	[PE_SNK_SOFT_RESET] = {NULL, handle_state_soft_reset},
+	[PE_SNK_SELECT_CAPABILITY]   = {enter_state_snk_select_capability,handle_state_snk_select_capability},
+	[PE_SNK_TRANSITION_SINK]     = {enter_state_snk_transition_sink,handle_state_snk_transition_sink},
+	[PE_SNK_READY]               = {enter_state_snk_ready, handle_state_snk_ready},
+	[PE_SNK_HARD_RESET]          = {enter_state_hard_reset, NULL},
+	[PE_SNK_SOFT_RESET]            = {NULL, handle_state_soft_reset},
 	[PE_SNK_TRANSITION_TO_DEFAULT] = {enter_state_snk_transition_to_default,handle_state_snk_transition_to_default},
-	[PE_DRS_SEND_DR_SWAP] = {NULL, handle_state_drs_send_dr_swap},
-	[PE_PRS_SNK_SRC_SEND_SWAP] = {NULL, handle_state_prs_snk_src_send_swap},
+	[PE_DRS_SEND_DR_SWAP]          = {NULL, handle_state_drs_send_dr_swap},
+	[PE_PRS_SNK_SRC_SEND_SWAP]     = {NULL, handle_state_prs_snk_src_send_swap},
 	[PE_PRS_SNK_SRC_TRANSITION_TO_OFF] = {enter_state_prs_snk_src_transition_to_off,handle_state_prs_snk_src_transition_to_off},
 	[PE_PRS_SNK_SRC_SOURCE_ON] = {NULL, handle_state_prs_snk_src_source_on},
 	[PE_PRS_SRC_SNK_SEND_SWAP] = {NULL, handle_state_prs_src_snk_send_swap},
 	[PE_PRS_SRC_SNK_TRANSITION_TO_OFF] = {enter_state_prs_src_snk_transition_to_off,handle_state_prs_src_snk_transition_to_off},
 	[PE_PRS_SRC_SNK_WAIT_SOURCE_ON] = {NULL, handle_state_prs_src_snk_wait_source_on},
-	[PE_SEND_SOFT_RESET] = {enter_state_send_soft_reset,handle_state_send_soft_reset},
+	[PE_SEND_SOFT_RESET]    = {enter_state_send_soft_reset,handle_state_send_soft_reset},
 	[PE_VCS_WAIT_FOR_VCONN] = {NULL, handle_state_vcs_wait_for_vconn},
 };
 
@@ -3412,8 +3414,7 @@ static int usbpd_process_typec_mode(struct usbpd *pd, enum power_supply_typec_mo
 
 		pd->current_pr = PR_SINK;
 
-		eval.intval = typec_mode > POWER_SUPPLY_TYPEC_SOURCE_DEFAULT ?
-				1 : 0;
+		eval.intval = typec_mode > POWER_SUPPLY_TYPEC_SOURCE_DEFAULT ? 1 : 0;
 		extcon_set_property(pd->extcon, EXTCON_USB,	EXTCON_PROP_USB_TYPEC_MED_HIGH_CURRENT, eval);
 		break;
 
