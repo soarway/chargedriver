@@ -1903,8 +1903,7 @@ static int rt_create_simple_map(struct rt_regmap_device *rd)
  * @client: a pointer to the slave client of this device
  * @drvdata: a pointer to the driver data
  */
-struct rt_regmap_device *rt_regmap_device_register
-			(struct rt_regmap_properties *props,
+struct rt_regmap_device *rt_regmap_device_register(struct rt_regmap_properties *props,
 			struct rt_regmap_fops *rops,
 			struct device *parent,
 			void *client, void *drvdata)
