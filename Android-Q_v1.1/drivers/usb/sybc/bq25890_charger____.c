@@ -745,13 +745,13 @@ static int bq25890_fw_read_u32_props(struct bq25890_device *bq)
 		u8 *conv_data; /* holds converted value from given property */
 	} props[] = {
 		/* required properties */
-		{"ti,charge-current", false, TBL_ICHG, &init->ichg},
-		{"ti,battery-regulation-voltage", false, TBL_VREG, &init->vreg},
-		{"ti,termination-current", false, TBL_ITERM, &init->iterm},
-		{"ti,precharge-current", false, TBL_ITERM, &init->iprechg},
-		{"ti,minimum-sys-voltage", false, TBL_SYSVMIN, &init->sysvmin},
-		{"ti,boost-voltage", false, TBL_BOOSTV, &init->boostv},
-		{"ti,boost-max-current", false, TBL_BOOSTI, &init->boosti},
+		{"ti,charge-current",             false, TBL_ICHG,    &init->ichg},
+		{"ti,battery-regulation-voltage", false, TBL_VREG,    &init->vreg},
+		{"ti,termination-current",        false, TBL_ITERM,   &init->iterm},
+		{"ti,precharge-current",          false, TBL_ITERM,   &init->iprechg},
+		{"ti,minimum-sys-voltage",        false, TBL_SYSVMIN, &init->sysvmin},
+		{"ti,boost-voltage",              false, TBL_BOOSTV,  &init->boostv},
+		{"ti,boost-max-current",          false, TBL_BOOSTI,  &init->boosti},
 
 		/* optional properties */
 		{"ti,thermal-regulation-threshold", true, TBL_TREG, &init->treg}
