@@ -28,8 +28,7 @@ static atomic_t device_count;
 
 static ssize_t state_show(struct device *dev, struct device_attribute *attr, char *buf)
 {
-	struct switch_dev *sdev = (struct switch_dev *)
-		dev_get_drvdata(dev);
+	struct switch_dev *sdev = (struct switch_dev *)	dev_get_drvdata(dev);
 
 	if (sdev->print_state) {
 		int ret = sdev->print_state(sdev, buf);
@@ -44,8 +43,7 @@ static ssize_t state_store(struct device *dev, struct device_attribute *attr,
 {
 	int new_state;
 	char *endp;
-	struct switch_dev *sdev = (struct switch_dev *)
-		dev_get_drvdata(dev);
+	struct switch_dev *sdev = (struct switch_dev *)	dev_get_drvdata(dev);
 
 	new_state = simple_strtol(buf, &endp, 0);
 	if (new_state != sdev->state && sdev->set_state) {
@@ -71,9 +69,7 @@ static ssize_t name_show(struct device *dev, struct device_attribute *attr,	char
 
 //static DEVICE_ATTR(state, S_IRUGO | S_IWUSR, state_show, NULL);
 static struct device_attribute dev_attr_state_ro = __ATTR_RO(state);
-static struct device_attribute dev_attr_state_rw =
-	__ATTR(state, S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR,
-	state_show, state_store);
+static struct device_attribute dev_attr_state_rw = __ATTR(state, S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR,	state_show, state_store);
 static DEVICE_ATTR(name, S_IRUSR | S_IRGRP | S_IROTH, name_show, NULL);
 //static DEVICE_ATTR_RO(name);
 

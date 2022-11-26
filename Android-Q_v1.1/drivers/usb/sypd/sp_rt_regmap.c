@@ -2034,13 +2034,13 @@ static int __init regmap_plat_init(void)
 	return 0;
 }
 
-subsys_initcall(regmap_plat_init);
 
 static void __exit regmap_plat_exit(void)
 {
 	debugfs_remove(rt_regmap_dir);
 }
 
+subsys_initcall(regmap_plat_init);
 module_exit(regmap_plat_exit);
 
 MODULE_DESCRIPTION("Richtek regmap Driver");

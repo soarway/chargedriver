@@ -435,8 +435,7 @@ int tcpc_schedule_init_work(struct tcpc_device *tcpc)
 
 	pr_info("[OBEI]%s wait %d num\n", __func__, tcpc->desc.notifier_supply_num);
 
-	schedule_delayed_work(
-		&tcpc->init_work, msecs_to_jiffies(30*1000));
+	schedule_delayed_work(&tcpc->init_work, msecs_to_jiffies(30*1000));
 	return 0;
 }
 

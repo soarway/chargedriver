@@ -835,27 +835,27 @@ qcom,clk-freq-out = <1000000>;//uu i2c fix 400k//100k //1M ba76
 /////////////////////////////////////////////////////////////////////////////////////////////////
 //pd sample.dts
 
-                        ba52@7f {
+        ba52@7f {
 			compatible = "silergy,ba52a";
 			reg = <0x7f>;
-                        status = "ok";
+            status = "ok";
 
-                        interrupt-parent = <&tlmm>;
-                        ba52,irq_pin = <&tlmm 59 0x00>;
+            interrupt-parent = <&tlmm>;
+            ba52,irq_pin = <&tlmm 59 0x00>;
 
-                        irq-gpios = <&tlmm 59 0x00>; 
-                        irq-flags = <2>;
+            irq-gpios = <&tlmm 59 0x00>; 
+            irq-flags = <2>;
 
-                        interrupts = <0 59 8>;//uu?
-		        interrupt-names = "ba52a_irq";        
-          		pinctrl-names = "qupv3_se1_ba52a_int_active", "qupv3_se1_ba52a_int_sleep";
-	        	pinctrl-0 = <&qupv3_se1_ba52a_int_active &qupv3_se1_ba52a_int_sleep>;
+            interrupts = <0 59 8>;//uu?
+		    interrupt-names = "ba52a_irq";        
+          	pinctrl-names = "qupv3_se1_ba52a_int_active", "qupv3_se1_ba52a_int_sleep";
+	        pinctrl-0 = <&qupv3_se1_ba52a_int_active &qupv3_se1_ba52a_int_sleep>;
 
 			sy-dual,supported_modes = <0>; // 0: dfp/ufp, 1: dfp, 2: ufp 
 			sy-tcpc,name = "type_c_ba52a"; // tcpc_device's name 
 			sy-tcpc,role_def = <4>; // 0: SNK Only, 1: SRC Only, 2: DRP, 3: Try.SRC, 4: Try.SNK 
 			sy-tcpc,rp_level = <0>; // 0: Default, 1: 1.5, 2: 3.0 
-		        sy-tcpc,vconn_supply  = <1>;  // 0: Never, 1: Always, 2: EMarkOnly, 3: StartOnly 
+		    sy-tcpc,vconn_supply  = <1>;  // 0: Never, 1: Always, 2: EMarkOnly, 3: StartOnly 
 			sy-tcpc,notifier_supply_num = <1>; // the number of notifier supply 
 			uf-data {
 				
@@ -868,7 +868,7 @@ qcom,clk-freq-out = <1000000>;//uu i2c fix 400k//100k //1M ba76
 				uf,source-pdo-size = <1>;
 				uf,source-pdo-data = <0x00019032>; // 5V, 500 mA 
 				uf,sink-pdo-size = <2>;
-                                uf,sink-pdo-data = <0x0002d12c 0x0002d12c> ; //9V3A  
+                uf,sink-pdo-data = <0x0002d12c 0x0002d12c> ; //9V3A  
 				//
 				//No DP, host + device
 				//	pd,id-vdo-size = <3>;
@@ -880,35 +880,35 @@ qcom,clk-freq-out = <1000000>;//uu i2c fix 400k//100k //1M ba76
 
 				uf,id-vdo-size = <3>;
 				uf,id-vdo-data = <0xd00029cf 0x0 0x00010000 >;
-			        };
+			};
 
 
-		          };
+		};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////  
 
 //pd sample.dts
-                        ba41@7e {
+        ba41@7e {
 			compatible = "silergy,ba41a";
 			reg = <0x7e>;
-                        status = "ok";
+            status = "ok";
 
-                        interrupt-parent = <&tlmm>;
-                        ba41,irq_pin = <&tlmm 59 0x00>;
+            interrupt-parent = <&tlmm>;
+            ba41,irq_pin = <&tlmm 59 0x00>;
 
-                        irq-gpios = <&tlmm 59 0x00>; 
-                        irq-flags = <2>;
+            irq-gpios = <&tlmm 59 0x00>; 
+            irq-flags = <2>;
 
-                        interrupts = <0 59 8>;//uu?
-		        interrupt-names = "ba41a_irq";        
-          		pinctrl-names = "qupv3_se1_ba41a_int_active", "qupv3_se1_ba41a_int_sleep";
-	        	pinctrl-0 = <&qupv3_se1_ba41a_int_active &qupv3_se1_ba41a_int_sleep>;
+            interrupts = <0 59 8>;//uu?
+		    interrupt-names = "ba41a_irq";        
+          	pinctrl-names = "qupv3_se1_ba41a_int_active", "qupv3_se1_ba41a_int_sleep";
+	        pinctrl-0 = <&qupv3_se1_ba41a_int_active &qupv3_se1_ba41a_int_sleep>;
 
 			sy-dual,supported_modes = <0>; // 0: dfp/ufp, 1: dfp, 2: ufp 
 			sy-tcpc,name = "type_c_ba41a"; // tcpc_device's name 
 			sy-tcpc,role_def = <4>; // 0: SNK Only, 1: SRC Only, 2: DRP, 3: Try.SRC, 4: Try.SNK 
 			sy-tcpc,rp_level = <0>; // 0: Default, 1: 1.5, 2: 3.0 
-		        sy-tcpc,vconn_supply  = <1>;  // 0: Never, 1: Always, 2: EMarkOnly, 3: StartOnly 
+		    sy-tcpc,vconn_supply  = <1>;  // 0: Never, 1: Always, 2: EMarkOnly, 3: StartOnly 
 			sy-tcpc,notifier_supply_num = <1>; // the number of notifier supply 
 			pd-data {
 				
@@ -921,7 +921,7 @@ qcom,clk-freq-out = <1000000>;//uu i2c fix 400k//100k //1M ba76
 				pd,source-pdo-size = <1>;
 				pd,source-pdo-data = <0x00019032>; // 5V, 500 mA 
 				pd,sink-pdo-size = <2>;
-                                pd,sink-pdo-data = <0x0002d12c 0x0002d12c> ; //9V3A  
+                pd,sink-pdo-data = <0x0002d12c 0x0002d12c> ; //9V3A  
 				//
 				//No DP, host + device
 				//	pd,id-vdo-size = <3>;
@@ -933,7 +933,7 @@ qcom,clk-freq-out = <1000000>;//uu i2c fix 400k//100k //1M ba76
 
 				pd,id-vdo-size = <3>;
 				pd,id-vdo-data = <0xd00029cf 0x0 0x00010000 >;
-			        };
+			};
 			dpm_caps {
 				local_dr_power;
 				local_dr_data;
@@ -951,7 +951,7 @@ qcom,clk-freq-out = <1000000>;//uu i2c fix 400k//100k //1M ba76
 				attemp_discover_id;
 
 				// 0: disable, 1: prefer_snk, 2: prefer_src 
-                                pr_check = <0>;
+                pr_check = <0>;
 				// pr_reject_as_source;
 				// pr_reject_as_sink;
 				// pr_check_gp_source;
@@ -961,7 +961,7 @@ qcom,clk-freq-out = <1000000>;//uu i2c fix 400k//100k //1M ba76
 				dr_check = <0>;
 				// dr_reject_as_dfp;
 				// dr_reject_as_ufp;
-			         };
+			};
 
 			displayport {
 				// connection type = "both", "ufp_d", "dfp_d" 
@@ -987,26 +987,26 @@ qcom,clk-freq-out = <1000000>;//uu i2c fix 400k//100k //1M ba76
 					//pin_assignment,mode_e;
 					//pin_assignment,mode_f;
 				       };
-			  };
+			};
 
 
-		          };
+		};
 
 ////////////////////////////////////////
-                     ba70@7d {
-                        compatible = "sy,ba70x";
+        ba70@7d {
+            compatible = "sy,ba70x";
 //			compatible = "silergy,ba70";
 			reg = <0x7d>;
-                        status = "ok";
+            status = "ok";
   
-                        interrupt-parent = <&tlmm>;
-                        ba70,irq_pin = <&tlmm 59 0x00>;
-                        irq-gpios = <&tlmm 59 0x00>; 
-                        irq-flags = <2>;
-                        interrupts = <0 59 8>;//uu?
-		        interrupt-names = "ba70_irq";        
-          		pinctrl-names = "qupv3_se1_ba70_int_active", "qupv3_se1_ba70_int_sleep";
-	        	pinctrl-0 = <&qupv3_se1_ba70_int_active &qupv3_se1_ba70_int_sleep>;
+            interrupt-parent = <&tlmm>;
+            ba70,irq_pin = <&tlmm 59 0x00>;
+            irq-gpios = <&tlmm 59 0x00>; 
+            irq-flags = <2>;
+            interrupts = <0 59 8>;//uu?
+		    interrupt-names = "ba70_irq";        
+          	pinctrl-names = "qupv3_se1_ba70_int_active", "qupv3_se1_ba70_int_sleep";
+	        pinctrl-0 = <&qupv3_se1_ba70_int_active &qupv3_se1_ba70_int_sleep>;
 
 
 
@@ -1032,9 +1032,9 @@ qcom,clk-freq-out = <1000000>;//uu i2c fix 400k//100k //1M ba76
 
 
 
-                        sy,ba70x,vbus-volt-high-level = <8700>;//tune adapter to output 9v 
-                        sy,ba70x,vbus-volt-low-level = <4400>;// tune adapter to output 5v 
-                        sy,ba70x,vbat-min-volt-to-tuneup = <3000>;
+            sy,ba70x,vbus-volt-high-level = <8700>;//tune adapter to output 9v 
+            sy,ba70x,vbus-volt-low-level = <4400>;// tune adapter to output 5v 
+            sy,ba70x,vbat-min-volt-to-tuneup = <3000>;
 			sy,ba70x,charge-voltage = <4208>;
 			sy,ba70x,charge-current = <2000>;
 			sy,ba70x,term-current = <256>;
@@ -1049,7 +1049,7 @@ qcom,clk-freq-out = <1000000>;//uu i2c fix 400k//100k //1M ba76
 
 
 
-                     };
+        };
 
    };
 ///////////////////////

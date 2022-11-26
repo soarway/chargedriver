@@ -189,8 +189,7 @@ static int hd3ss460_switch_probe(struct platform_device *pdev)
 	struct hd3ss460_switch_data *switch_data;
 	int ret = 0, i, registered_sw_devs_nr;
 
-	switch_data = devm_kzalloc(&pdev->dev,
-		sizeof(*switch_data), GFP_KERNEL);
+	switch_data = devm_kzalloc(&pdev->dev, sizeof(*switch_data), GFP_KERNEL);
 	if (!switch_data)
 		return -ENOMEM;
 	mutex_init(&switch_data->io_lock);
@@ -200,8 +199,7 @@ static int hd3ss460_switch_probe(struct platform_device *pdev)
 		goto err_parse_dt;
 
 	for (i = 0, registered_sw_devs_nr = 0; i < SW_NR; i++) {
-		ret = gpio_request(switch_data->gpios[i],
-			switch_data->sdevs[i].name);
+		ret = gpio_request(switch_data->gpios[i], switch_data->sdevs[i].name);
 		if (ret < 0)
 			goto err_request_gpio;
 		registered_sw_devs_nr = i + 1;
@@ -226,8 +224,7 @@ static int hd3ss460_switch_probe(struct platform_device *pdev)
 		switch_data->nb.notifier_call = hd3ss460_tcp_notifer_call;
 		register_tcp_dev_notifier(switch_data->tcpc, &switch_data->nb);
 	} else
-		pr_info("[OBEI]%s : Warning *** can't find tcpc device [%s]\n",
-			__FUNCTION__, switch_data->tcpc_name);
+		pr_info("[OBEI]%s : Warning *** can't find tcpc device [%s]\n",	__FUNCTION__, switch_data->tcpc_name);
 
 	return 0;
 err_register_switch:

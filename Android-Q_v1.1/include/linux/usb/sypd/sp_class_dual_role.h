@@ -74,12 +74,8 @@ extern struct dual_role_phy_instance *__must_check
 devm_dual_role_instance_register(struct device *parent,	 const struct dual_role_phy_desc *desc);
 extern void devm_dual_role_instance_unregister(struct device *dev, struct dual_role_phy_instance *dual_role);
 extern struct dual_role_phy_instance  *dual_role_phy_instance_get_byname(const char *name);
-extern int dual_role_get_property(struct dual_role_phy_instance *dual_role,
-				  enum dual_role_property prop,
-				  unsigned int *val);
-extern int dual_role_set_property(struct dual_role_phy_instance *dual_role,
-				  enum dual_role_property prop,
-				  const unsigned int *val);
+extern int dual_role_get_property(struct dual_role_phy_instance *dual_role, enum dual_role_property prop, unsigned int *val);
+extern int dual_role_set_property(struct dual_role_phy_instance *dual_role, enum dual_role_property prop, const unsigned int *val);
 extern int dual_role_property_is_writeable(struct dual_role_phy_instance   *dual_role, enum dual_role_property prop);
 extern void *dual_role_get_drvdata(struct dual_role_phy_instance *dual_role);
 #else /* CONFIG_DUAL_ROLE_USB_INTF */

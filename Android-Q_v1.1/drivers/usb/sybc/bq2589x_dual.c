@@ -1852,6 +1852,8 @@ static void bq2589x_charger2_shutdown(struct i2c_client *client)
 	g_bq2 = NULL;
 }
 
+
+//-------------------------------------------------------------------------------
 static struct of_device_id bq2589x_charger1_match_table[] = {
 	{.compatible = "BA70",},
 	{},
@@ -1876,6 +1878,13 @@ static struct i2c_driver bq2589x_charger1_driver = {
 	.shutdown   = bq2589x_charger1_shutdown,
 };
 
+static struct i2c_board_info __initdata i2c_bq2589x_charger1[] = {
+	{
+		I2C_BOARD_INFO("BA70", 0x7D),
+	},
+};
+
+//----------------------------------------------------------------------------
 static struct of_device_id bq2589x_charger2_match_table[] = {
 	{.compatible = "ti,bq2589x-2",},
 	{},
@@ -1900,20 +1909,13 @@ static struct i2c_driver bq2589x_charger2_driver = {
 	.probe		= bq2589x_charger2_probe,
 	.shutdown   = bq2589x_charger2_shutdown,
 };
-  //先注释掉，避免编译不通过
-static struct i2c_board_info __initdata i2c_bq2589x_charger1[] = {
-	{
-		I2C_BOARD_INFO("BA70", 0x7D),
-	},
-};
-
 
 static struct i2c_board_info __initdata i2c_bq2589x_charger2[] = {
 	{
 		I2C_BOARD_INFO("bq2589x-2", 0x6B),
 	},
 };
-
+//--------------------------------------------------------------------------------------------
 static int __init bq2589x_charger_init(void)
 {
 
@@ -1921,15 +1923,18 @@ static int __init bq2589x_charger_init(void)
 	i2c_register_board_info(0, i2c_bq2589x_charger1, ARRAY_SIZE(i2c_bq2589x_charger1));
 	i2c_register_board_info(0, i2c_bq2589x_charger2, ARRAY_SIZE(i2c_bq2589x_charger2));
 
-	if (i2c_add_driver(&bq2589x_charger2_driver))
-		printk("[OBEI]%s, failed to register bq2589x_charger2_driver.\n", __func__);
-	else
-		printk("[OBEI]%s, bq2589x_charger2_driver register successfully!\n", __func__);
+
 
 	if (i2c_add_driver(&bq2589x_charger1_driver))
 		printk("[OBEI]%s, failed to register bq2589x_charger1_driver.\n", __func__);
 	else
 		printk("[OBEI]%s, bq2589x_charger1_driver register successfully!\n", __func__);
+
+	if (i2c_add_driver(&bq2589x_charger2_driver))
+		printk("[OBEI]%s, failed to register bq2589x_charger2_driver.\n", __func__);
+	else
+		printk("[OBEI]%s, bq2589x_charger2_driver register successfully!\n", __func__);
+
 
 	return 0;
 }

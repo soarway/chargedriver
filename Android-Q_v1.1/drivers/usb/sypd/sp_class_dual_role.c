@@ -107,7 +107,7 @@ static void dual_role_dev_release(struct device *dev)
 	pr_debug("device: '%s': %s\n", dev_name(dev), __func__);
 	kfree(dual_role);
 }
-static struct dual_role_phy_instance *__must_check
+static struct dual_role_phy_instance *__must_check 
 __dual_role_register(struct device *parent, const struct dual_role_phy_desc *desc)
 {
 	struct device *dev;

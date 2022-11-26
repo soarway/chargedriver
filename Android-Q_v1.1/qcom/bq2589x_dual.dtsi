@@ -8,8 +8,8 @@
 			
 			ti,bq2589x,enable-auto-dpdm;
 			ti,bq2589x,enable-termination;
-			ti, bq2589x,enable-ico;
-			ti, bq2589x,use-absolute-vindpm;
+			ti,bq2589x,enable-ico;
+			ti,bq2589x,use-absolute-vindpm;
 			
             ti,bq2589x,vbus-volt-high-level = <8700>;/* tune adapter to output 9v */
             ti,bq2589x,vbus-volt-low-level = <4400>;/* tune adapter to output 5v */
@@ -28,7 +28,7 @@
 			/*ti,bq2589x,enable-auto-dpdm;*/
 			ti,bq2589x,enable-termination;
 			/*ti, bq2589x,enable-ico;*/
-			ti, bq2589x,use-absolute-vindpm;
+			ti,bq2589x,use-absolute-vindpm;
 
             ti,bq2589x,vbus-volt-high-level = <8700>;/* tune adapter to output 9v */
             ti,bq2589x,vbus-volt-low-level = <4400>;/* tune adapter to output 5v */

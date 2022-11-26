@@ -10,6 +10,7 @@
         "sp_pd_process_evt.h": "c",
         "sp_pd_policy_engine.h": "c",
         "sp_rt_regmap.h": "c",
-        "bq2589x_reg.h": "c"
+        "bq2589x_reg.h": "c",
+        "symaster.h": "c"
     }
 }

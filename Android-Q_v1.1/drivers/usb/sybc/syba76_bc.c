@@ -32,37 +32,40 @@
 #define BQ25890_IRQ_PIN			    "bq25890_irq"
 
 #define BQ25890_ID			3
+#define SYBA76_BC_ID		0x66
 
+#define NAME          "BA76_70_7D"
+#define DRIVER_NAME   NAME;
+#define DEVICE_NAME   NAME
+/*
 enum _bq25890_fields_ {
-	F_EN_HIZ, F_EN_ILIM, F_IILIM,				     		/* Reg00 */
-	F_BHOT, F_BCOLD, F_VINDPM_OFS,				     		/* Reg01 */
-	F_CONV_START, F_CONV_RATE, F_BOOSTF, F_ICO_EN,
-	F_HVDCP_EN, F_MAXC_EN, F_FORCE_DPM, F_AUTO_DPDM_EN,	     /* Reg02 */
-	F_BAT_LOAD_EN, F_WD_RST, F_OTG_CFG, F_CHG_CFG, F_SYSVMIN,    /* Reg03 */
-	F_PUMPX_EN, F_ICHG,					     		/* Reg04 */
-	F_IPRECHG, F_ITERM,					     		/* Reg05 */
-	F_VREG, F_BATLOWV, F_VRECHG,				     /* Reg06 */
-	F_TERM_EN, F_STAT_DIS, F_WD, F_TMR_EN, F_CHG_TMR,
-	F_JEITA_ISET,						     	/* Reg07 */
-	F_BATCMP, F_VCLAMP, F_TREG,				     /* Reg08 */
+	F_EN_HIZ, F_EN_ILIM, F_IILIM,				     		// Reg00 
+	F_BHOT, F_BCOLD, F_VINDPM_OFS,				     		// Reg01 
+	F_CONV_START, F_CONV_RATE, F_BOOSTF, F_ICO_EN, F_HVDCP_EN, F_MAXC_EN, F_FORCE_DPM, F_AUTO_DPDM_EN, // Reg02 
+	F_BAT_LOAD_EN, F_WD_RST, F_OTG_CFG, F_CHG_CFG, F_SYSVMIN,    // Reg03 
+	F_PUMPX_EN, F_ICHG,					     		// Reg04 
+	F_IPRECHG, F_ITERM,					     		// Reg05 
+	F_VREG, F_BATLOWV, F_VRECHG,				     // Reg06 
+	F_TERM_EN, F_STAT_DIS, F_WD, F_TMR_EN, F_CHG_TMR,F_JEITA_ISET,// Reg07 
+	F_BATCMP, F_VCLAMP, F_TREG,				     // Reg08 
 	F_FORCE_ICO, F_TMR2X_EN, F_BATFET_DIS, F_JEITA_VSET,
-	F_BATFET_DLY, F_BATFET_RST_EN, F_PUMPX_UP, F_PUMPX_DN,	     /* Reg09 */
-	F_BOOSTV, F_BOOSTI,					     					/* Reg0A */
-	F_VBUS_STAT, F_CHG_STAT, F_PG_STAT, F_SDP_STAT, F_VSYS_STAT, /* Reg0B */
+	F_BATFET_DLY, F_BATFET_RST_EN, F_PUMPX_UP, F_PUMPX_DN,	     // Reg09 
+	F_BOOSTV, F_BOOSTI,					     					// Reg0A 
+	F_VBUS_STAT, F_CHG_STAT, F_PG_STAT, F_SDP_STAT, F_VSYS_STAT, // Reg0B 
 	F_WD_FAULT, F_BOOST_FAULT, F_CHG_FAULT, F_BAT_FAULT,
-	F_NTC_FAULT,						     					/* Reg0C */
-	F_FORCE_VINDPM, F_VINDPM,				     				/* Reg0D */
-	F_THERM_STAT, F_BATV,					     				/* Reg0E */
-	F_SYSV,							     						/* Reg0F */
-	F_TSPCT,						     						/* Reg10 */
-	F_VBUS_GD, F_VBUSV,					     					/* Reg11 */
-	F_ICHGR,						     						/* Reg12 */
-	F_VDPM_STAT, F_IDPM_STAT, F_IDPM_LIM,			     		/* Reg13 */
-	F_REG_RST, F_ICO_OPTIMIZED, F_PN, F_TS_PROFILE, F_DEV_REV,   /* Reg14 */
+	F_NTC_FAULT,						     					// Reg0C 
+	F_FORCE_VINDPM, F_VINDPM,				     				// Reg0D 
+	F_THERM_STAT, F_BATV,					     				// Reg0E 
+	F_SYSV,							     						// Reg0F 
+	F_TSPCT,						     						// Reg10 
+	F_VBUS_GD, F_VBUSV,					     					// Reg11 
+	F_ICHGR,						     						// Reg12 
+	F_VDPM_STAT, F_IDPM_STAT, F_IDPM_LIM,			     		// Reg13 
+	F_REG_RST, F_ICO_OPTIMIZED, F_PN, F_TS_PROFILE, F_DEV_REV,  // Reg14 
 
 	F_MAX_FIELDS
 };
-
+*/
 enum bq25890_fields {
 	F_DEVICE_ID,				     		/* Reg00 */
 	F_VAC_OVP_DIS, F_VAC_OVP, F_VBUS_OVP_DIS, F_VBUS_OVP,	/* Reg04 */
@@ -255,16 +258,18 @@ struct reg_field {
 				.msb = _msb,	\
 				}
 */
+
+/*
 static const struct reg_field _bq25890_reg_fields_[] = {
-	/* REG00 */
+	// REG00 
 	[F_EN_HIZ]		= REG_FIELD(0x00, 7, 7),
 	[F_EN_ILIM]		= REG_FIELD(0x00, 6, 6),
 	[F_IILIM]		= REG_FIELD(0x00, 0, 5),
-	/* REG01 */
+	// REG01 
 	[F_BHOT]		= REG_FIELD(0x01, 6, 7),
 	[F_BCOLD]		= REG_FIELD(0x01, 5, 5),
 	[F_VINDPM_OFS]	= REG_FIELD(0x01, 0, 4),
-	/* REG02 */
+	// REG02 
 	[F_CONV_START]	= REG_FIELD(0x02, 7, 7),
 	[F_CONV_RATE]	= REG_FIELD(0x02, 6, 6),
 	[F_BOOSTF]		= REG_FIELD(0x02, 5, 5),
@@ -273,34 +278,34 @@ static const struct reg_field _bq25890_reg_fields_[] = {
 	[F_MAXC_EN]		= REG_FIELD(0x02, 2, 2),
 	[F_FORCE_DPM]	= REG_FIELD(0x02, 1, 1),
 	[F_AUTO_DPDM_EN]= REG_FIELD(0x02, 0, 0),
-	/* REG03 */
+	// REG03 
 	[F_BAT_LOAD_EN]	= REG_FIELD(0x03, 7, 7),
 	[F_WD_RST]		= REG_FIELD(0x03, 6, 6),
 	[F_OTG_CFG]		= REG_FIELD(0x03, 5, 5),
 	[F_CHG_CFG]		= REG_FIELD(0x03, 4, 4),
 	[F_SYSVMIN]		= REG_FIELD(0x03, 1, 3),
-	/* REG04 */
+	// REG04 
 	[F_PUMPX_EN]	= REG_FIELD(0x04, 7, 7),
 	[F_ICHG]		= REG_FIELD(0x04, 0, 6),
-	/* REG05 */
+	// REG05 
 	[F_IPRECHG]		= REG_FIELD(0x05, 4, 7),
 	[F_ITERM]		= REG_FIELD(0x05, 0, 3),
-	/* REG06 */
+	// REG06 
 	[F_VREG]		= REG_FIELD(0x06, 2, 7),
 	[F_BATLOWV]		= REG_FIELD(0x06, 1, 1),
 	[F_VRECHG]		= REG_FIELD(0x06, 0, 0),
-	/* REG07 */
+	// REG07 
 	[F_TERM_EN]		= REG_FIELD(0x07, 7, 7),
 	[F_STAT_DIS]	= REG_FIELD(0x07, 6, 6),
 	[F_WD]			= REG_FIELD(0x07, 4, 5),
 	[F_TMR_EN]		= REG_FIELD(0x07, 3, 3),
 	[F_CHG_TMR]		= REG_FIELD(0x07, 1, 2),
 	[F_JEITA_ISET]	= REG_FIELD(0x07, 0, 0),
-	/* REG08 */
+	// REG08 
 	[F_BATCMP]		= REG_FIELD(0x08, 6, 7),
 	[F_VCLAMP]		= REG_FIELD(0x08, 2, 4),
 	[F_TREG]		= REG_FIELD(0x08, 0, 1),
-	/* REG09 */
+	// REG09 
 	[F_FORCE_ICO]		= REG_FIELD(0x09, 7, 7),
 	[F_TMR2X_EN]		= REG_FIELD(0x09, 6, 6),
 	[F_BATFET_DIS]		= REG_FIELD(0x09, 5, 5),
@@ -309,47 +314,48 @@ static const struct reg_field _bq25890_reg_fields_[] = {
 	[F_BATFET_RST_EN]	= REG_FIELD(0x09, 2, 2),
 	[F_PUMPX_UP]		= REG_FIELD(0x09, 1, 1),
 	[F_PUMPX_DN]		= REG_FIELD(0x09, 0, 0),
-	/* REG0A */
+	// REG0A 
 	[F_BOOSTV]			= REG_FIELD(0x0A, 4, 7),
 	[F_BOOSTI]			= REG_FIELD(0x0A, 0, 2),
-	/* REG0B */
+	// REG0B 
 	[F_VBUS_STAT]		= REG_FIELD(0x0B, 5, 7),
 	[F_CHG_STAT]		= REG_FIELD(0x0B, 3, 4),
 	[F_PG_STAT]			= REG_FIELD(0x0B, 2, 2),
 	[F_SDP_STAT]		= REG_FIELD(0x0B, 1, 1),
 	[F_VSYS_STAT]		= REG_FIELD(0x0B, 0, 0),
-	/* REG0C */
+	// REG0C 
 	[F_WD_FAULT]		= REG_FIELD(0x0C, 7, 7),
 	[F_BOOST_FAULT]		= REG_FIELD(0x0C, 6, 6),
 	[F_CHG_FAULT]		= REG_FIELD(0x0C, 4, 5),
 	[F_BAT_FAULT]		= REG_FIELD(0x0C, 3, 3),
 	[F_NTC_FAULT]		= REG_FIELD(0x0C, 0, 2),
-	/* REG0D */
+	// REG0D 
 	[F_FORCE_VINDPM]	= REG_FIELD(0x0D, 7, 7),
 	[F_VINDPM]			= REG_FIELD(0x0D, 0, 6),
-	/* REG0E */
+	// REG0E 
 	[F_THERM_STAT]		= REG_FIELD(0x0E, 7, 7),
 	[F_BATV]			= REG_FIELD(0x0E, 0, 6),
-	/* REG0F */
+	// REG0F 
 	[F_SYSV]			= REG_FIELD(0x0F, 0, 6),
-	/* REG10 */
+	// REG10 
 	[F_TSPCT]			= REG_FIELD(0x10, 0, 6),
-	/* REG11 */
+	// REG11 
 	[F_VBUS_GD]			= REG_FIELD(0x11, 7, 7),
 	[F_VBUSV]			= REG_FIELD(0x11, 0, 6),
-	/* REG12 */
+	// REG12 
 	[F_ICHGR]			= REG_FIELD(0x12, 0, 6),
-	/* REG13 */
+	// REG13 
 	[F_VDPM_STAT]		= REG_FIELD(0x13, 7, 7),
 	[F_IDPM_STAT]		= REG_FIELD(0x13, 6, 6),
 	[F_IDPM_LIM]		= REG_FIELD(0x13, 0, 5),
-	/* REG14 */
+	// REG14 
 	[F_REG_RST]			= REG_FIELD(0x14, 7, 7),
 	[F_ICO_OPTIMIZED]	= REG_FIELD(0x14, 6, 6),
 	[F_PN]				= REG_FIELD(0x14, 3, 5),
 	[F_TS_PROFILE]		= REG_FIELD(0x14, 2, 2),
 	[F_DEV_REV]			= REG_FIELD(0x14, 0, 1)
 };
+*/
 
 static const struct reg_field bq25890_reg_fields[] = {
 	/* REG00 */
@@ -402,7 +408,7 @@ static const struct reg_field bq25890_reg_fields[] = {
 	[F_ADC_DONE_MASK]	= REG_FIELD(0x0B, 4, 4),
 	[F_REGN_OK_MASK]	= REG_FIELD(0x0B, 3, 3),
 	[F_VBAT_PRESENT_MASK]	= REG_FIELD(0x0B, 2, 2),
-	F_VBUS_PRESENT_MASK[]	= REG_FIELD(0x0B, 1, 1),
+	[F_VBUS_PRESENT_MASK]	= REG_FIELD(0x0B, 1, 1),
 	[F_VAC_PRESENT_MASK]	= REG_FIELD(0x0B, 0, 0),
 
 	/* Reg0C */
@@ -906,9 +912,7 @@ static u8 bq25890_find_idx(u32 value, enum bq25890_table_ids id)
 
 		rtbl_size = (rtbl->max - rtbl->min) / rtbl->step + 1;
 
-		for (idx = 1;
-		     idx < rtbl_size && (idx * rtbl->step + rtbl->min <= value);
-		     idx++)
+		for ( idx = 1; idx < rtbl_size && (idx * rtbl->step + rtbl->min <= value);  idx++ )
 			;
 	}
 
@@ -947,6 +951,8 @@ enum bq25890_chrg_fault {
 static int bq25890_power_supply_get_property(struct power_supply *psy, enum power_supply_property psp, union power_supply_propval *val)
 {
 	int ret;
+	int v1, v2;
+
 	struct bq25890_device *bq = power_supply_get_drvdata(psy);
 	struct bq25890_state state;
 
@@ -992,7 +998,7 @@ static int bq25890_power_supply_get_property(struct power_supply *psy, enum powe
 
 	case POWER_SUPPLY_PROP_CONSTANT_CHARGE_CURRENT:
 		//ret = bq25890_field_read(bq, F_ICHGR); /* read measured value */
-		ret = bq25890_field_read(bq, ICHG_CC); /* 读取电流的测量值 */
+		ret = bq25890_field_read(bq, F_ICHG_CC); /* 读取电流的测量值 */
 		
 		if (ret < 0)
 			return ret;
@@ -1011,9 +1017,14 @@ static int bq25890_power_supply_get_property(struct power_supply *psy, enum powe
 			break;
 		}
 
-		ret = bq25890_field_read(bq, F_BATV); /* read measured value */
-		if (ret < 0)
-			return ret;
+		//ret = bq25890_field_read(bq, F_BATV); /* read measured value */
+		v1 = bq25890_field_read(bq, F_VBAT_ADC_1); /* 改为两个字节合并 */
+		v2 = bq25890_field_read(bq, F_VBAT_ADC_2); /* 改为两个字节合并 */
+		
+		if (v1 < 0 || v2 < 0)
+			return v1<v2?v1:v2;
+
+		ret = ((v1 & 0xF) << 8) | (v2 & 0xFF);
 
 		/* converted_val = 2.304V + ADC_val * 20mV (table 10.3.15) */
 		val->intval = 2304000 + ret * 20000;
@@ -1043,11 +1054,14 @@ static int bq25890_get_chip_state(struct bq25890_device *bq, struct bq25890_stat
 		u8 *data;
 	} state_fields[] = {
 		{F_CHG_STAT,	&state->chrg_status},
-		{F_PG_STAT,		&state->online},
-		{F_VSYS_STAT,	&state->vsys_status},
-		{F_BOOST_FAULT, &state->boost_fault},
-		{F_BAT_FAULT,	&state->bat_fault},
-		{F_CHG_FAULT,	&state->chrg_fault}
+		{F_VBUS_GOOD_STAT,		&state->online},//{F_PG_STAT,		&state->online},
+		{F_VSYSMIN_REG_STAT,	&state->vsys_status},//{F_VSYS_STAT,	&state->vsys_status},
+		
+		//{F_BOOST_FAULT, &state->boost_fault},//{F_BOOST_FAULT, &state->boost_fault},
+		
+		{F_BATFET_STAT,	&state->bat_fault}//{F_BAT_FAULT,	&state->bat_fault},
+		
+		//{F_CHG_FAULT,	&state->chrg_fault}
 	};
 
 	for (i = 0; i < ARRAY_SIZE(state_fields); i++) {
@@ -1058,11 +1072,11 @@ static int bq25890_get_chip_state(struct bq25890_device *bq, struct bq25890_stat
 		*state_fields[i].data = ret;
 	}
 
-	dev_dbg(bq->dev, "S:CHG/PG/VSYS=%d/%d/%d, F:CHG/BOOST/BAT=%d/%d/%d\n", state->chrg_status, state->online, state->vsys_status, state->chrg_fault, state->boost_fault, state->bat_fault);
+	//dev_dbg(bq->dev, "[OBEI_BC]S:CHG/PG/VSYS=%d/%d/%d, F:CHG/BOOST/BAT=%d/%d/%d\n", state->chrg_status, state->online, state->vsys_status, state->chrg_fault, state->boost_fault, state->bat_fault);
 
 	return 0;
 }
-
+//判断状态是否发生改变
 static bool bq25890_state_changed(struct bq25890_device *bq, struct bq25890_state *new_state)
 {
 	struct bq25890_state old_state;
@@ -1072,11 +1086,11 @@ static bool bq25890_state_changed(struct bq25890_device *bq, struct bq25890_stat
 	mutex_unlock(&bq->lock);
 
 	return (old_state.chrg_status != new_state->chrg_status ||
-		old_state.chrg_fault != new_state->chrg_fault	||
-		old_state.online != new_state->online		||
-		old_state.bat_fault != new_state->bat_fault	||
-		old_state.boost_fault != new_state->boost_fault ||
-		old_state.vsys_status != new_state->vsys_status);
+		    old_state.chrg_fault != new_state->chrg_fault	||
+		    old_state.online != new_state->online		||
+		    old_state.bat_fault != new_state->bat_fault	||
+		    old_state.boost_fault != new_state->boost_fault ||
+		    old_state.vsys_status != new_state->vsys_status);
 }
 
 static void bq25890_handle_state_change(struct bq25890_device *bq, struct bq25890_state *new_state)
@@ -1090,12 +1104,15 @@ static void bq25890_handle_state_change(struct bq25890_device *bq, struct bq2589
 
 	if (!new_state->online) {  /* power removed */
 		/* disable ADC */
-		ret = bq25890_field_write(bq, F_CONV_START, 0);
+		//ret = bq25890_field_write(bq, F_CONV_START, 0);
+		ret = bq25890_field_write(bq, F_ADC_EN, 0);
+		
 		if (ret < 0)
 			goto error;
-	} else if (!old_state.online) {			    /* power inserted */
+	} else if (!old_state.online) {	  /* power inserted */
 		/* enable ADC, to have control of charge current/voltage */
-		ret = bq25890_field_write(bq, F_CONV_START, 1);
+		//ret = bq25890_field_write(bq, F_CONV_START, 1);
+		ret = bq25890_field_write(bq, F_ADC_EN, 1);
 		if (ret < 0)
 			goto error;
 	}
@@ -1136,12 +1153,12 @@ static int bq25890_chip_reset(struct bq25890_device *bq)
 	int ret;
 	int rst_check_counter = 10;
 
-	ret = bq25890_field_write(bq, F_REG_RST, 1);
+	ret = bq25890_field_write(bq, F_REG_RST, 1);//此行无需修改，新老文档名字一样，寄存器从REG14变REG08,
 	if (ret < 0)
 		return ret;
 
 	do {
-		ret = bq25890_field_read(bq, F_REG_RST);
+		ret = bq25890_field_read(bq, F_REG_RST);//此行无需修改，新老文档名字一样，寄存器从REG14变REG08,
 		if (ret < 0)
 			return ret;
 
@@ -1181,11 +1198,13 @@ static int bq25890_hw_init(struct bq25890_device *bq)
 		return ret;
 
 	/* disable watchdog */
-	ret = bq25890_field_write(bq, F_WD, 0);
+	//ret = bq25890_field_write(bq, F_WD, 0);
+	ret = bq25890_field_write(bq, F_WD_TIMEOUT, 0);//寄存器未变
+	
 	if (ret < 0)
 		return ret;
 
-	/* initialize currents/voltages and other parameters */
+	/* 初始化电流/电压和其他参数。 initialize currents/voltages and other parameters */
 	for (i = 0; i < ARRAY_SIZE(init_data); i++) {
 		ret = bq25890_field_write(bq, init_data[i].id, init_data[i].value);
 		if (ret < 0)
@@ -1193,7 +1212,9 @@ static int bq25890_hw_init(struct bq25890_device *bq)
 	}
 
 	/* Configure ADC for continuous conversions. This does not enable it. */
-	ret = bq25890_field_write(bq, F_CONV_RATE, 1);
+	//ret = bq25890_field_write(bq, F_CONV_RATE, 1);
+	ret = bq25890_field_write(bq, F_ADC_RATE, 1);
+	
 	if (ret < 0)
 		return ret;
 
@@ -1225,18 +1246,18 @@ static char *bq25890_charger_supplied_to[] = {
 };
 
 static const struct power_supply_desc bq25890_power_supply_desc = {
-	.name = "bq25890-charger",
+	.name = DEVICE_NAME,
 	.type = POWER_SUPPLY_TYPE_USB,
 	.properties = bq25890_power_supply_props,
 	.num_properties = ARRAY_SIZE(bq25890_power_supply_props),
 	.get_property = bq25890_power_supply_get_property,
 };
-
+//注册power_supply就是注册设备么 ？
 static int bq25890_power_supply_init(struct bq25890_device *bq)
 {
 	struct power_supply_config psy_cfg = { .drv_data = bq, };
 
-	psy_cfg.supplied_to = bq25890_charger_supplied_to;
+	psy_cfg.supplied_to     = bq25890_charger_supplied_to;
 	psy_cfg.num_supplicants = ARRAY_SIZE(bq25890_charger_supplied_to);
 
 	bq->ps_charger = power_supply_register(bq->dev, &bq25890_power_supply_desc, &psy_cfg);
@@ -1252,14 +1273,17 @@ static void bq25890_usb_work(struct work_struct *data)
 	switch (bq->usb_event) {
 	case USB_EVENT_ID:
 		/* Enable boost mode */
-		ret = bq25890_field_write(bq, F_OTG_CFG, 1);
+		//ret = bq25890_field_write(bq, F_OTG_CFG, 1);
+		ret = bq25890_field_write(bq, F_BOOST_EN, 1);
+		
 		if (ret < 0)
 			goto error;
 		break;
 
 	case USB_EVENT_NONE:
 		/* Disable boost mode */
-		ret = bq25890_field_write(bq, F_OTG_CFG, 0);
+		//ret = bq25890_field_write(bq, F_OTG_CFG, 0);
+		ret = bq25890_field_write(bq, F_BOOST_EN, 0);
 		if (ret < 0)
 			goto error;
 
@@ -1270,7 +1294,7 @@ static void bq25890_usb_work(struct work_struct *data)
 	return;
 
 error:
-	dev_err(bq->dev, "Error switching to boost/charger mode.\n");
+	dev_err(bq->dev, "[OBEI_BC]Error switching to boost/charger mode.\n");
 }
 
 static int bq25890_usb_notifier(struct notifier_block *nb, unsigned long val, void *priv)
@@ -1289,7 +1313,7 @@ static int bq25890_irq_probe(struct bq25890_device *bq)
 
 	irq = devm_gpiod_get(bq->dev, BQ25890_IRQ_PIN, GPIOD_IN);
 	if (IS_ERR(irq)) {
-		dev_err(bq->dev, "Could not probe irq pin.\n");
+		dev_err(bq->dev, "[OBEI_BC]Could not probe irq pin.\n");
 		return PTR_ERR(irq);
 	}
 
@@ -1320,22 +1344,38 @@ static int bq25890_fw_read_u32_props(struct bq25890_device *bq)
 		/* optional properties */
 		{"ti,thermal-regulation-threshold", true, TBL_TREG, &init->treg}
 	};
-
+	/*
+	bq24150a: bq24150a@6b {
+		compatible = "ti,bq24150a";
+		reg = <0x6b>;
+		ti,current-limit = <100>;
+		ti,weak-battery-voltage = <3400>;
+		ti,battery-regulation-voltage = <4200>;
+		ti,charge-current = <650>;
+		ti,termination-current = <100>;
+		ti,resistor-sense = <68>;
+		ti,usb-charger-detection = <&isp1707>;
+	};
+	*/
+	*props[TBL_ICHG].conv_data = 650;
 	/* initialize data for optional properties */
 	init->treg = 3; /* 120 degrees Celsius */
 
+	/*
 	for (i = 0; i < ARRAY_SIZE(props); i++) {
+		//从设备树中读取上面的属性值
 		ret = device_property_read_u32(bq->dev, props[i].name, &property);
 		if (ret < 0) {
 			if (props[i].optional)
 				continue;
-
+			//读取失败直接返回错误
 			return ret;
 		}
 
+		//读取成功.给conv_data变量赋值....
 		*props[i].conv_data = bq25890_find_idx(property, props[i].tbl_id);
 	}
-
+	*/
 	return 0;
 }
 
@@ -1363,7 +1403,7 @@ static int bq25890_probe(struct i2c_client *client, const struct i2c_device_id *
 	int i;
 
 	if (!i2c_check_functionality(adapter, I2C_FUNC_SMBUS_BYTE_DATA)) {
-		dev_err(dev, "No support for SMBUS_BYTE_DATA\n");
+		dev_err(dev, "[OBEI_BC]No support for SMBUS_BYTE_DATA\n");
 		return -ENODEV;
 	}
 
@@ -1378,7 +1418,7 @@ static int bq25890_probe(struct i2c_client *client, const struct i2c_device_id *
 
 	bq->rmap = devm_regmap_init_i2c(client, &bq25890_regmap_config);
 	if (IS_ERR(bq->rmap)) {
-		dev_err(dev, "failed to allocate register map\n");
+		dev_err(dev, "[OBEI_BC]failed to allocate register map\n");
 		return PTR_ERR(bq->rmap);
 	}
 
@@ -1387,28 +1427,31 @@ static int bq25890_probe(struct i2c_client *client, const struct i2c_device_id *
 
 		bq->rmap_fields[i] = devm_regmap_field_alloc(dev, bq->rmap, reg_fields[i]);
 		if (IS_ERR(bq->rmap_fields[i])) {
-			dev_err(dev, "cannot allocate regmap field\n");
+			dev_err(dev, "[OBEI_BC]cannot allocate regmap field\n");
 			return PTR_ERR(bq->rmap_fields[i]);
 		}
 	}
 
 	i2c_set_clientdata(client, bq);
 
-	bq->chip_id = bq25890_field_read(bq, F_PN);
+	//bq->chip_id = bq25890_field_read(bq, F_PN);
+	bq->chip_id = bq25890_field_read(bq, F_DEVICE_ID);//读取设备编号 0x66
+
 	if (bq->chip_id < 0) {
-		dev_err(dev, "Cannot read chip ID.\n");
+		dev_err(dev, "[OBEI_BC]Cannot read chip ID.\n");
 		return bq->chip_id;
 	}
-
-	if (bq->chip_id != BQ25890_ID) {
-		dev_err(dev, "Chip with ID=%d, not supported!\n", bq->chip_id);
+	
+	//if (bq->chip_id != BQ25890_ID) {
+	if (bq->chip_id != SYBA76_BC_ID) {
+		dev_err(dev, "[OBEI_BC]Chip with ID=%d, not supported!\n", bq->chip_id);
 		return -ENODEV;
 	}
 
 	if (!dev->platform_data) {
 		ret = bq25890_fw_probe(bq);
 		if (ret < 0) {
-			dev_err(dev, "Cannot read device properties.\n");
+			dev_err(dev, "[OBEI_BC]Cannot read device properties.\n");
 			return ret;
 		}
 	} else {
@@ -1417,7 +1460,7 @@ static int bq25890_probe(struct i2c_client *client, const struct i2c_device_id *
 
 	ret = bq25890_hw_init(bq);
 	if (ret < 0) {
-		dev_err(dev, "Cannot initialize the chip.\n");
+		dev_err(dev, "[OBEI_BC]Cannot initialize the chip.\n");
 		return ret;
 	}
 
@@ -1425,7 +1468,7 @@ static int bq25890_probe(struct i2c_client *client, const struct i2c_device_id *
 		client->irq = bq25890_irq_probe(bq);
 
 	if (client->irq < 0) {
-		dev_err(dev, "No irq resource found.\n");
+		dev_err(dev, "[OBEI_BC]No irq resource found.\n");
 		return client->irq;
 	}
 
@@ -1443,7 +1486,7 @@ static int bq25890_probe(struct i2c_client *client, const struct i2c_device_id *
 
 	ret = bq25890_power_supply_init(bq);
 	if (ret < 0) {
-		dev_err(dev, "Failed to register power supply\n");
+		dev_err(dev, "[OBEI_BC]Failed to register power supply\n");
 		goto irq_fail;
 	}
 
@@ -1480,7 +1523,9 @@ static int bq25890_suspend(struct device *dev)
 	 * If charger is removed, while in suspend, make sure ADC is diabled
 	 * since it consumes slightly more power.
 	 */
-	return bq25890_field_write(bq, F_CONV_START, 0);
+	//return bq25890_field_write(bq, F_CONV_START, 0);
+	return bq25890_field_write(bq, F_ADC_EN, 0);
+	
 }
 
 static int bq25890_resume(struct device *dev)
@@ -1499,7 +1544,8 @@ static int bq25890_resume(struct device *dev)
 
 	/* Re-enable ADC only if charger is plugged in. */
 	if (state.online) {
-		ret = bq25890_field_write(bq, F_CONV_START, 1);
+		//ret = bq25890_field_write(bq, F_CONV_START, 1);
+		ret = bq25890_field_write(bq, F_ADC_EN, 1);
 		if (ret < 0)
 			return ret;
 	}
@@ -1516,26 +1562,26 @@ static const struct dev_pm_ops bq25890_pm = {
 };
 
 static const struct i2c_device_id bq25890_i2c_ids[] = {
-	{ "bq25890", 0 },
+	{ DRIVER_NAME, 0 },
 	{},
 };
 MODULE_DEVICE_TABLE(i2c, bq25890_i2c_ids);
 
 static const struct of_device_id bq25890_of_match[] = {
-	{ .compatible = "ti,bq25890", },
+	{ .compatible = DRIVER_NAME, },
 	{ },
 };
 MODULE_DEVICE_TABLE(of, bq25890_of_match);
 
 static const struct acpi_device_id bq25890_acpi_match[] = {
-	{"BQ258900", 0},
+	{DRIVER_NAME, 0},
 	{},
 };
 MODULE_DEVICE_TABLE(acpi, bq25890_acpi_match);
 
 static struct i2c_driver bq25890_driver = {
 	.driver = {
-		.name = "bq25890-charger",
+		.name = DRIVER_NAME,
 		.of_match_table = of_match_ptr(bq25890_of_match),
 		.acpi_match_table = ACPI_PTR(bq25890_acpi_match),
 		.pm = &bq25890_pm,
