@@ -156,6 +156,8 @@ enum bq25890_fields {
 	F_VBUS_STAT,F_INPUT_DET_DONE_FLAG,F_DP_OVP_FLAG,F_DM_OVP_FLAG,/* Reg94 */
 	F_INPUT_DET_DONE_MASK,F_DP_OVP_MASK,F_DM_OVP_MASK,/* Reg95 */
 
+	F_DP_OVP_STAT,F_DP_IN4,F_DP_IN3,F_DP_IN2,F_DP_IN1,F_DP_IN0,/* Reg98 */
+	F_DM_OVP_STAT,F_DM_IN4,F_DM_IN3,F_DM_IN2,F_DM_IN1,F_DM_IN0,/* Reg99 */
 	F_MAX_FIELDS
 };
 
@@ -206,13 +208,14 @@ struct bq25890_device {
 //只读寄存器范围
 static const struct regmap_range bq25890_readonly_reg_ranges[] = {
 	regmap_reg_range(0x00, 0x00),
-	regmap_reg_range(0x09, 0x0A),
-	regmap_reg_range(0x0C, 0x0D),
+	regmap_reg_range(0x09, 0x0A),regmap_reg_range(0x0B, 0x0B),
+	regmap_reg_range(0x0C, 0x0D),regmap_reg_range(0x0E, 0x0E),
 	regmap_reg_range(0x11, 0x26),
-	regmap_reg_range(0x41, 0x46),
-	regmap_reg_range(0x50, 0x53),
-	regmap_reg_range(0x87, 0x89),
-	regmap_reg_range(0x98, 0x99),
+	regmap_reg_range(0x41, 0x46),regmap_reg_range(0x47, 0x49),
+	regmap_reg_range(0x50, 0x53),regmap_reg_range(0x54, 0x55),
+	regmap_reg_range(0x87, 0x89),regmap_reg_range(0x92, 0x92),
+	regmap_reg_range(0x94, 0x99),
+	regmap_reg_range(0x9D, 0x9D),
 };
 //可写寄存器
 static const struct regmap_access_table bq25890_writeable_regs = {
@@ -221,10 +224,12 @@ static const struct regmap_access_table bq25890_writeable_regs = {
 };
 //volatile寄存器范围
 static const struct regmap_range bq25890_volatile_reg_ranges[] = {
-	regmap_reg_range(0x00, 0x00),
-	regmap_reg_range(0x09, 0x09),
-	regmap_reg_range(0x0b, 0x0c),
-	regmap_reg_range(0x0e, 0x14),
+	regmap_reg_range(0x3C, 0x3C),
+	regmap_reg_range(0x35, 0x35),
+	regmap_reg_range(0x42, 0x42),
+	regmap_reg_range(0x58, 0x58),
+	regmap_reg_range(0x94, 0x94),
+	
 };
 //volatile寄存器
 static const struct regmap_access_table bq25890_volatile_regs = {
@@ -236,7 +241,7 @@ static const struct regmap_config bq25890_regmap_config = {
 	.reg_bits = 8,
 	.val_bits = 8,
 
-	.max_register = 0x95,
+	.max_register = 0x9D,
 	.cache_type = REGCACHE_RBTREE,
 
 	.wr_table = &bq25890_writeable_regs//,
@@ -813,7 +818,22 @@ static const struct reg_field bq25890_reg_fields[] = {
 	/* Reg95 */
 	[F_INPUT_DET_DONE_MASK] = REG_FIELD(0x95, 2, 2),
 	[F_DP_OVP_MASK] = REG_FIELD(0x95, 1, 1),
-	[F_DM_OVP_MASK] = REG_FIELD(0x95, 0, 0)
+	[F_DM_OVP_MASK] = REG_FIELD(0x95, 0, 0),
+
+	/* Reg98 */
+	[F_DP_OVP_STAT] = REG_FIELD(0x98, 7, 7),
+	[F_DP_IN4] = REG_FIELD(0x98, 4, 4),
+	[F_DP_IN3] = REG_FIELD(0x98, 3, 3),
+	[F_DP_IN2] = REG_FIELD(0x98, 2, 2),
+	[F_DP_IN1] = REG_FIELD(0x98, 1, 1),
+	[F_DP_IN0] = REG_FIELD(0x98, 0, 0),
+	/* Reg99 */
+	[F_DM_OVP_STAT] = REG_FIELD(0x99, 7, 7),
+	[F_DM_IN4] = REG_FIELD(0x99, 4, 4),
+	[F_DM_IN3] = REG_FIELD(0x99, 3, 3),
+	[F_DM_IN2] = REG_FIELD(0x99, 2, 2),
+	[F_DM_IN1] = REG_FIELD(0x99, 1, 1),
+	[F_DM_IN0] = REG_FIELD(0x99, 0, 0)
 
 };
 
@@ -878,6 +898,8 @@ static const union {
 	[TBL_TREG] =	{ .lt = {bq25890_treg_tbl, BQ25890_TREG_TBL_SIZE} },
 	[TBL_BOOSTI] =	{ .lt = {bq25890_boosti_tbl, BQ25890_BOOSTI_TBL_SIZE} }
 };
+
+
 //读取指定寄存器的值
 static int bq25890_field_read(struct bq25890_device *bq, enum bq25890_fields field_id)
 {

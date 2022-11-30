@@ -197,8 +197,7 @@ extern bool dp_dfp_u_notify_enter_mode(struct pd_port *pd_port, struct svdm_svid
 
 extern bool dp_dfp_u_notify_exit_mode(struct pd_port *pd_port, struct svdm_svid_data *svid_data, uint8_t ops);
 
-extern bool dp_dfp_u_notify_attention(struct pd_port *pd_port,
-	struct svdm_svid_data *svid_data, struct pd_event *pd_event);
+extern bool dp_dfp_u_notify_attention(struct pd_port *pd_port, struct svdm_svid_data *svid_data, struct pd_event *pd_event);
 #endif	/* CONFIG_USB_PD_ALT_MODE_DFP */
 
 extern void dp_ufp_u_request_enter_mode(struct pd_port *pd_port, struct svdm_svid_data *svid_data, uint8_t ops);

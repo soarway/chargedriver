@@ -9,8 +9,8 @@ obj-$(CONFIG_DUAL_ROLE_USB_INTF)	+= sp_class_dual_role.o sp_tcpci_dual_role.o
 
 obj-$(CONFIG_TCPC_RT1711H)		+= sp_tcpc_rt1711h.o
 
-obj-$(CONFIG_TCPC_CLASS)		+= sp_tcpci_core.o sp_tcpci_typec.o sp_tcpci_alert.o \
-					   sp_tcpci_timer.o sp_tcpm.o sp_tcpm_legacy.o sp_tcpm_block.o sp_pd_dbg_info.o
+obj-$(CONFIG_TCPC_CLASS)		+= sp_tcpci_core.o sp_tcpci_typec.o sp_tcpci_alert.o sp_tcpci_timer.o \
+									sp_tcpm.o sp_tcpm_legacy.o sp_tcpm_block.o sp_pd_dbg_info.o
 
 obj-$(CONFIG_USB_POWER_DELIVERY)	+= sp_tcpci_event.o \
 					   sp_pd_core.o sp_pd_policy_engine.o sp_pd_process_evt.o sp_pd_dpm_core.o \

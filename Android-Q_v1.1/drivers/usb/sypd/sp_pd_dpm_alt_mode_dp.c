@@ -693,8 +693,7 @@ bool dp_dfp_u_notify_dp_configuration(
 	return true;
 }
 
-bool dp_dfp_u_notify_attention(struct pd_port *pd_port,
-	struct svdm_svid_data *svid_data, struct pd_event *pd_event)
+bool dp_dfp_u_notify_attention(struct pd_port *pd_port,	struct svdm_svid_data *svid_data, struct pd_event *pd_event)
 {
 	bool valid_connected;
 	uint32_t dp_status = pd_event->pd_msg->payload[1];
@@ -704,8 +703,7 @@ bool dp_dfp_u_notify_attention(struct pd_port *pd_port,
 	pd_port->dp_ufp_u_attention = (uint8_t) dp_status;
 	switch (pd_port->dp_dfp_u_state) {
 	case DP_DFP_U_WAIT_ATTENTION:
-		valid_connected =
-			dp_dfp_u_update_dp_connected(pd_port, dp_status);
+		valid_connected = dp_dfp_u_update_dp_connected(pd_port, dp_status);
 		if (valid_connected)
 			dp_dfp_u_request_dp_configuration(pd_port, pd_event);
 		break;
@@ -757,15 +755,13 @@ void dp_ufp_u_request_enter_mode(
 		dp_ufp_u_set_state(pd_port, DP_UFP_U_WAIT);
 }
 
-void dp_ufp_u_request_exit_mode(
-	struct pd_port *pd_port, struct svdm_svid_data *svid_data, uint8_t ops)
+void dp_ufp_u_request_exit_mode(struct pd_port *pd_port, struct svdm_svid_data *svid_data, uint8_t ops)
 {
 	pd_port->dp_status = 0;
 	dp_ufp_u_set_state(pd_port, DP_UFP_U_NONE);
 }
 
-static inline bool dp_ufp_u_update_dp_connected(
-	struct pd_port *pd_port, uint32_t dp_status)
+static inline bool dp_ufp_u_update_dp_connected(struct pd_port *pd_port, uint32_t dp_status)
 {
 	bool valid_connected;
 	uint32_t dp_connected, dp_local_connected;
@@ -776,13 +772,11 @@ static inline bool dp_ufp_u_update_dp_connected(
 	switch (dp_connected) {
 	case DPSTS_DFP_D_CONNECTED:
 	case DPSTS_UFP_D_CONNECTED:
-		valid_connected = dp_update_dp_connected_one(
-			pd_port, dp_connected, dp_local_connected);
+		valid_connected = dp_update_dp_connected_one(pd_port, dp_connected, dp_local_connected);
 		break;
 
 	case DPSTS_BOTH_CONNECTED:
-		valid_connected = dp_update_dp_connected_both(
-			pd_port, dp_connected, dp_local_connected);
+		valid_connected = dp_update_dp_connected_both(pd_port, dp_connected, dp_local_connected);
 		break;
 
 	default:
@@ -793,8 +787,7 @@ static inline bool dp_ufp_u_update_dp_connected(
 	return valid_connected;
 }
 
-int dp_ufp_u_request_dp_status(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+int dp_ufp_u_request_dp_status(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool ack = true;
 	uint32_t dp_status;

@@ -35,10 +35,10 @@ static ssize_t tcpc_show_property(struct device *dev,  struct device_attribute *
 static ssize_t tcpc_store_property(struct device *dev,  struct device_attribute *attr, const char *buf, size_t count);
 
 #define TCPC_DEVICE_ATTR(_name, _mode)					\
-{									\
+{														\
 	.attr = { .name = #_name, .mode = _mode },			\
-	.show = tcpc_show_property,					\
-	.store = tcpc_store_property,					\
+	.show = tcpc_show_property,							\
+	.store = tcpc_store_property,						\
 }
 
 static struct class *tcpc_class;
@@ -138,10 +138,8 @@ static ssize_t tcpc_show_property(struct device *dev,  struct device_attribute *
 			"8: discover_id", "9: discover_cable");
 		break;
 	case TCPC_DESC_INFO:
-		i += snprintf(buf + i,
-			256, "|^|==( %s info )==|^|\n", tcpc->desc.name);
-		i += snprintf(buf + i,
-			256, "role = %s\n", role_text[tcpc->desc.role_def]);
+		i += snprintf(buf + i,	256, "|^|==( %s info )==|^|\n", tcpc->desc.name);
+		i += snprintf(buf + i,	256, "role = %s\n", role_text[tcpc->desc.role_def]);
 		if (tcpc->typec_local_rp_level == TYPEC_CC_RP_DFT)
 			i += snprintf(buf + i, 256, "rplvl = %s\n", "Default");
 		else if (tcpc->typec_local_rp_level == TYPEC_CC_RP_1_5)
@@ -278,11 +276,8 @@ static ssize_t tcpc_store_property(struct device *dev, struct device_attribute *
 	return count;
 }
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 9, 0))
+
 static int tcpc_match_device_by_name(struct device *dev, const void *data)
-#else
-static int tcpc_match_device_by_name(struct device *dev, void *data)
-#endif
 {
 	const char *name = data;
 	struct tcpc_device *tcpc = dev_get_drvdata(dev);
@@ -292,11 +287,7 @@ static int tcpc_match_device_by_name(struct device *dev, void *data)
 
 struct tcpc_device *tcpc_dev_get_by_name(const char *name)
 {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 9, 0))
-	struct device *dev = class_find_device(tcpc_class,NULL, (const void *)name, tcpc_match_device_by_name);
-#else
-	struct device *dev = class_find_device(tcpc_class,NULL, (void *)name, tcpc_match_device_by_name);
-#endif
+	struct device *dev = class_find_device(tcpc_class, NULL, (const void *)name, tcpc_match_device_by_name);
 	return dev ? dev_get_drvdata(dev) : NULL;
 }
 
@@ -416,8 +407,7 @@ static int tcpc_device_irq_enable(struct tcpc_device *tcpc)
 
 static void tcpc_init_work(struct work_struct *work)
 {
-	struct tcpc_device *tcpc = container_of(
-		work, struct tcpc_device, init_work.work);
+	struct tcpc_device *tcpc = container_of(work, struct tcpc_device, init_work.work);
 
 	if (tcpc->desc.notifier_supply_num == 0)
 		return;

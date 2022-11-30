@@ -202,6 +202,7 @@ static inline int bq24735_disable_charging(struct bq24735 *charger)
 	return bq24735_update_word(charger->client, BQ24735_CHG_OPT, BQ24735_CHG_OPT_CHARGE_DISABLE, 1);
 }
 
+//https://zhuanlan.zhihu.com/p/512249351
 //判断充电器是否存在，查看pdf文件中的 0x12H 寄存器的值
 static bool bq24735_charger_is_present(struct bq24735 *charger)
 {

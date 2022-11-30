@@ -88,9 +88,7 @@ static const sw_config_t configs[] = {
 
 #define SW_EN_DELAY_US	500
 
-int hd3ss460_set_switch(
-	struct hd3ss460_switch_data *switch_data, uint8_t enable,
-	uint8_t  amsel, uint8_t polarity)
+int hd3ss460_set_switch(struct hd3ss460_switch_data *switch_data, uint8_t enable, uint8_t  amsel, uint8_t polarity)
 {
 	mutex_lock(&switch_data->io_lock);
 	if (enable) {
@@ -118,8 +116,7 @@ int hd3ss460_set_switch(
 /* Please handle the notification in notifier call function,
  * handle SWITCH control event
  */
-static int hd3ss460_tcp_notifer_call(struct notifier_block *nb,
-				unsigned long event, void *data)
+static int hd3ss460_tcp_notifer_call(struct notifier_block *nb,	unsigned long event, void *data)
 {
 	hd3ss460_switch_data_t* switch_data = container_of(nb, hd3ss460_switch_data_t, nb);
 	struct tcp_notify *tcp_noti = data;
@@ -127,15 +124,13 @@ static int hd3ss460_tcp_notifer_call(struct notifier_block *nb,
 	switch (event) {
 	case TCP_NOTIFY_AMA_DP_STATE:
 		// TODO
-		hd3ss460_set_switch(switch_data, tcp_noti->ama_dp_state.active,
-			0, tcp_noti->ama_dp_state.polarity);
+		hd3ss460_set_switch(switch_data, tcp_noti->ama_dp_state.active,	0, tcp_noti->ama_dp_state.polarity);
 		break;
 	case TCP_NOTIFY_TYPEC_STATE:
 		switch (tcp_noti->typec_state.new_state) {
 			case TYPEC_ATTACHED_SNK:
 			case TYPEC_ATTACHED_SRC:
-			hd3ss460_set_switch(switch_data, 1, 0,
-				tcp_noti->typec_state.polarity);
+			hd3ss460_set_switch(switch_data, 1, 0, tcp_noti->typec_state.polarity);
 			break;
 			case TYPEC_UNATTACHED:
 			hd3ss460_set_switch(switch_data, 0, 0, 0);
@@ -150,8 +145,7 @@ static int hd3ss460_tcp_notifer_call(struct notifier_block *nb,
 }
 
 
-static int hd3ss460_parse_dt(struct hd3ss460_switch_data *switch_data,
-	struct device *dev)
+static int hd3ss460_parse_dt(struct hd3ss460_switch_data *switch_data, struct device *dev)
 {
 	struct device_node *np = dev->of_node;
 	int i;
@@ -176,8 +170,7 @@ static int hd3ss460_switch_set_state(struct switch_dev *sdev, int new_state)
 	struct hd3ss460_switch_data *switch_data =  switch_dev_get_drvdata(sdev);
 	int index = sdev - switch_data->sdevs;
 
-	dev_dbg(sdev->dev, "[OBEI]%s : switch number = %d, name = %s\n",
-		__FUNCTION__, index, hd3ss460_sw_default_names[index]);
+	dev_dbg(sdev->dev, "[OBEI]%s : switch number = %d, name = %s\n", __FUNCTION__, index, hd3ss460_sw_default_names[index]);
 	if (index >= SW_NR)
 		return -EFAULT;
 	gpio_set_value(switch_data->gpios[index], new_state);
@@ -204,12 +197,14 @@ static int hd3ss460_switch_probe(struct platform_device *pdev)
 			goto err_request_gpio;
 		registered_sw_devs_nr = i + 1;
 	}
+
 	for (i = 0, registered_sw_devs_nr = 0; i < SW_NR; i++) {
 		ret = gpio_direction_output(switch_data->gpios[i], 0);
 		if (ret < 0)
 			goto err_set_gpio_output;
 		registered_sw_devs_nr = i + 1;
 	}
+	
 	for (i = 0, registered_sw_devs_nr = 0; i < SW_NR; i++) {
 		switch_data->sdevs[i].set_state = hd3ss460_switch_set_state;
 		ret = switch_dev_register(switch_data->sdevs + i);
@@ -286,14 +281,8 @@ static void hd3ss460_shutdown(struct platform_device *pdev)
 }
 
 static const struct dev_pm_ops hd3ss460_pm_ops = {
-    SET_SYSTEM_SLEEP_PM_OPS(
-    hd3ss460_suspend,
-    hd3ss460_resume)
-	SET_RUNTIME_PM_OPS(
-		hd3ss460_pm_suspend_runtime,
-		hd3ss460_pm_resume_runtime,
-		NULL
-	)
+    SET_SYSTEM_SLEEP_PM_OPS(hd3ss460_suspend, hd3ss460_resume)
+	SET_RUNTIME_PM_OPS(hd3ss460_pm_suspend_runtime,	hd3ss460_pm_resume_runtime,	NULL)
 };
 #define HD3SS460_PM_OPS	(&hd3ss460_pm_ops)
 #else

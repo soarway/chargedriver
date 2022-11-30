@@ -11,6 +11,7 @@
         "sp_pd_policy_engine.h": "c",
         "sp_rt_regmap.h": "c",
         "bq2589x_reg.h": "c",
-        "symaster.h": "c"
+        "symaster.h": "c",
+        "sp_tcpci_typec.h": "c"
     }
 }

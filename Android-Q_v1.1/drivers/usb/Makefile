@@ -71,3 +71,4 @@ obj-$(CONFIG_USB_ROLE_SWITCH)	+= roles/
 obj-$(CONFIG_USB_PD)		+= pd/
 obj-$(CONFIG_USB_SYPD)		+= sypd/
 obj-$(CONFIG_USB_SYBC)		+= sybc/
+obj-$(CONFIG_USB_SYCHARGER)		+= sycharger/

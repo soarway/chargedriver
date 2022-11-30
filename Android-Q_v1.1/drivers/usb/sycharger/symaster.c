@@ -15,7 +15,382 @@
 #include "symaster.h"
 
 
+struct master_platform {
+	uint32_t charge_current;
+	uint32_t charge_voltage;
+	uint32_t input_current;
 
+	const char *name;
+
+	bool ext_control;
+
+	char **supplied_to;
+	size_t num_supplicants;
+};
+
+struct symaster {
+	struct power_supply			*charger;
+	struct power_supply_desc	 charger_desc;
+	struct i2c_client			*client;
+	struct device               *dev;
+	struct master_platform		*pdata;
+	struct mutex			lock;
+	struct gpio_desc		*status_gpio;
+	struct delayed_work		poll;
+	u32						poll_interval;
+	bool					charging;
+
+	struct symaster_device *master_dev;
+	struct notifier_block   master_nb;
+};
+
+
+
+//使能充电器：先初始化寄存器的值，然后再获取对充电器的控制，就是往BQ24735_CHG_OPT=0x12寄存器写入数据
+static inline int master_enable_charging(struct symaster *charger)
+{
+	//struct tcp_notify tcp_noti;
+
+	struct symaster_device* sydev = charger->master_dev;
+
+	return srcu_notifier_call_chain(&sydev->master_event, SY_NOTIFY_BC7D_ENABLE_CHARGER, sydev);
+}
+
+//消能充电器：
+static inline int master_disable_charging(struct symaster *charger)
+{
+	struct symaster_device* sydev = charger->master_dev;
+
+	return srcu_notifier_call_chain(&sydev->master_event, SY_NOTIFY_BC7D_DISABLE_CHARGER, sydev);
+}
+
+
+static inline struct symaster *to_master(struct power_supply *psy)
+{
+	return power_supply_get_drvdata(psy);
+}
+
+static enum power_supply_property master_charger_properties[] = {
+	POWER_SUPPLY_PROP_STATUS,
+	POWER_SUPPLY_PROP_ONLINE,
+};
+
+//https://zhuanlan.zhihu.com/p/512249351
+//判断充电器是否存在，查看pdf文件中的 0x12H 寄存器的值
+static bool master_charger_is_present(struct symaster *charger)
+{
+	return false;
+}
+
+//更新充电设备状态
+static void master_update(struct symaster *charger)
+{
+	mutex_lock(&charger->lock);
+
+	if (master_charger_is_present(charger))
+		master_enable_charging(charger);
+	else
+		master_disable_charging(charger);
+
+	mutex_unlock(&charger->lock);
+
+	power_supply_changed(charger->charger);
+}
+
+
+
+//中断处理回调函数
+static irqreturn_t master_irq_handler(int irq, void *devid)
+{
+	struct power_supply *psy = devid;
+	struct symaster *charger = to_master(psy);
+	struct symaster_device* sydev = charger->master_dev;
+
+	master_update(charger);
+	printk("[OBEI][master]irq handler\n");
+
+	//发一个消息到BC7D, 让其返回是否满足DCP特性
+	srcu_notifier_call_chain(&sydev->master_event, SY_NOTIFY_BC7D_CHECK_DCP, sydev);
+
+	return IRQ_HANDLED;
+}
+
+//定时器处理函数(没有设置中断的时候会使用此定时器函数)
+static void master_work_poll(struct work_struct *work)
+{
+	struct symaster *charger = container_of(work, struct symaster, poll.work);
+
+	master_update(charger);
+	printk("[OBEI][master]work poll\n");
+	schedule_delayed_work(&charger->poll, msecs_to_jiffies(charger->poll_interval));
+}
+
+
+
+//获取充电设备的属性值
+static int master_charger_get_property(struct power_supply *psy, enum power_supply_property psp, union power_supply_propval *val)
+{
+	struct symaster *charger = to_master(psy);
+	return 0;
+}
+
+//设置充电器属性：设置充电状态，取消充电状态
+static int master_charger_set_property(struct power_supply *psy, enum power_supply_property psp, const union power_supply_propval *val)
+{
+	struct symaster *charger = to_master(psy);
+
+	return 0;
+}
+
+
+
+//解析设备树，读取设备树的属性值
+static struct master_platform *parse_dt_data(struct i2c_client *client)
+{
+	struct master_platform *pdata = 0;
+	struct device_node *np = client->dev.of_node;
+	u32 val;
+	int ret;
+
+	pdata = devm_kzalloc(&client->dev, sizeof(*pdata), GFP_KERNEL);
+	if (!pdata) {
+		dev_err(&client->dev, "Memory alloc for bq24735 pdata failed\n");
+		return NULL;
+	}
+
+	//ret = of_property_read_u32(np, "ti,charge-current", &val);
+	//if (!ret)
+		pdata->charge_current = 2000;
+
+	//ret = of_property_read_u32(np, "ti,charge-voltage", &val);
+	//if (!ret)
+		pdata->charge_voltage = 16800;
+
+	//ret = of_property_read_u32(np, "ti,input-current", &val);
+	//if (!ret)
+		pdata->input_current = 500;
+
+	pdata->ext_control = true;//of_property_read_bool(np, "ti,external-control");
+
+	return pdata;
+}
+
+static int master_charger_property_is_writeable(struct power_supply *psy, enum power_supply_property psp)
+{
+	return 0;
+}
+
+
+
+
+static int master_event_notifer_call(struct notifier_block *nb, unsigned long event, void *data)
+{
+	//struct symaster_device* sydev;
+	//struct symaster * chip = container_of(nb, struct symaster, master_nb);
+
+	//struct tcp_notify *tcp_noti = data;
+
+	switch (event) {
+	case SY_NOTIFY_MASTER_ENABLE_CHARGER:
+		pr_info("[OBEI][master]: event call enable charger\n");
+		break;
+	case SY_NOTIFY_MASTER_DISABLE_CHARGER:
+		pr_info("[OBEI][master]: event call disable charger\n");
+		break;
+	default:
+		break;
+	};
+
+	return NOTIFY_OK;
+}
+
+
+static int master_device_init(struct symaster *chip, struct device *dev)
+{
+	struct symaster_device *mdev;
+	
+
+	pr_info("[OBEI][MASTER] register mdev device (%s)\n",  MASTER_DEVICE_NAME);
+
+	mdev = sy_device_register(dev, MASTER_DEVICE_NAME, chip);
+	if (!mdev) {
+		pr_err("[OBEI][master] : allocate mdev memeory failed\n");
+		return -1;
+	}
+	return 0;
+
+}
+
+//驱动匹配后被系统内核调用的初始化函数
+static int master_charger_probe(struct i2c_client *client, const struct i2c_device_id *id)
+{
+	int ret, irqn;
+	struct symaster *charger;
+	struct power_supply_desc *supply_desc;
+	struct power_supply_config psy_cfg = {};
+	char *name;
+
+	dev_info(&client->dev, "[OBEI][master]call probe !\n");
+	//分配自定义结构体的内存
+	charger = devm_kzalloc(&client->dev, sizeof(*charger), GFP_KERNEL);
+	if (!charger)
+		return -ENOMEM;
+
+	//初始化锁
+	mutex_init(&charger->lock);
+	charger->charging = true;//要求进入充电状态
+	charger->pdata = client->dev.platform_data;
+
+	if (IS_ENABLED(CONFIG_OF) && !charger->pdata && client->dev.of_node)
+	{
+		charger->pdata = parse_dt_data(client);
+		dev_info(&client->dev, "[OBEI][master]pdata success\n");
+	}	
+
+	if (!charger->pdata) {
+		dev_err(&client->dev, "[OBEI][master]no platform data provided\n");
+		return -EINVAL;
+	}
+
+	name = (char *)charger->pdata->name;
+	if (!name) {
+		name = devm_kasprintf(&client->dev, GFP_KERNEL, "symaster@%s", dev_name(&client->dev));
+		if (!name) {
+			dev_err(&client->dev, "[OBEI][master]Failed to alloc device name\n");
+			return -ENOMEM;
+		}
+		else {
+			dev_info(&client->dev, "[OBEI][master]device name=%s\n", name);
+		}
+	}
+
+	charger->client = client;
+	charger->dev = &client->dev;
+
+	supply_desc = &charger->charger_desc;
+
+	supply_desc->name = name;
+	supply_desc->type = POWER_SUPPLY_TYPE_MAINS;
+	supply_desc->properties = master_charger_properties;
+	supply_desc->num_properties = ARRAY_SIZE(master_charger_properties);
+	supply_desc->get_property = master_charger_get_property;
+	supply_desc->set_property = master_charger_set_property;
+	supply_desc->property_is_writeable = master_charger_property_is_writeable;
+
+	psy_cfg.supplied_to = charger->pdata->supplied_to;
+	psy_cfg.num_supplicants = charger->pdata->num_supplicants;
+	psy_cfg.of_node  = client->dev.of_node;
+	psy_cfg.drv_data = charger;
+
+	//注册结构体的数据指针到系统内核中
+	i2c_set_clientdata(client, charger);
+	ret = master_device_init(charger, &client->dev);
+	if (ret < 0) {
+		dev_err(&client->dev, "[OBEI][master] tcpc dev init fail\n");
+		return ret;
+	}
+
+	//获取GPIO的状态
+	charger->status_gpio = devm_gpiod_get_optional(&client->dev, "ti,ac-detect", GPIOD_IN);
+	if (IS_ERR(charger->status_gpio)) {
+		ret = PTR_ERR(charger->status_gpio);
+		dev_err(&client->dev, "[OBEI][master]Getting gpio failed: %d\n", ret);
+		return ret;
+	}
+	else {
+		dev_info(&client->dev, "[OBEI][master]Getting gpio success\n");
+	}
+
+	//充电器是否存在
+	if (master_charger_is_present(charger)) {
+		/*
+		//使能充电器
+		ret = bq24735_enable_charging(charger);
+		if (ret < 0) {
+			dev_err(&client->dev, "Failed to enable charging\n");
+			return ret;
+		}
+		*/
+	}
+
+
+
+
+	//注册驱动为一个power_supply设备
+	charger->charger = devm_power_supply_register(&client->dev, supply_desc, &psy_cfg);
+	if (IS_ERR(charger->charger)) {
+		ret = PTR_ERR(charger->charger);
+		dev_err(&client->dev, "[OBEI][master]Failed to register power supply: %d\n", ret);
+		return ret;
+	}
+	else
+	{
+		dev_info(&client->dev, "[OBEI][master]Success to register power supply\n");
+	}
+
+	//中断处理
+	ret = gpio_request(GPIO_IRQ, "bq2589x irq pin");
+	if (ret) {
+		dev_err(&client->dev, "[OBEI][master] gpio request failed\n");
+		return ret;
+	}
+	gpio_direction_input(GPIO_IRQ);
+
+	irqn = gpio_to_irq(GPIO_IRQ);
+	if (irqn < 0) {
+		dev_err(&client->dev, "%s:%d gpio_to_irq failed\n", __func__, irqn);
+		ret = irqn;
+		goto err_1;
+	}
+	client->irq = irqn;
+
+
+	//支持中断
+	//内核提供 request_threaded_irq 和 devm_request_threaded_irq 为中断分配内核线程
+	//若flags中设置IRQF_ONESHOT标志，内核会自动在中断上下文中屏蔽该中断号
+	//bq24735_charger_isr 为中断处理函数
+	if (client->irq) {
+		ret = devm_request_threaded_irq(&client->dev, client->irq, NULL, master_irq_handler, 
+				IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING | IRQF_ONESHOT, supply_desc->name, charger->charger);
+		if (ret) {
+			dev_err(&client->dev, "[OBEI][master]Unable to register IRQ %d err %d\n", client->irq, ret);
+			return ret;
+		}
+	} 
+	else {
+		//不支持中断，通过定时轮询来进入主循环
+
+		charger->poll_interval = 100;
+
+		INIT_DELAYED_WORK(&charger->poll, master_work_poll);
+		schedule_delayed_work(&charger->poll, msecs_to_jiffies(charger->poll_interval));
+	}
+
+
+	//注册事件回调函数
+	charger->master_nb.notifier_call = master_event_notifer_call;
+	ret = sy_register_notifier(charger->master_dev, &charger->master_nb);
+	if (ret < 0) {
+		dev_err(&client->dev, "[OBEI]register tcpc notifer fail\n");
+		return -EINVAL;
+	}
+
+	return 0;
+
+err_1:
+	gpio_free(GPIO_IRQ);
+	return 0;
+}
+
+static int master_charger_remove(struct i2c_client *client)
+{
+	struct symaster *charger = i2c_get_clientdata(client);
+
+	if (charger->poll_interval)
+		cancel_delayed_work_sync(&charger->poll);//取消定时器
+
+	return 0;
+}
 
 //---------------------------------------symaster--------------------------------------------
 static struct of_device_id   master_charger_match_table[] = {
@@ -24,7 +399,7 @@ static struct of_device_id   master_charger_match_table[] = {
 };
 
 static const struct i2c_device_id  master_charger_id[] = {
-	{ SY_MASTER, BQ25890 },
+	{ SY_MASTER, 0 },
 	{},
 };
 
@@ -37,22 +412,23 @@ static struct i2c_driver   master_charger_driver = {
 	},
 	.id_table	= master_charger_id,
 
-	.probe		= master_charger_probe,
-	.shutdown   = master_charger_shutdown,
+	.probe	= master_charger_probe,
+	.remove = master_charger_remove,
+	//.shutdown   = master_charger_shutdown,
 };
 
 
 
 //---------------------------------------------------------------------------------------------------
 
-static int __init bq2589x_charger_init(void)
+static int __init master_charger_init(void)
 {
 
 	//添加主驱动
 	if (i2c_add_driver(&master_charger_driver))
-		printk("[OBEI] failed to register symaster_driver.\n");
+		printk("[OBEI][master]failed to register symaster_driver.\n");
 	else
-		printk("[OBEI] symaster_driver register successfully!\n");
+		printk("[OBEI][master]symaster_driver register successfully!\n");
 
 	
 
@@ -65,7 +441,7 @@ static void __exit master_charger_exit(void)
 
 }
 
-module_init(master_charger_init);
+subsys_initcall(master_charger_init);
 module_exit(master_charger_exit);
 
 MODULE_DESCRIPTION("SY MASTER Charger Driver");

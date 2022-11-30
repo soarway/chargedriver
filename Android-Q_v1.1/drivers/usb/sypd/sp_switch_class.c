@@ -38,8 +38,7 @@ static ssize_t state_show(struct device *dev, struct device_attribute *attr, cha
 	return sprintf(buf, "%d\n", sdev->state);
 }
 
-static ssize_t state_store(struct device *dev, struct device_attribute *attr,
-                        const char *buf, size_t count)
+static ssize_t state_store(struct device *dev, struct device_attribute *attr, const char *buf, size_t count)
 {
 	int new_state;
 	char *endp;
@@ -55,8 +54,7 @@ static ssize_t state_store(struct device *dev, struct device_attribute *attr,
 
 static ssize_t name_show(struct device *dev, struct device_attribute *attr,	char *buf)
 {
-	struct switch_dev *sdev = (struct switch_dev *)
-		dev_get_drvdata(dev);
+	struct switch_dev *sdev = (struct switch_dev *)	dev_get_drvdata(dev);
 
 	if (sdev->print_name) {
 		int ret = sdev->print_name(sdev, buf);
@@ -105,7 +103,7 @@ void switch_set_state(struct switch_dev *sdev, int state)
 			kobject_uevent_env(&sdev->dev->kobj, KOBJ_CHANGE, envp);
 			free_page((unsigned long)prop_buf);
 		} else {
-			printk(KERN_ERR "[OBEI]out of memory in switch_set_state\n");
+			printk(KERN_ERR "[OBEI]out of memory in switch_ set_state\n");
 			kobject_uevent(&sdev->dev->kobj, KOBJ_CHANGE);
 		}
 	}

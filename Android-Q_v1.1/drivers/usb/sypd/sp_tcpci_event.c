@@ -701,8 +701,7 @@ void pd_put_recv_hard_reset_event(struct tcpc_device *tcpc_dev)
 {
 	mutex_lock(&tcpc_dev->access_lock);
 
-	tcpci_notify_hard_reset_state(
-		tcpc_dev, TCP_HRESET_SIGNAL_RECV);
+	tcpci_notify_hard_reset_state(tcpc_dev, TCP_HRESET_SIGNAL_RECV);
 
 	tcpc_dev->pd_transmit_state = PD_TX_STATE_HARD_RESET;
 
@@ -980,8 +979,7 @@ void pd_notify_pe_error_recovery(struct pd_port *pd_port)
 
 	mutex_lock(&tcpc_dev->access_lock);
 
-	tcpci_notify_hard_reset_state(
-		tcpc_dev, TCP_HRESET_RESULT_FAIL);
+	tcpci_notify_hard_reset_state(tcpc_dev, TCP_HRESET_RESULT_FAIL);
 
 	tcpc_dev->pd_wait_pr_swap_complete = false;
 	__tcp_event_buf_reset(tcpc_dev, TCP_DPM_RET_DROP_ERROR_REOCVERY);
@@ -1030,8 +1028,7 @@ void pd_notify_pe_hard_reset_completed(struct pd_port *pd_port)
 	struct tcpc_device *tcpc_dev = pd_port->tcpc_dev;
 
 	mutex_lock(&tcpc_dev->access_lock);
-	tcpci_notify_hard_reset_state(
-		tcpc_dev, TCP_HRESET_RESULT_DONE);
+	tcpci_notify_hard_reset_state(tcpc_dev, TCP_HRESET_RESULT_DONE);
 	mutex_unlock(&tcpc_dev->access_lock);
 }
 

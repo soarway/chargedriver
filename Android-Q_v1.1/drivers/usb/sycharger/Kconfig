@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# USB Power Delivery driver configuration
+#
+
+config USB_SY_MASTER
+	tristate "sy master class support"
+	default y
+	help
+	  Say Y here. 
+
+config USB_SY_BC7D
+	tristate "sy bc7d class support"
+	default y
+	help
+	  Say Y here. 
+
+config USB_SY_PD7E
+	tristate "sy pd7e class support"
+	default y
+	help
+	  Say Y here. 
+
+config USB_SY_UF7F
+	tristate "sy uf7f class support"
+	default y
+	help
+	  Say Y here. 

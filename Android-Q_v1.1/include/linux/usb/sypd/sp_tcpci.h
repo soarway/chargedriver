@@ -422,7 +422,7 @@ static inline int tcpci_source_vbus(struct tcpc_device *tcpc, uint8_t type, int 
 
 	tcpci_enable_watchdog(tcpc, mv != 0);
 	TCPC_DBG("source_vbus: %d mV, %d mA\r\n", mv, ma);
-	return srcu_notifier_call_chain(&tcpc->evt_nh,	TCP_NOTIFY_SOURCE_VBUS, &tcp_noti);
+	return srcu_notifier_call_chain(&tcpc->evt_nh,TCP_NOTIFY_SOURCE_VBUS, &tcp_noti);
 }
 
 static inline int tcpci_sink_vbus(struct tcpc_device *tcpc, uint8_t type, int mv, int ma)
@@ -461,7 +461,7 @@ static inline int tcpci_sink_vbus(struct tcpc_device *tcpc, uint8_t type, int mv
 	tcp_noti.vbus_state.type = type;
 
 	TCPC_DBG("sink_vbus: %d mV, %d mA\r\n", mv, ma);
-	return srcu_notifier_call_chain(&tcpc->evt_nh,	TCP_NOTIFY_SINK_VBUS, &tcp_noti);
+	return srcu_notifier_call_chain(&tcpc->evt_nh,TCP_NOTIFY_SINK_VBUS, &tcp_noti);
 }
 
 static inline int tcpci_disable_vbus_control(struct tcpc_device *tcpc)
@@ -518,7 +518,7 @@ static inline int tcpci_enable_ext_discharge(struct tcpc_device *tcpc, bool en)
 		tcpc->typec_ext_discharge = en;
 		tcp_noti.en_state.en = en;
 		TCPC_DBG("EXT-Discharge: %d\r\n", en);
-		ret = srcu_notifier_call_chain(	&tcpc->evt_nh, TCP_NOTIFY_EXT_DISCHARGE, &tcp_noti);
+		ret = srcu_notifier_call_chain(&tcpc->evt_nh, TCP_NOTIFY_EXT_DISCHARGE, &tcp_noti);
 	}
 
 	mutex_unlock(&tcpc->access_lock);
@@ -601,7 +601,7 @@ static inline int tcpci_notify_hard_reset_state(struct tcpc_device *tcpc, uint8_
 	else
 		return 0;
 
-	return srcu_notifier_call_chain(&tcpc->evt_nh,	TCP_NOTIFY_HARD_RESET_STATE, &tcp_noti);
+	return srcu_notifier_call_chain(&tcpc->evt_nh,TCP_NOTIFY_HARD_RESET_STATE, &tcp_noti);
 }
 
 static inline int tcpci_enter_mode(struct tcpc_device *tcpc,uint16_t svid, uint8_t ops, uint32_t mode)
@@ -675,7 +675,7 @@ static inline int tcpci_dp_configure(struct tcpc_device *tcpc, uint32_t dp_confi
 	tcp_noti.ama_dp_state.signal = (dp_config >> 2) & 0x0f;
 	tcp_noti.ama_dp_state.polarity = tcpc->typec_polarity;
 	tcp_noti.ama_dp_state.active = 1;
-	return srcu_notifier_call_chain(&tcpc->evt_nh,	TCP_NOTIFY_AMA_DP_STATE, &tcp_noti);
+	return srcu_notifier_call_chain(&tcpc->evt_nh,TCP_NOTIFY_AMA_DP_STATE, &tcp_noti);
 }
 
 
@@ -751,7 +751,7 @@ static inline int tcpci_dc_notify_en_unlock(struct tcpc_device *tcpc)
 	struct tcp_notify tcp_noti;
 
 	DC_INFO("DirectCharge en_unlock\r\n");
-	return srcu_notifier_call_chain(&tcpc->evt_nh,	TCP_NOTIFY_DC_EN_UNLOCK, &tcp_noti);
+	return srcu_notifier_call_chain(&tcpc->evt_nh,TCP_NOTIFY_DC_EN_UNLOCK, &tcp_noti);
 }
 #endif	/* CONFIG_USB_PD_ALT_MODE_RTDC */
 
