@@ -158,7 +158,7 @@ static int bq2589x_update_bits(struct bq2589x *bq, u8 reg, u8 mask, u8 data)
 	return bq2589x_write_byte(bq, reg, tmp);
 }
 
-
+//获取VBUS类型
 static enum bq2589x_vbus_type bq2589x_get_vbus_type(struct bq2589x *bq)
 {
 	u8 val = 0;
@@ -173,7 +173,7 @@ static enum bq2589x_vbus_type bq2589x_get_vbus_type(struct bq2589x *bq)
 	return val;
 }
 
-
+//启用OTG
 static int bq2589x_enable_otg(struct bq2589x *bq)
 {
 	u8 val = BQ2589X_OTG_ENABLE << BQ2589X_OTG_CONFIG_SHIFT;
@@ -181,7 +181,7 @@ static int bq2589x_enable_otg(struct bq2589x *bq)
 	return bq2589x_update_bits(bq, BQ2589X_REG_03, BQ2589X_OTG_CONFIG_MASK, val);
 
 }
-
+//禁用OTG
 static int bq2589x_disable_otg(struct bq2589x *bq)
 {
 	u8 val = BQ2589X_OTG_DISABLE << BQ2589X_OTG_CONFIG_SHIFT;
@@ -190,7 +190,7 @@ static int bq2589x_disable_otg(struct bq2589x *bq)
 
 }
 EXPORT_SYMBOL_GPL(bq2589x_disable_otg);
-
+//设置OTG电压
 static int bq2589x_set_otg_volt(struct bq2589x *bq, int volt)
 {
 	u8 val = 0;
@@ -206,7 +206,7 @@ static int bq2589x_set_otg_volt(struct bq2589x *bq, int volt)
 
 }
 EXPORT_SYMBOL_GPL(bq2589x_set_otg_volt);
-
+//设置OTG电流
 static int bq2589x_set_otg_current(struct bq2589x *bq, int curr)
 {
 	u8 temp;
@@ -231,7 +231,7 @@ static int bq2589x_set_otg_current(struct bq2589x *bq, int curr)
 	return bq2589x_update_bits(bq, BQ2589X_REG_0A, BQ2589X_BOOST_LIM_MASK, temp << BQ2589X_BOOST_LIM_SHIFT);
 }
 EXPORT_SYMBOL_GPL(bq2589x_set_otg_current);
-
+//启用充电
 static int bq2589x_enable_charger(struct bq2589x *bq)
 {
 	int ret;
@@ -242,7 +242,7 @@ static int bq2589x_enable_charger(struct bq2589x *bq)
 		bq->status |= BQ2589X_STATUS_CHARGE_ENABLE;
 	return ret;
 }
-
+//禁用充电
 static int bq2589x_disable_charger(struct bq2589x *bq)
 {
 	int ret;
@@ -255,7 +255,7 @@ static int bq2589x_disable_charger(struct bq2589x *bq)
 }
 EXPORT_SYMBOL_GPL(bq2589x_disable_charger);
 
-
+//ADC模式开始
 /* interfaces that can be called by other module */
 int bq2589x_adc_start(struct bq2589x *bq, bool oneshot)
 {
@@ -277,14 +277,19 @@ int bq2589x_adc_start(struct bq2589x *bq, bool oneshot)
 	return ret;
 }
 EXPORT_SYMBOL_GPL(bq2589x_adc_start);
-
+//ADC模式停止
 int bq2589x_adc_stop(struct bq2589x *bq)
 {
 	return bq2589x_update_bits(bq, BQ2589X_REG_02, BQ2589X_CONV_RATE_MASK, BQ2589X_ADC_CONTINUE_DISABLE << BQ2589X_CONV_RATE_SHIFT);
 }
 EXPORT_SYMBOL_GPL(bq2589x_adc_stop);
 
-
+/*
+ADC conversion of Battery Voltage (VBAT)
+Offset: 2.304V
+Range: 2.304V (0000000) – 4.848V (1111111)
+Default: 2.304V (0000000)
+*/
 int bq2589x_adc_read_battery_volt(struct bq2589x *bq)
 {
 	uint8_t val;
@@ -349,7 +354,7 @@ int bq2589x_adc_read_temperature(struct bq2589x *bq)
 	}
 }
 EXPORT_SYMBOL_GPL(bq2589x_adc_read_temperature);
-
+//读取充电电流
 int bq2589x_adc_read_charge_current(struct bq2589x *bq)
 {
 	uint8_t val;
@@ -365,7 +370,7 @@ int bq2589x_adc_read_charge_current(struct bq2589x *bq)
 	}
 }
 EXPORT_SYMBOL_GPL(bq2589x_adc_read_charge_current);
-
+//设置充电电流
 int bq2589x_set_chargecurrent(struct bq2589x *bq, int curr)
 {
 	u8 ichg;
@@ -375,7 +380,7 @@ int bq2589x_set_chargecurrent(struct bq2589x *bq, int curr)
 
 }
 EXPORT_SYMBOL_GPL(bq2589x_set_chargecurrent);
-
+//设置中断电流
 int bq2589x_set_term_current(struct bq2589x *bq, int curr)
 {
 	u8 iterm;
@@ -386,7 +391,7 @@ int bq2589x_set_term_current(struct bq2589x *bq, int curr)
 }
 EXPORT_SYMBOL_GPL(bq2589x_set_term_current);
 
-
+//设置预充电电流
 int bq2589x_set_prechg_current(struct bq2589x *bq, int curr)
 {
 	u8 iprechg;
@@ -396,7 +401,7 @@ int bq2589x_set_prechg_current(struct bq2589x *bq, int curr)
 	return bq2589x_update_bits(bq, BQ2589X_REG_05, BQ2589X_IPRECHG_MASK, iprechg << BQ2589X_IPRECHG_SHIFT);
 }
 EXPORT_SYMBOL_GPL(bq2589x_set_prechg_current);
-
+//设置充电器电压
 int bq2589x_set_chargevoltage(struct bq2589x *bq, int volt)
 {
 	u8 val;
@@ -406,7 +411,7 @@ int bq2589x_set_chargevoltage(struct bq2589x *bq, int volt)
 }
 EXPORT_SYMBOL_GPL(bq2589x_set_chargevoltage);
 
-
+//设置输入电压的上限
 int bq2589x_set_input_volt_limit(struct bq2589x *bq, int volt)
 {
 	u8 val;
@@ -414,7 +419,7 @@ int bq2589x_set_input_volt_limit(struct bq2589x *bq, int volt)
 	return bq2589x_update_bits(bq, BQ2589X_REG_0D, BQ2589X_VINDPM_MASK, val << BQ2589X_VINDPM_SHIFT);
 }
 EXPORT_SYMBOL_GPL(bq2589x_set_input_volt_limit);
-
+//设置输入电流的上限
 int bq2589x_set_input_current_limit(struct bq2589x *bq, int curr)
 {
 	u8 val;
@@ -433,7 +438,7 @@ int bq2589x_set_vindpm_offset(struct bq2589x *bq, int offset)
 	return bq2589x_update_bits(bq, BQ2589X_REG_01, BQ2589X_VINDPMOS_MASK, val << BQ2589X_VINDPMOS_SHIFT);
 }
 EXPORT_SYMBOL_GPL(bq2589x_set_vindpm_offset);
-
+//读充电状态
 int bq2589x_get_charging_status(struct bq2589x *bq)
 {
 	u8 val = 0;
@@ -449,7 +454,7 @@ int bq2589x_get_charging_status(struct bq2589x *bq)
 	return val;
 }
 EXPORT_SYMBOL_GPL(bq2589x_get_charging_status);
-
+//设置OTG的enable和disable
 void bq2589x_set_otg(struct bq2589x *bq, int enable)
 {
 	int ret;
@@ -467,13 +472,13 @@ void bq2589x_set_otg(struct bq2589x *bq, int enable)
 	}
 }
 EXPORT_SYMBOL_GPL(bq2589x_set_otg);
-
+//启用看门狗定时器
 int bq2589x_set_watchdog_timer(struct bq2589x *bq, u8 timeout)
 {
 	return bq2589x_update_bits(bq, BQ2589X_REG_07, BQ2589X_WDT_MASK, (u8)((timeout - BQ2589X_WDT_BASE) / BQ2589X_WDT_LSB) << BQ2589X_WDT_SHIFT);
 }
 EXPORT_SYMBOL_GPL(bq2589x_set_watchdog_timer);
-
+//禁用看门狗定时器
 int bq2589x_disable_watchdog_timer(struct bq2589x *bq)
 {
 	u8 val = BQ2589X_WDT_DISABLE << BQ2589X_WDT_SHIFT;
@@ -481,7 +486,7 @@ int bq2589x_disable_watchdog_timer(struct bq2589x *bq)
 	return bq2589x_update_bits(bq, BQ2589X_REG_07, BQ2589X_WDT_MASK, val);
 }
 EXPORT_SYMBOL_GPL(bq2589x_disable_watchdog_timer);
-
+//重置看门狗定时器
 int bq2589x_reset_watchdog_timer(struct bq2589x *bq)
 {
 	u8 val = BQ2589X_WDT_RESET << BQ2589X_WDT_RESET_SHIFT;
@@ -489,7 +494,7 @@ int bq2589x_reset_watchdog_timer(struct bq2589x *bq)
 	return bq2589x_update_bits(bq, BQ2589X_REG_03, BQ2589X_WDT_RESET_MASK, val);
 }
 EXPORT_SYMBOL_GPL(bq2589x_reset_watchdog_timer);
-
+//强制使用dpdm模式
 int bq2589x_force_dpdm(struct bq2589x *bq)
 {
 	int ret;
@@ -504,7 +509,7 @@ int bq2589x_force_dpdm(struct bq2589x *bq)
 
 }
 EXPORT_SYMBOL_GPL(bq2589x_force_dpdm);
-
+//Reset to default register value and reset safety timer
 int bq2589x_reset_chip(struct bq2589x *bq)
 {
 	int ret;

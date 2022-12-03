@@ -1,4 +1,4 @@
-
+#include <linux/miscdevice.h>
 #include <linux/gpio.h>
 #include <linux/i2c.h>
 #include <linux/init.h>
@@ -105,9 +105,9 @@ static irqreturn_t master_irq_handler(int irq, void *devid)
 	struct power_supply *psy = devid;
 	struct symaster *charger = to_master(psy);
 	struct symaster_device* sydev = charger->master_dev;
-
-	master_update(charger);
 	printk("[OBEI][master]irq handler\n");
+	//master_update(charger);
+	
 
 	//发一个消息到BC7D, 让其返回是否满足DCP特性
 	srcu_notifier_call_chain(&sydev->master_event, SY_NOTIFY_BC7D_CHECK_DCP, sydev);
@@ -154,7 +154,7 @@ static struct master_platform *parse_dt_data(struct i2c_client *client)
 
 	pdata = devm_kzalloc(&client->dev, sizeof(*pdata), GFP_KERNEL);
 	if (!pdata) {
-		dev_err(&client->dev, "Memory alloc for bq24735 pdata failed\n");
+		printk("Memory alloc for bq24735 pdata failed\n");
 		return NULL;
 	}
 
@@ -204,19 +204,21 @@ static int master_event_notifer_call(struct notifier_block *nb, unsigned long ev
 	return NOTIFY_OK;
 }
 
-
+//设备初始化
 static int master_device_init(struct symaster *chip, struct device *dev)
 {
 	struct symaster_device *mdev;
 	
 
-	pr_info("[OBEI][MASTER] register mdev device (%s)\n",  MASTER_DEVICE_NAME);
+	pr_info("[OBEI][master] device init (%s)\n",  MASTER_DEVICE_NAME);
 
 	mdev = sy_device_register(dev, MASTER_DEVICE_NAME, chip);
 	if (!mdev) {
 		pr_err("[OBEI][master] : allocate mdev memeory failed\n");
 		return -1;
 	}
+	chip->master_dev = mdev;
+	
 	return 0;
 
 }
@@ -230,7 +232,7 @@ static int master_charger_probe(struct i2c_client *client, const struct i2c_devi
 	struct power_supply_config psy_cfg = {};
 	char *name;
 
-	dev_info(&client->dev, "[OBEI][master]call probe !\n");
+	pr_info("[OBEI][master]call probe start!\n");
 	//分配自定义结构体的内存
 	charger = devm_kzalloc(&client->dev, sizeof(*charger), GFP_KERNEL);
 	if (!charger)
@@ -244,11 +246,11 @@ static int master_charger_probe(struct i2c_client *client, const struct i2c_devi
 	if (IS_ENABLED(CONFIG_OF) && !charger->pdata && client->dev.of_node)
 	{
 		charger->pdata = parse_dt_data(client);
-		dev_info(&client->dev, "[OBEI][master]pdata success\n");
+		printk("[OBEI][master]pdata success\n");
 	}	
 
 	if (!charger->pdata) {
-		dev_err(&client->dev, "[OBEI][master]no platform data provided\n");
+		printk("[OBEI][master]no platform data provided\n");
 		return -EINVAL;
 	}
 
@@ -256,11 +258,11 @@ static int master_charger_probe(struct i2c_client *client, const struct i2c_devi
 	if (!name) {
 		name = devm_kasprintf(&client->dev, GFP_KERNEL, "symaster@%s", dev_name(&client->dev));
 		if (!name) {
-			dev_err(&client->dev, "[OBEI][master]Failed to alloc device name\n");
+			printk("[OBEI][master]Failed to alloc device name\n");
 			return -ENOMEM;
 		}
 		else {
-			dev_info(&client->dev, "[OBEI][master]device name=%s\n", name);
+			printk("[OBEI][master]device name=%s\n", name);
 		}
 	}
 
@@ -286,59 +288,57 @@ static int master_charger_probe(struct i2c_client *client, const struct i2c_devi
 	i2c_set_clientdata(client, charger);
 	ret = master_device_init(charger, &client->dev);
 	if (ret < 0) {
-		dev_err(&client->dev, "[OBEI][master] tcpc dev init fail\n");
+		printk("[OBEI][master] tcpc dev init fail\n");
 		return ret;
 	}
 
+	/*
 	//获取GPIO的状态
 	charger->status_gpio = devm_gpiod_get_optional(&client->dev, "ti,ac-detect", GPIOD_IN);
 	if (IS_ERR(charger->status_gpio)) {
 		ret = PTR_ERR(charger->status_gpio);
-		dev_err(&client->dev, "[OBEI][master]Getting gpio failed: %d\n", ret);
+		printk("[OBEI][master]Getting gpio failed: %d\n", ret);
 		return ret;
 	}
 	else {
-		dev_info(&client->dev, "[OBEI][master]Getting gpio success\n");
+		printk("[OBEI][master]Getting gpio success\n");
 	}
-
+	*/
 	//充电器是否存在
 	if (master_charger_is_present(charger)) {
 		/*
 		//使能充电器
 		ret = bq24735_enable_charging(charger);
 		if (ret < 0) {
-			dev_err(&client->dev, "Failed to enable charging\n");
+			printk("Failed to enable charging\n");
 			return ret;
 		}
 		*/
 	}
 
-
-
-
 	//注册驱动为一个power_supply设备
 	charger->charger = devm_power_supply_register(&client->dev, supply_desc, &psy_cfg);
 	if (IS_ERR(charger->charger)) {
 		ret = PTR_ERR(charger->charger);
-		dev_err(&client->dev, "[OBEI][master]Failed to register power supply: %d\n", ret);
+		printk("[OBEI][master]Failed to register power supply: %d\n", ret);
 		return ret;
 	}
 	else
 	{
-		dev_info(&client->dev, "[OBEI][master]Success to register power supply\n");
+		printk("[OBEI][master]Success to register power supply\n");
 	}
 
 	//中断处理
-	ret = gpio_request(GPIO_IRQ, "bq2589x irq pin");
+	ret = gpio_request(GPIO_IRQ, "symaster_irq_pin");
 	if (ret) {
-		dev_err(&client->dev, "[OBEI][master] gpio request failed\n");
+		printk("[OBEI][master] gpio request failed\n");
 		return ret;
 	}
 	gpio_direction_input(GPIO_IRQ);
 
 	irqn = gpio_to_irq(GPIO_IRQ);
 	if (irqn < 0) {
-		dev_err(&client->dev, "%s:%d gpio_to_irq failed\n", __func__, irqn);
+		printk("[OBEI][master]%d gpio_to_irq failed\n", irqn);
 		ret = irqn;
 		goto err_1;
 	}
@@ -353,8 +353,11 @@ static int master_charger_probe(struct i2c_client *client, const struct i2c_devi
 		ret = devm_request_threaded_irq(&client->dev, client->irq, NULL, master_irq_handler, 
 				IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING | IRQF_ONESHOT, supply_desc->name, charger->charger);
 		if (ret) {
-			dev_err(&client->dev, "[OBEI][master]Unable to register IRQ %d err %d\n", client->irq, ret);
+			printk("[OBEI][master]Unable to request IRQ %d err %d\n", client->irq, ret);
 			return ret;
+		}
+		else {
+			pr_info("[OBEI][master]request IRQ success!\n");
 		}
 	} 
 	else {
@@ -371,10 +374,11 @@ static int master_charger_probe(struct i2c_client *client, const struct i2c_devi
 	charger->master_nb.notifier_call = master_event_notifer_call;
 	ret = sy_register_notifier(charger->master_dev, &charger->master_nb);
 	if (ret < 0) {
-		dev_err(&client->dev, "[OBEI]register tcpc notifer fail\n");
+		printk("[OBEI][master]register master_dev notifer fail\n");
 		return -EINVAL;
 	}
 
+	pr_info("[OBEI][master]call probe success!\n");
 	return 0;
 
 err_1:
@@ -394,12 +398,12 @@ static int master_charger_remove(struct i2c_client *client)
 
 //---------------------------------------symaster--------------------------------------------
 static struct of_device_id   master_charger_match_table[] = {
-	{.compatible = SY_MASTER,},
+	{.compatible = "sy,masterba76",},
 	{},
 };
 
 static const struct i2c_device_id  master_charger_id[] = {
-	{ SY_MASTER, 0 },
+	{ "symasterba76", 0 },
 	{},
 };
 
@@ -407,28 +411,63 @@ MODULE_DEVICE_TABLE(i2c, master_charger_id);
 
 static struct i2c_driver   master_charger_driver = {
 	.driver		= {
-		.name	= SY_MASTER,
+		.name	= "masterba76",
 		.of_match_table = master_charger_match_table,
 	},
 	.id_table	= master_charger_id,
 
 	.probe	= master_charger_probe,
-	.remove = master_charger_remove,
+	.remove = master_charger_remove
 	//.shutdown   = master_charger_shutdown,
 };
 
+/*
+static struct file_operations dev_fops = {
+	.owner=THIS_MODULE
+};
 
-
+static struct miscdevice misc = {
+	.minor = MISC_DYNAMIC_MINOR,
+	.name = "symasterba76",
+	.fops = &dev_fops,
+};
+*/
 //---------------------------------------------------------------------------------------------------
 
 static int __init master_charger_init(void)
 {
+	int ret;
 
+	struct device_node *np1;
+	struct device_node *np2;
+	
+
+	
+	np1 = of_find_node_by_name(NULL, "syabcdef");
+	if (np1 != NULL)
+		pr_info("[OBEI][master]syabcdef node found...\n");
+	else
+		pr_info("[OBEI][master]syabcdef node not found...\n");
+
+	np2 = of_find_node_by_name(NULL, "symaster");
+	if (np2 != NULL)
+		pr_info("[OBEI][master]symaster node found...\n");
+	else
+		pr_info("[OBEI][master]symaster node not found...\n");
+/*
+	ret = misc_register(&misc);
+	if (ret) {
+		printk("[OBEI][master]misc V register fail.\n");
+	}
+	else {
+		printk("[OBEI][master]misc V register success.\n");
+	}
+*/
 	//添加主驱动
 	if (i2c_add_driver(&master_charger_driver))
 		printk("[OBEI][master]failed to register symaster_driver.\n");
 	else
-		printk("[OBEI][master]symaster_driver register successfully!\n");
+		printk("[OBEI][master]driver register successfully!\n");
 
 	
 
@@ -439,6 +478,7 @@ static void __exit master_charger_exit(void)
 {
 	i2c_del_driver(&master_charger_driver);
 
+	//misc_deregister(&misc);
 }
 
 subsys_initcall(master_charger_init);

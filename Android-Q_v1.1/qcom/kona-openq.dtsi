@@ -830,226 +830,203 @@
 };
 
 &qupv3_se1_i2c {
-status = "ok";
-qcom,clk-freq-out = <1000000>;//uu i2c fix 400k//100k //1M ba76
-/////////////////////////////////////////////////////////////////////////////////////////////////
-//pd sample.dts
+	status = "ok";
+	qcom,clk-freq-out = <1000000>;//uu i2c fix 400k//100k //1M ba76
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	//pd sample.dts
+	symaster@1d {
+		compatible = "sy,masterba76";
+		reg = <0x1d>;
+		status = "ok";
+	};
+    ba52@7f {
+		compatible = "silergy,ba52a";
+		reg = <0x7f>;
+        status = "ok";
 
-        ba52@7f {
-			compatible = "silergy,ba52a";
-			reg = <0x7f>;
-            status = "ok";
+        interrupt-parent = <&tlmm>;
+        ba52,irq_pin = <&tlmm 59 0x00>;
 
-            interrupt-parent = <&tlmm>;
-            ba52,irq_pin = <&tlmm 59 0x00>;
+        irq-gpios = <&tlmm 59 0x00>; 
+        irq-flags = <2>;
 
-            irq-gpios = <&tlmm 59 0x00>; 
-            irq-flags = <2>;
+        interrupts = <0 59 8>;//uu?
+	    interrupt-names = "ba52a_irq";        
+      	pinctrl-names = "qupv3_se1_ba52a_int_active", "qupv3_se1_ba52a_int_sleep";
+	    pinctrl-0 = <&qupv3_se1_ba52a_int_active &qupv3_se1_ba52a_int_sleep>;
 
-            interrupts = <0 59 8>;//uu?
-		    interrupt-names = "ba52a_irq";        
-          	pinctrl-names = "qupv3_se1_ba52a_int_active", "qupv3_se1_ba52a_int_sleep";
-	        pinctrl-0 = <&qupv3_se1_ba52a_int_active &qupv3_se1_ba52a_int_sleep>;
+		sy-dual,supported_modes = <0>; // 0: dfp/ufp, 1: dfp, 2: ufp 
+		sy-tcpc,name = "type_c_ba52a"; // tcpc_device's name 
+		sy-tcpc,role_def = <4>; // 0: SNK Only, 1: SRC Only, 2: DRP, 3: Try.SRC, 4: Try.SNK 
+		sy-tcpc,rp_level = <0>; // 0: Default, 1: 1.5, 2: 3.0 
+	    sy-tcpc,vconn_supply  = <1>;  // 0: Never, 1: Always, 2: EMarkOnly, 3: StartOnly 
+		sy-tcpc,notifier_supply_num = <1>; // the number of notifier supply 
+		uf-data {
+			
+			//	VSAFE5V = 0, DIRECT_CHARGE = 1, CUSTOM = 2,
+			//	MAX_POWER = 0x03,
+			//	MAX_POWER_LV = 0x23, MAX_POWER_LVIC = 0x33
+			//	MAX_POWER_HV = 0x43, MAX_POWER_HVIC = 0x53
+			//
+			uf,charging_policy= <0x21>;
+			uf,source-pdo-size = <1>;
+			uf,source-pdo-data = <0x00019032>; // 5V, 500 mA 
+			uf,sink-pdo-size = <2>;
+            uf,sink-pdo-data = <0x0002d12c 0x0002d12c> ; //9V3A  
+			//
+			//No DP, host + device
+			//	pd,id-vdo-size = <3>;
+			//	pd,id-vdo-data = <0xd00029cf 0x0 0x00010000>;
+			//With DP
+			//	pd,id-vdo-size = <4>;
+			//	pd,id-vdo-data = <0xec0029cf 0x0 0x00010000 0x11000001>;
+			//
 
-			sy-dual,supported_modes = <0>; // 0: dfp/ufp, 1: dfp, 2: ufp 
-			sy-tcpc,name = "type_c_ba52a"; // tcpc_device's name 
-			sy-tcpc,role_def = <4>; // 0: SNK Only, 1: SRC Only, 2: DRP, 3: Try.SRC, 4: Try.SNK 
-			sy-tcpc,rp_level = <0>; // 0: Default, 1: 1.5, 2: 3.0 
-		    sy-tcpc,vconn_supply  = <1>;  // 0: Never, 1: Always, 2: EMarkOnly, 3: StartOnly 
-			sy-tcpc,notifier_supply_num = <1>; // the number of notifier supply 
-			uf-data {
-				
-				//	VSAFE5V = 0, DIRECT_CHARGE = 1, CUSTOM = 2,
-				//	MAX_POWER = 0x03,
-				//	MAX_POWER_LV = 0x23, MAX_POWER_LVIC = 0x33
-				//	MAX_POWER_HV = 0x43, MAX_POWER_HVIC = 0x53
-				//
-				uf,charging_policy= <0x21>;
-				uf,source-pdo-size = <1>;
-				uf,source-pdo-data = <0x00019032>; // 5V, 500 mA 
-				uf,sink-pdo-size = <2>;
-                uf,sink-pdo-data = <0x0002d12c 0x0002d12c> ; //9V3A  
-				//
-				//No DP, host + device
-				//	pd,id-vdo-size = <3>;
-				//	pd,id-vdo-data = <0xd00029cf 0x0 0x00010000>;
-				//With DP
-				//	pd,id-vdo-size = <4>;
-				//	pd,id-vdo-data = <0xec0029cf 0x0 0x00010000 0x11000001>;
-				//
-
-				uf,id-vdo-size = <3>;
-				uf,id-vdo-data = <0xd00029cf 0x0 0x00010000 >;
-			};
-
-
+			uf,id-vdo-size = <3>;
+			uf,id-vdo-data = <0xd00029cf 0x0 0x00010000 >;
 		};
+
+
+	};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////  
 
 //pd sample.dts
-        ba41@7e {
-			compatible = "silergy,ba41a";
-			reg = <0x7e>;
-            status = "ok";
+    ba41@7e {
+		compatible = "silergy,ba41a";
+		reg = <0x7e>;
+        status = "ok";
 
-            interrupt-parent = <&tlmm>;
-            ba41,irq_pin = <&tlmm 59 0x00>;
+        interrupt-parent = <&tlmm>;
+        ba41,irq_pin = <&tlmm 59 0x00>;
 
-            irq-gpios = <&tlmm 59 0x00>; 
-            irq-flags = <2>;
+        irq-gpios = <&tlmm 59 0x00>; 
+        irq-flags = <2>;
 
-            interrupts = <0 59 8>;//uu?
-		    interrupt-names = "ba41a_irq";        
-          	pinctrl-names = "qupv3_se1_ba41a_int_active", "qupv3_se1_ba41a_int_sleep";
-	        pinctrl-0 = <&qupv3_se1_ba41a_int_active &qupv3_se1_ba41a_int_sleep>;
+        interrupts = <0 59 8>;//uu?
+	    interrupt-names = "ba41a_irq";        
+      	pinctrl-names = "qupv3_se1_ba41a_int_active", "qupv3_se1_ba41a_int_sleep";
+	    pinctrl-0 = <&qupv3_se1_ba41a_int_active &qupv3_se1_ba41a_int_sleep>;
 
-			sy-dual,supported_modes = <0>; // 0: dfp/ufp, 1: dfp, 2: ufp 
-			sy-tcpc,name = "type_c_ba41a"; // tcpc_device's name 
-			sy-tcpc,role_def = <4>; // 0: SNK Only, 1: SRC Only, 2: DRP, 3: Try.SRC, 4: Try.SNK 
-			sy-tcpc,rp_level = <0>; // 0: Default, 1: 1.5, 2: 3.0 
-		    sy-tcpc,vconn_supply  = <1>;  // 0: Never, 1: Always, 2: EMarkOnly, 3: StartOnly 
-			sy-tcpc,notifier_supply_num = <1>; // the number of notifier supply 
-			pd-data {
-				
-				//	VSAFE5V = 0, DIRECT_CHARGE = 1, CUSTOM = 2,
-				//	MAX_POWER = 0x03,
-				//	MAX_POWER_LV = 0x23, MAX_POWER_LVIC = 0x33
-				//	MAX_POWER_HV = 0x43, MAX_POWER_HVIC = 0x53
-				//
-				pd,charging_policy= <0x21>;
-				pd,source-pdo-size = <1>;
-				pd,source-pdo-data = <0x00019032>; // 5V, 500 mA 
-				pd,sink-pdo-size = <2>;
-                pd,sink-pdo-data = <0x0002d12c 0x0002d12c> ; //9V3A  
-				//
-				//No DP, host + device
-				//	pd,id-vdo-size = <3>;
-				//	pd,id-vdo-data = <0xd00029cf 0x0 0x00010000>;
-				//With DP
-				//	pd,id-vdo-size = <4>;
-				//	pd,id-vdo-data = <0xec0029cf 0x0 0x00010000 0x11000001>;
-				//
+		sy-dual,supported_modes = <0>; // 0: dfp/ufp, 1: dfp, 2: ufp 
+		sy-tcpc,name = "type_c_ba41a"; // tcpc_device's name 
+		sy-tcpc,role_def = <4>; // 0: SNK Only, 1: SRC Only, 2: DRP, 3: Try.SRC, 4: Try.SNK 
+		sy-tcpc,rp_level = <0>; // 0: Default, 1: 1.5, 2: 3.0 
+	    sy-tcpc,vconn_supply  = <1>;  // 0: Never, 1: Always, 2: EMarkOnly, 3: StartOnly 
+		sy-tcpc,notifier_supply_num = <1>; // the number of notifier supply 
+		pd-data {
+			
+			//	VSAFE5V = 0, DIRECT_CHARGE = 1, CUSTOM = 2,
+			//	MAX_POWER = 0x03,
+			//	MAX_POWER_LV = 0x23, MAX_POWER_LVIC = 0x33
+			//	MAX_POWER_HV = 0x43, MAX_POWER_HVIC = 0x53
+			//
+			pd,charging_policy= <0x21>;
+			pd,source-pdo-size = <1>;
+			pd,source-pdo-data = <0x00019032>; // 5V, 500 mA 
+			pd,sink-pdo-size = <2>;
+            pd,sink-pdo-data = <0x0002d12c 0x0002d12c> ; //9V3A  
+			//
+			//No DP, host + device
+			//	pd,id-vdo-size = <3>;
+			//	pd,id-vdo-data = <0xd00029cf 0x0 0x00010000>;
+			//With DP
+			//	pd,id-vdo-size = <4>;
+			//	pd,id-vdo-data = <0xec0029cf 0x0 0x00010000 0x11000001>;
+			//
 
-				pd,id-vdo-size = <3>;
-				pd,id-vdo-data = <0xd00029cf 0x0 0x00010000 >;
-			};
-			dpm_caps {
-				local_dr_power;
-				local_dr_data;
-//				 local_ext_power;
-				local_usb_comm;
-//				 local_usb_suspend;
-				 local_high_cap;
-//				 local_give_back;
-//				local_no_suspend;
-				local_vconn_supply;
+			pd,id-vdo-size = <3>;
+			pd,id-vdo-data = <0xd00029cf 0x0 0x00010000 >;
+		};
+		dpm_caps {
+			local_dr_power;
+			local_dr_data;
+//			 local_ext_power;
+			local_usb_comm;
+//			 local_usb_suspend;
+			 local_high_cap;
+//			 local_give_back;
+//			local_no_suspend;
+			local_vconn_supply;
 
-//				attemp_discover_cable_dfp;
-				attemp_enter_dp_mode;
-				attemp_discover_cable;
-				attemp_discover_id;
+//			attemp_discover_cable_dfp;
+			attemp_enter_dp_mode;
+			attemp_discover_cable;
+			attemp_discover_id;
 
-				// 0: disable, 1: prefer_snk, 2: prefer_src 
-                pr_check = <0>;
-				// pr_reject_as_source;
-				// pr_reject_as_sink;
-				// pr_check_gp_source;
-				// pr_check_gp_sink;
+			// 0: disable, 1: prefer_snk, 2: prefer_src 
+            pr_check = <0>;
+			// pr_reject_as_source;
+			// pr_reject_as_sink;
+			// pr_check_gp_source;
+			// pr_check_gp_sink;
 
-				// 0: disable, 1: prefer_ufp, 2: prefer_dfp 
-				dr_check = <0>;
-				// dr_reject_as_dfp;
-				// dr_reject_as_ufp;
-			};
-
-			displayport {
-				// connection type = "both", "ufp_d", "dfp_d" 
-				1st_connection = "dfp_d";
-				2nd_connection = "dfp_d";
-				signal,dp_v13;
-				//signal,dp_gen2;
-				usbr20_not_used;
-				typec,receptacle;
-				ufp_d {
-					//pin_assignment,mode_a;
-					//pin_assignment,mode_b;
-					//pin_assignment,mode_c;
-					//pin_assignment,mode_d;
-					//pin_assignment,mode_e;
-				      };
-				dfp_d {
-					// Only support mode C & D 
-					pin_assignment,mode_a;
-					pin_assignment,mode_b;
-					//pin_assignment,mode_c;
-					//pin_assignment,mode_d;
-					//pin_assignment,mode_e;
-					//pin_assignment,mode_f;
-				       };
-			};
-
-
+			// 0: disable, 1: prefer_ufp, 2: prefer_dfp 
+			dr_check = <0>;
+			// dr_reject_as_dfp;
+			// dr_reject_as_ufp;
 		};
 
+		displayport {
+			// connection type = "both", "ufp_d", "dfp_d" 
+			1st_connection = "dfp_d";
+			2nd_connection = "dfp_d";
+			signal,dp_v13;
+			//signal,dp_gen2;
+			usbr20_not_used;
+			typec,receptacle;
+			ufp_d {
+				//pin_assignment,mode_a;
+				//pin_assignment,mode_b;
+				//pin_assignment,mode_c;
+				//pin_assignment,mode_d;
+				//pin_assignment,mode_e;
+			      };
+			dfp_d {
+				// Only support mode C & D 
+				pin_assignment,mode_a;
+				pin_assignment,mode_b;
+				//pin_assignment,mode_c;
+				//pin_assignment,mode_d;
+				//pin_assignment,mode_e;
+				//pin_assignment,mode_f;
+			       };
+		};
+
+
+	};
+
 ////////////////////////////////////////
-        ba70@7d {
-            compatible = "sy,ba70x";
-//			compatible = "silergy,ba70";
-			reg = <0x7d>;
-            status = "ok";
+    ba70@7d {
+        compatible = "sy,ba70x";
+//		compatible = "silergy,ba70";
+		reg = <0x7d>;
+        status = "ok";
   
-            interrupt-parent = <&tlmm>;
-            ba70,irq_pin = <&tlmm 59 0x00>;
-            irq-gpios = <&tlmm 59 0x00>; 
-            irq-flags = <2>;
-            interrupts = <0 59 8>;//uu?
-		    interrupt-names = "ba70_irq";        
-          	pinctrl-names = "qupv3_se1_ba70_int_active", "qupv3_se1_ba70_int_sleep";
-	        pinctrl-0 = <&qupv3_se1_ba70_int_active &qupv3_se1_ba70_int_sleep>;
+        interrupt-parent = <&tlmm>;
+        ba70,irq_pin = <&tlmm 59 0x00>;
+        irq-gpios = <&tlmm 59 0x00>; 
+        irq-flags = <2>;
+        interrupts = <0 59 8>;//uu?
+	    interrupt-names = "ba70_irq";        
+      	pinctrl-names = "qupv3_se1_ba70_int_active", "qupv3_se1_ba70_int_sleep";
+	    pinctrl-0 = <&qupv3_se1_ba70_int_active &qupv3_se1_ba70_int_sleep>;
 
+        sy,ba70x,vbus-volt-high-level = <8700>;//tune adapter to output 9v 
+        sy,ba70x,vbus-volt-low-level = <4400>;// tune adapter to output 5v 
+        sy,ba70x,vbat-min-volt-to-tuneup = <3000>;
+		sy,ba70x,charge-voltage = <4208>;
+		sy,ba70x,charge-current = <2000>;
+		sy,ba70x,term-current = <256>;
 
+//		sy,ba70x,enable-auto-dpdm;
+		sy,ba70x,enable-terminasyon;
+		//sy,ba70x,enable-ico;
+		sy,ba70x,use-absolute-vindpm;
 
-/*
-//		pinctrl-names = "default";
-//		pinctrl-0 = <&bq25890_int_default &bq25890_otg_default>;
-//		intr-gpio = <&tlmm 19 0>;
-//		otg-gpio = <&tlmm 63 0>;
-		//usb-switch1 = <&tlmm 24 0>;
-		//usb-switch2 = <&tlmm 101 0>;
-		ti,bq2589x,charge-voltage = <4610>;
-		ti,bq2589x,charge-current = <500>;
-		ti,bq2589x,term-current = <256>;
-		//ti,bq2589x,enable-auto-dpdm;
-		ti,bq2589x,enable-termination;
-		ti,bq2589x,use-absolute-vindpm;
-		ti,bq2589x,otg_vol = <5300>;
-		ti,bq2589x,otg_current = <1800>;
-		// usb 
-		dpdm-supply = <&usb2_phy0>;
-*/
+///////////////////////////////////////
 
-
-
-
-            sy,ba70x,vbus-volt-high-level = <8700>;//tune adapter to output 9v 
-            sy,ba70x,vbus-volt-low-level = <4400>;// tune adapter to output 5v 
-            sy,ba70x,vbat-min-volt-to-tuneup = <3000>;
-			sy,ba70x,charge-voltage = <4208>;
-			sy,ba70x,charge-current = <2000>;
-			sy,ba70x,term-current = <256>;
-
-//			sy,ba70x,enable-auto-dpdm;
-			sy,ba70x,enable-terminasyon;
-			//sy,ba70x,enable-ico;
-			sy,ba70x,use-absolute-vindpm;
-
-///////////////////////////////////////////
-
-
-
-
-        };
+    };
 
    };
 ///////////////////////

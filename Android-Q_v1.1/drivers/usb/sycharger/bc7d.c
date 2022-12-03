@@ -688,6 +688,13 @@ static int bc7d_event_notifer_call(struct notifier_block *nb, unsigned long even
 	//--------------test-------------------
 	//测试消息从子模块发送到主模块
 	sydev = sy_dev_get_by_name(MASTER_DEVICE_NAME);
+	if (sydev == NULL) {
+		pr_info("[OBEI][bc7d]: get master dev fail\n");
+		return NOTIFY_OK;
+	}
+	else {
+		pr_info("[OBEI][bc7d]: get master dev success\n");
+	}
 	srcu_notifier_call_chain(&sydev->master_event, SY_NOTIFY_MASTER_ENABLE_CHARGER, chip);
 	//------------- end--------------------
 	return NOTIFY_OK;
@@ -752,7 +759,7 @@ static int bc7d_charger_probe(struct i2c_client *client, const struct i2c_device
 	//struct power_supply_config psy_cfg = {};
 	char *name;
 
-	printk("[OBEI][bc7d]bc7d charger probe.\n");
+	printk("[OBEI][bc7d]call charger probe.\n");
 
 	//分配自定义结构体的内存
 	charger = devm_kzalloc(&client->dev, sizeof(*charger), GFP_KERNEL);
@@ -767,7 +774,7 @@ static int bc7d_charger_probe(struct i2c_client *client, const struct i2c_device
 
 	charger->rmap = devm_regmap_init_i2c(client, &BC7D_regmap_config);
 	if (IS_ERR(charger->rmap)) {
-		dev_err(&client->dev, "[OBEI][bc7d]failed to allocate register map\n");
+		printk("[OBEI][bc7d]failed to allocate register map\n");
 		return PTR_ERR(charger->rmap);
 	}
 
@@ -776,29 +783,35 @@ static int bc7d_charger_probe(struct i2c_client *client, const struct i2c_device
 
 		charger->rmap_fields[i] = devm_regmap_field_alloc(dev, charger->rmap, reg_fields[i]);
 		if (IS_ERR(charger->rmap_fields[i])) {
-			dev_err(&client->dev, "[OBEI][bc7d]cannot allocate regmap field\n");
+			printk("[OBEI][bc7d]cannot allocate regmap field\n");
 			return PTR_ERR(charger->rmap_fields[i]);
 		}
 	}
 
 	i2c_set_clientdata(client, charger);
+	charger->chip_id = bc7d_field_read(charger, F_DEVICE_ID);//读取设备编号 0x66
+	if (charger->chip_id < 0) {
+		printk("[OBEI][bc7d]read DEVICE ID fail\n");
+		return -EINVAL;
+	}
+	
+	pr_info("[OBEI][bc7d]read  DEVICE ID = %x\n", charger->chip_id);
+	if (charger->chip_id != 0x66) {
+		printk("[OBEI][bc7d]Chip with  not supported!\n");
+		return -ENODEV;
+	}
+
 
 	//注册事件回调函数
 	charger->bc7d_nb.notifier_call = bc7d_event_notifer_call;
 	ret = sy_register_notifier(charger->sydev, &charger->bc7d_nb);
 	if (ret < 0) {
-		dev_err(&client->dev, "[OBEI][bc7d]register  notifer fail\n");
+		printk("[OBEI][bc7d]register  notifer fail\n");
 		return -EINVAL;
 	}
 
 
-	charger->chip_id = bc7d_field_read(charger, F_DEVICE_ID);//读取设备编号 0x66
-	if (charger->chip_id < 0) {
-		dev_err(&client->dev, "[OBEI][bc7d]read DEVICE ID fail\n");
-		return -EINVAL;
-	}
-	
-	pr_info("[OBEI][bc7d]read  DEVICE ID = %x\n", charger->chip_id);
+
 
 
 	return 0;
@@ -852,16 +865,18 @@ static struct i2c_board_info __initdata   i2c_bc7d_charger[] = {
 
 static int __init bc7d_charger_init(void)
 {
-
-	i2c_register_board_info(0, i2c_bc7d_charger,   ARRAY_SIZE(i2c_bc7d_charger));
-
+	int ret;
+	ret = i2c_register_board_info(1, i2c_bc7d_charger,   ARRAY_SIZE(i2c_bc7d_charger));
+	if (ret) {
+		printk("[OBEI][bc7d]register board info fail.\n");
+	}
 
 
 	//添加bc1.2驱动
 	if (i2c_add_driver(&bc7d_charger_driver))
 		printk("[OBEI][bc7d]failed to register bc7d_driver.\n");
 	else
-		printk("[OBEI][bc7d]bc7d_driver register successfully!\n");
+		printk("[OBEI][bc7d]driver register successfully!\n");
 
 
 

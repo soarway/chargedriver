@@ -992,8 +992,7 @@ static const struct {
 	{"ufp_d", DPSTS_UFP_D_CONNECTED},
 };
 
-bool dp_parse_svid_data(
-	struct pd_port *pd_port, struct svdm_svid_data *svid_data)
+bool dp_parse_svid_data(struct pd_port *pd_port, struct svdm_svid_data *svid_data)
 {
 	struct device_node *np, *ufp_np, *dfp_np;
 	const char *connection;
@@ -1019,20 +1018,16 @@ bool dp_parse_svid_data(
 	if (ufp_np) {
 		pr_info("[OBEI]dp, ufp_np\n");
 		for (i = 0; i < ARRAY_SIZE(supported_dp_pin_modes) - 1; i++) {
-			if (of_property_read_bool(ufp_np,
-				supported_dp_pin_modes[i].prop_name))
-				ufp_d_pin_cap |=
-					supported_dp_pin_modes[i].mode;
+			if (of_property_read_bool(ufp_np, supported_dp_pin_modes[i].prop_name))
+				ufp_d_pin_cap |= supported_dp_pin_modes[i].mode;
 		}
 	}
 
 	if (dfp_np) {
 		pr_info("[OBEI]dp, dfp_np\n");
 		for (i = 0; i < ARRAY_SIZE(supported_dp_pin_modes); i++) {
-			if (of_property_read_bool(dfp_np,
-				supported_dp_pin_modes[i].prop_name))
-				dfp_d_pin_cap |=
-					supported_dp_pin_modes[i].mode;
+			if (of_property_read_bool(dfp_np, supported_dp_pin_modes[i].prop_name))
+				dfp_d_pin_cap |= supported_dp_pin_modes[i].mode;
 		}
 	}
 
@@ -1057,10 +1052,8 @@ bool dp_parse_svid_data(
 	if (of_property_read_string(np, "1st_connection", &connection) == 0) {
 		pr_info("[OBEI]dp, 1st_connection\n");
 		for (i = 0; i < ARRAY_SIZE(dp_connect_mode); i++) {
-			if (strcasecmp(connection,
-				dp_connect_mode[i].conn_mode) == 0) {
-				pd_port->dp_first_connected =
-					dp_connect_mode[i].val;
+			if (strcasecmp(connection, dp_connect_mode[i].conn_mode) == 0) {
+				pd_port->dp_first_connected = dp_connect_mode[i].val;
 				break;
 			}
 		}

@@ -63,7 +63,7 @@ static int uf7f_charger_probe(struct i2c_client *client, const struct i2c_device
 	//struct power_supply_config psy_cfg = {};
 	//char *name;
 
-	pr_info("[OBEI][uf7f]uf7f charger probe.\n");
+	pr_info("[OBEI][uf7f]charger probe.\n");
 
 	//分配自定义结构体的内存
 	charger = devm_kzalloc(&client->dev, sizeof(*charger), GFP_KERNEL);
@@ -132,16 +132,18 @@ static struct i2c_board_info __initdata i2c_uf7f_charger[] = {
 
 static int __init uf7f_charger_init(void)
 {
+	int ret;
 
-	i2c_register_board_info(0, i2c_uf7f_charger,   ARRAY_SIZE(i2c_uf7f_charger));
-
-
+	ret = i2c_register_board_info(3, i2c_uf7f_charger, ARRAY_SIZE(i2c_uf7f_charger));
+	if (ret) {
+		printk("[OBEI][uf7f]register board info fail.\n");
+	}
 
 	//添加bc1.2驱动
 	if (i2c_add_driver(&uf7f_charger_driver))
-		printk("[OBEI][uf7f] failed to register uf7f_driver.\n");
+		printk("[OBEI][uf7f]failed to register uf7f_driver.\n");
 	else
-		printk("[OBEI][uf7f] driver register successfully!\n");
+		printk("[OBEI][uf7f]driver register successfully!\n");
 
 
 

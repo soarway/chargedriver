@@ -24,8 +24,16 @@ static int sy_match_device_by_name(struct device *dev, const void *data)
 
 struct symaster_device *sy_dev_get_by_name(const char *name)
 {
+	struct symaster_device * sydev = 0;
 	struct device *dev = class_find_device(sy_class, NULL, (const void *)name, sy_match_device_by_name);
-	return dev ? dev_get_drvdata(dev) : NULL;
+	sydev = dev ? dev_get_drvdata(dev) : NULL;
+	if (sydev != NULL) {
+		pr_info("[OBEI][class]class find device name=%s success\n", name);
+	}
+	else {
+		pr_info("[OBEI][class]class find device name=%s fail\n", name);
+	}
+	return sydev;
 }
 
 //作为函数指针赋值给dev.release
@@ -42,35 +50,36 @@ static void sy_device_release(struct device *pdev)
 //设备注册
 struct symaster_device *sy_device_register(struct device *parent, const char* name, void *drv_data)
 {
-	struct symaster_device *tcpc;
+	struct symaster_device *symdev;
 	int ret = 0;
 
-	pr_info("[OBEI]%s register tcpc device (%s)\n", __func__, name);
-	tcpc = devm_kzalloc(parent, sizeof(*tcpc), GFP_KERNEL);
-	if (!tcpc) {
-		pr_err("[OBEI]%s : allocate tcpc memeory failed\n", __func__);
+	pr_info("[OBEI][class] sy register  device (%s) start!\n", name);
+	symdev = devm_kzalloc(parent, sizeof(*symdev), GFP_KERNEL);
+	if (!symdev) {
+		pr_err("[OBEI][class] : allocate dev reg memeory failed\n");
 		return NULL;
 	}
 
-	tcpc->dev.class = sy_class;
-	tcpc->dev.type = &sy_dev_type;
-	tcpc->dev.parent = parent;
-	tcpc->dev.release = sy_device_release;
+	symdev->dev.class = sy_class;
+	symdev->dev.type = &sy_dev_type;
+	symdev->dev.parent = parent;
+	symdev->dev.release = sy_device_release;
 
-	dev_set_drvdata(&tcpc->dev, tcpc);
-	tcpc->drv_data = drv_data;
-	dev_set_name(&tcpc->dev, name);
+	dev_set_drvdata(&symdev->dev, symdev);
+	symdev->drv_data = drv_data;
+	dev_set_name(&symdev->dev, name);
 
 
-	ret = device_register(&tcpc->dev);
+	ret = device_register(&symdev->dev);
 	if (ret) {
-		kfree(tcpc);
+		kfree(symdev);
 		return ERR_PTR(ret);
 	}
 
-	srcu_init_notifier_head(&tcpc->master_event);
+	srcu_init_notifier_head(&symdev->master_event);
 
-	return tcpc;
+	pr_info("[OBEI][class]sy register device success!\n");
+	return symdev;
 }
 EXPORT_SYMBOL(sy_device_register);
 //设备取消注册
@@ -85,7 +94,10 @@ EXPORT_SYMBOL(sy_device_unregister);
 int sy_register_notifier(struct symaster_device *sydev, struct notifier_block *nb)
 {
 	int ret;
-
+	if (sydev == NULL || nb == NULL) {
+		pr_info("[OBEI][class] register notifier error!\n");
+		return -1;
+	}
 	ret = srcu_notifier_chain_register(&sydev->master_event, nb);
 	if (ret != 0)
 		return ret;
@@ -120,14 +132,14 @@ static int __init sy_class_init(void)
 		return PTR_ERR(sy_class);
 	}
 
-	pr_info("[OBEI]sy class init OK\n");
+	pr_info("[OBEI][class]sy class init OK\n");
 	return 0;
 }
 
 static void __exit sy_class_exit(void)
 {
 	class_destroy(sy_class);
-	pr_info("[OBEI]sy class un-init OK\n");
+	pr_info("[OBEI][class]sy class un-init OK\n");
 }
 
 subsys_initcall(sy_class_init);

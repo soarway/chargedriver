@@ -139,16 +139,18 @@ static struct i2c_board_info __initdata i2c_pd7e_charger[] = {
 
 static int __init pd7e_charger_init(void)
 {
-
-	i2c_register_board_info(0, i2c_pd7e_charger,   ARRAY_SIZE(i2c_pd7e_charger));
-
+	int ret;
+	ret = i2c_register_board_info(2, i2c_pd7e_charger,   ARRAY_SIZE(i2c_pd7e_charger));
+	if (ret) {
+		printk("[OBEI][pd7e]register board info fail.\n");
+	}
 
 
 	//添加bc1.2驱动
 	if (i2c_add_driver(&pd7e_charger_driver))
-		printk("[OBEI][pd7e] failed to register pd7e_driver.\n");
+		printk("[OBEI][pd7e]failed to register pd7e_driver.\n");
 	else
-		printk("[OBEI][pd7e] pd7e_driver register successfully!\n");
+		printk("[OBEI][pd7e]driver register successfully!\n");
 
 
 
