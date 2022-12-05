@@ -675,13 +675,16 @@ static int bc7d_event_notifer_call(struct notifier_block *nb, unsigned long even
 		pr_info("[OBEI][bc7d]: event call disable charger\n");
 		break;
 	case SY_NOTIFY_BC7D_CHECK_DCP:
-		pr_info("[OBEI][bc7d]: event call check DCP\n");
 		if ( check_DCP_condition(chip) )
 		{
-			
+			pr_info("[OBEI][bc7d]:event DCP is true\n");
+		}
+		else {
+			pr_info("[OBEI][bc7d]:event DCP is false\n");
 		}
 		break;
 	default:
+		pr_info("[OBEI][bc7d]: unknown event = %d\n", event);
 		break;
 	};
 
@@ -689,11 +692,11 @@ static int bc7d_event_notifer_call(struct notifier_block *nb, unsigned long even
 	//测试消息从子模块发送到主模块
 	sydev = sy_dev_get_by_name(MASTER_DEVICE_NAME);
 	if (sydev == NULL) {
-		pr_info("[OBEI][bc7d]: get master dev fail\n");
+		pr_info("[OBEI][bc7d]:event notify: get master dev fail\n");
 		return NOTIFY_OK;
 	}
 	else {
-		pr_info("[OBEI][bc7d]: get master dev success\n");
+		pr_info("[OBEI][bc7d]:event notify: get master dev success\n");
 	}
 	srcu_notifier_call_chain(&sydev->master_event, SY_NOTIFY_MASTER_ENABLE_CHARGER, chip);
 	//------------- end--------------------
@@ -740,7 +743,7 @@ bool check_DCP_condition (struct bc7d *bq)
 	ret = bc7d_field_read(bq, F_INPUT_DET_DONE_FLAG);
 	if (ret == 1) {
 		ret = bc7d_field_read(bq, F_VBUS_STAT);
-		if (ret == USB_DCP)
+		if (ret == BC7D_VBUS_USB_DCP)
 		{
 			return true;
 		}
@@ -756,6 +759,8 @@ static int bc7d_charger_probe(struct i2c_client *client, const struct i2c_device
 	struct bc7d *charger;
 	struct device *dev = &client->dev;
 	struct power_supply_desc *supply_desc;
+	struct symaster_device* sydev;
+
 	//struct power_supply_config psy_cfg = {};
 	char *name;
 
@@ -803,15 +808,20 @@ static int bc7d_charger_probe(struct i2c_client *client, const struct i2c_device
 
 
 	//注册事件回调函数
-	charger->bc7d_nb.notifier_call = bc7d_event_notifer_call;
-	ret = sy_register_notifier(charger->sydev, &charger->bc7d_nb);
-	if (ret < 0) {
-		printk("[OBEI][bc7d]register  notifer fail\n");
-		return -EINVAL;
+	sydev = sy_dev_get_by_name(MASTER_DEVICE_NAME);
+	if (sydev != NULL) {
+		charger->sydev = sydev;
+
+		charger->bc7d_nb.notifier_call = bc7d_event_notifer_call;
+		ret = sy_register_notifier(charger->sydev, &charger->bc7d_nb);
+		if (ret < 0) {
+			printk("[OBEI][bc7d]register  notifer fail\n");
+			return -EINVAL;
+		}
 	}
-
-
-
+	else {
+		printk("[OBEI][bc7d]sydev get by name fail!\n");
+	}
 
 
 	return 0;

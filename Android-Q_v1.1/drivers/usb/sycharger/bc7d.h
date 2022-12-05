@@ -2,14 +2,20 @@
 #ifndef __SY_BC7D_HEADER__
 #define __SY_BC7D_HEADER__
 
-#define USB_NO_INPUT  0x0
-#define USB_SDP       0x1
-#define USB_CDP       0x2
-#define USB_DCP       0x3
-#define USB_HVDCP     0x4
-#define USB_UNKNOWN   0x5
-#define USB_NON_STD   0x6
-#define USB_OTG       0x7
+
+
+enum bc7d_vbus_type {
+	BC7D_VBUS_NONE,
+	BC7D_VBUS_USB_SDP,
+	BC7D_VBUS_USB_CDP, /*CDP for bq25890, Adapter for bq25892*/
+	BC7D_VBUS_USB_DCP,
+	BC7D_VBUS_MAXC,
+	BC7D_VBUS_UNKNOWN,
+	BC7D_VBUS_NONSTAND,
+	BC7D_VBUS_OTG,
+	BC7D_VBUS_TYPE_NUM,
+};
+
 
 struct bc7d;
 

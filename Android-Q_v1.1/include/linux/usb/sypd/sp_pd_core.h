@@ -20,6 +20,11 @@
 #include <linux/usb/sypd/sp_tcpci_event.h>
 #include <linux/usb/sypd/sp_tcpm.h>
 
+//启用3.0协议
+#ifndef CONFIG_USB_PD_REV30
+#define CONFIG_USB_PD_REV30 1
+#endif
+
 /*---------------------------------------------------------------------------*/
 
 #ifndef CONFIG_TCPC_SOURCE_VCONN
@@ -1347,9 +1352,7 @@ static inline int pd_reply_svdm_request_simply(struct pd_port *pd_port, struct p
 #ifdef CONFIG_USB_PD_UVDM
 static inline int pd_send_uvdm(struct pd_port *pd_port, uint8_t sop_type)
 {
-	return pd_send_data_msg(
-			pd_port, sop_type, PD_DATA_VENDOR_DEF,
-			pd_port->uvdm_cnt, pd_port->uvdm_data);
+	return pd_send_data_msg(pd_port, sop_type, PD_DATA_VENDOR_DEF, pd_port->uvdm_cnt, pd_port->uvdm_data);
 }
 
 static inline int pd_reply_uvdm(struct pd_port *pd_port, uint8_t sop_type,uint8_t cnt, uint32_t *payload)

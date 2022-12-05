@@ -59,9 +59,9 @@
 	};
 
 
-	rt1711@7e {
+	rt1711@9e {
 		compatible = "rt1711";
-		reg = <0x7e>;
+		reg = <0x9e>;
 		/* rt1711,irq_pin = <&msmgpio 59 0x00>; */
 		/* rt1711,irq_pin = <&tlmm 59 0x00>; */
 		rt-dual,supported_modes = <0>; /* 0: dfp/ufp, 1: dfp, 2: ufp */

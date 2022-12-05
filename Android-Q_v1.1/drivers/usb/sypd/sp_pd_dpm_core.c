@@ -149,8 +149,7 @@ int pd_dpm_send_sink_caps(struct pd_port *pd_port)
 {
 	struct pd_port_power_capabilities *snk_cap = &pd_port->local_snk_cap;
 
-	return pd_send_data_msg(pd_port, TCPC_TX_SOP, PD_DATA_SINK_CAP,
-		snk_cap->nr, snk_cap->pdos);
+	return pd_send_data_msg(pd_port, TCPC_TX_SOP, PD_DATA_SINK_CAP, snk_cap->nr, snk_cap->pdos);
 }
 
 int pd_dpm_send_source_caps(struct pd_port *pd_port)

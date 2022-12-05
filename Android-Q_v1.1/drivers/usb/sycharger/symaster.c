@@ -143,7 +143,7 @@ static int master_charger_set_property(struct power_supply *psy, enum power_supp
 }
 
 
-
+/*
 //解析设备树，读取设备树的属性值
 static struct master_platform *parse_dt_data(struct i2c_client *client)
 {
@@ -174,7 +174,7 @@ static struct master_platform *parse_dt_data(struct i2c_client *client)
 
 	return pdata;
 }
-
+*/
 static int master_charger_property_is_writeable(struct power_supply *psy, enum power_supply_property psp)
 {
 	return 0;
@@ -208,7 +208,8 @@ static int master_event_notifer_call(struct notifier_block *nb, unsigned long ev
 static int master_device_init(struct symaster *chip, struct device *dev)
 {
 	struct symaster_device *mdev;
-	
+	struct bc7d_device* bc7ddev;
+
 
 	pr_info("[OBEI][master] device init (%s)\n",  MASTER_DEVICE_NAME);
 
@@ -218,7 +219,8 @@ static int master_device_init(struct symaster *chip, struct device *dev)
 		return -1;
 	}
 	chip->master_dev = mdev;
-	
+
+	bc7ddev = bc7d_device_register(dev, SY_BC7D, chip);
 	return 0;
 
 }
@@ -242,12 +244,12 @@ static int master_charger_probe(struct i2c_client *client, const struct i2c_devi
 	mutex_init(&charger->lock);
 	charger->charging = true;//要求进入充电状态
 	charger->pdata = client->dev.platform_data;
-
+	/*
 	if (IS_ENABLED(CONFIG_OF) && !charger->pdata && client->dev.of_node)
 	{
 		charger->pdata = parse_dt_data(client);
 		printk("[OBEI][master]pdata success\n");
-	}	
+	}*/
 
 	if (!charger->pdata) {
 		printk("[OBEI][master]no platform data provided\n");
@@ -286,12 +288,15 @@ static int master_charger_probe(struct i2c_client *client, const struct i2c_devi
 
 	//注册结构体的数据指针到系统内核中
 	i2c_set_clientdata(client, charger);
+
+
 	ret = master_device_init(charger, &client->dev);
 	if (ret < 0) {
 		printk("[OBEI][master] tcpc dev init fail\n");
 		return ret;
 	}
 
+	
 	/*
 	//获取GPIO的状态
 	charger->status_gpio = devm_gpiod_get_optional(&client->dev, "ti,ac-detect", GPIOD_IN);
@@ -398,12 +403,12 @@ static int master_charger_remove(struct i2c_client *client)
 
 //---------------------------------------symaster--------------------------------------------
 static struct of_device_id   master_charger_match_table[] = {
-	{.compatible = "sy,masterba76",},
+	{.compatible = SY_MASTER,},
 	{},
 };
 
 static const struct i2c_device_id  master_charger_id[] = {
-	{ "symasterba76", 0 },
+	{ SY_MASTER, 0 },
 	{},
 };
 
@@ -411,7 +416,7 @@ MODULE_DEVICE_TABLE(i2c, master_charger_id);
 
 static struct i2c_driver   master_charger_driver = {
 	.driver		= {
-		.name	= "masterba76",
+		.name	= SY_MASTER,
 		.of_match_table = master_charger_match_table,
 	},
 	.id_table	= master_charger_id,
@@ -438,31 +443,15 @@ static int __init master_charger_init(void)
 {
 	int ret;
 
-	struct device_node *np1;
 	struct device_node *np2;
 	
-
-	
-	np1 = of_find_node_by_name(NULL, "syabcdef");
-	if (np1 != NULL)
-		pr_info("[OBEI][master]syabcdef node found...\n");
-	else
-		pr_info("[OBEI][master]syabcdef node not found...\n");
 
 	np2 = of_find_node_by_name(NULL, "symaster");
 	if (np2 != NULL)
 		pr_info("[OBEI][master]symaster node found...\n");
 	else
 		pr_info("[OBEI][master]symaster node not found...\n");
-/*
-	ret = misc_register(&misc);
-	if (ret) {
-		printk("[OBEI][master]misc V register fail.\n");
-	}
-	else {
-		printk("[OBEI][master]misc V register success.\n");
-	}
-*/
+
 	//添加主驱动
 	if (i2c_add_driver(&master_charger_driver))
 		printk("[OBEI][master]failed to register symaster_driver.\n");

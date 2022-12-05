@@ -45,12 +45,11 @@ enum bq2589x_part_no {
 };
 
 
-#define BQ2589X_STATUS_PLUGIN		0x0001
-#define BQ2589X_STATUS_PG			0x0002
+#define BQ2589X_STATUS_PLUGIN		 0x0001
+#define BQ2589X_STATUS_PG			 0x0002
 #define	BQ2589X_STATUS_CHARGE_ENABLE 0x0004
-#define BQ2589X_STATUS_FAULT		0x0008
-
-#define BQ2589X_STATUS_EXIST		0x0100
+#define BQ2589X_STATUS_FAULT		 0x0008
+#define BQ2589X_STATUS_EXIST		 0x0100
 
 struct bq2589x_config {
 	bool	enable_auto_dpdm;
@@ -1096,7 +1095,8 @@ static void bq2589x_adapter_in_workfunc(struct work_struct *work)
 		else
 			dev_info(bq->dev, "%s: Set charge current to %dmA successfully\n",__func__,bq->cfg.charge_current);
 		schedule_delayed_work(&bq->ico_work, 0);
-	} else if (bq->vbus_type == BQ2589X_VBUS_USB_DCP) {/* DCP, let's check if it is PE adapter*/
+	} 
+	else if (bq->vbus_type == BQ2589X_VBUS_USB_DCP) {/* DCP, let's check if it is PE adapter*/
 		dev_info(bq->dev, "%s:usb dcp adapter plugged in\n", __func__);
 		ret = bq2589x_set_chargecurrent(bq, bq->cfg.charge_current);
 		if (ret < 0) 
@@ -1104,7 +1104,8 @@ static void bq2589x_adapter_in_workfunc(struct work_struct *work)
 		else
 			dev_info(bq->dev, "%s: Set charge current to %dmA successfully\n",__func__,bq->cfg.charge_current);
 		schedule_delayed_work(&bq->check_pe_tuneup_work, 0);
-	} else if (bq->vbus_type == BQ2589X_VBUS_USB_SDP || bq->vbus_type == BQ2589X_VBUS_UNKNOWN) {
+	} 
+	else if (bq->vbus_type == BQ2589X_VBUS_USB_SDP || bq->vbus_type == BQ2589X_VBUS_UNKNOWN) {
 		if (bq->vbus_type == BQ2589X_VBUS_USB_SDP)
 			dev_info(bq->dev, "%s:host SDP plugged in\n", __func__);
 		else
@@ -1303,7 +1304,7 @@ static void bq2589x_monitor_workfunc(struct work_struct *work)
 }
 
 
-
+//被中断处理函数调用
 static void bq2589x_charger_irq_workfunc(struct work_struct *work)
 {
 	struct bq2589x *bq = container_of(work, struct bq2589x, irq_work);
@@ -1314,11 +1315,11 @@ static void bq2589x_charger_irq_workfunc(struct work_struct *work)
 
 	msleep(5);
 
-	/* Read STATUS and FAULT registers */
+	/* Read STATUS registers */
 	ret = bq2589x_read_byte(bq, &status, BQ2589X_REG_0B);
 	if (ret)
 		return;
-
+	/* Read FAULT registers */
 	ret = bq2589x_read_byte(bq, &fault, BQ2589X_REG_0C);
 	if (ret)
 		return;
@@ -1329,7 +1330,8 @@ static void bq2589x_charger_irq_workfunc(struct work_struct *work)
 		dev_info(bq->dev, "%s:adapter removed\n", __func__);
 		bq->status &= ~BQ2589X_STATUS_PLUGIN;
 		schedule_work(&bq->adapter_out_work);
-	} else if (bq->vbus_type != BQ2589X_VBUS_NONE && (bq->vbus_type != BQ2589X_VBUS_OTG) && !(bq->status & BQ2589X_STATUS_PLUGIN)) {
+	} 
+	else if (bq->vbus_type != BQ2589X_VBUS_NONE && (bq->vbus_type != BQ2589X_VBUS_OTG) && !(bq->status & BQ2589X_STATUS_PLUGIN)) {
 		dev_info(bq->dev, "%s:adapter plugged in\n", __func__);
 		bq->status |= BQ2589X_STATUS_PLUGIN;
 		schedule_work(&bq->adapter_in_work);
@@ -1360,7 +1362,7 @@ static void bq2589x_charger_irq_workfunc(struct work_struct *work)
 		dev_info(bq->dev, "%s:charge fault:%02x\n", __func__,fault);
 }
 
-
+//中断处理函数
 static irqreturn_t bq2589x_charger_interrupt(int irq, void *data)
 {
 	struct bq2589x *bq = data;

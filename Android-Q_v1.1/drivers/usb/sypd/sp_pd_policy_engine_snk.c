@@ -83,8 +83,7 @@ void pe_snk_discovery_entry(struct pd_port *pd_port, struct pd_event *pd_event)
 	pd_enable_vbus_valid_detection(pd_port, true);
 }
 
-void pe_snk_wait_for_capabilities_entry(
-			struct pd_port *pd_port, struct pd_event *pd_event)
+void pe_snk_wait_for_capabilities_entry(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 #ifdef CONFIG_USB_PD_SNK_HRESET_KEEP_DRAW
 	/* Default current draw after HardReset */
@@ -99,8 +98,7 @@ void pe_snk_wait_for_capabilities_entry(
 	pd_free_pd_event(pd_port, pd_event);
 }
 
-void pe_snk_wait_for_capabilities_exit(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+void pe_snk_wait_for_capabilities_exit(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 #ifdef CONFIG_USB_PD_IGNORE_PS_RDY_AFTER_PR_SWAP
 	pd_port->msg_id_pr_swap_last = 0xff;
@@ -109,8 +107,7 @@ void pe_snk_wait_for_capabilities_exit(
 	pd_disable_timer(pd_port, PD_TIMER_SINK_WAIT_CAP);
 }
 
-void pe_snk_evaluate_capability_entry(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+void pe_snk_evaluate_capability_entry(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	/* Disable UART output for Source SenderResponse */
 	pd_lock_msg_output(pd_port);
@@ -138,14 +135,12 @@ void pe_snk_evaluate_capability_entry(
 	pd_free_pd_event(pd_port, pd_event);
 }
 
-void pe_snk_select_capability_entry(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+void pe_snk_select_capability_entry(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	pd_port->pd_wait_sender_response = true;
 
 	if (pd_event->msg == PD_DPM_NOTIFIED) {
-		PE_DBG("SelectCap%d, rdo:0x%08x\r\n",
-			pd_event->msg_sec, pd_port->last_rdo);
+		PE_DBG("SelectCap%d, rdo:0x%08x\r\n", pd_event->msg_sec, pd_port->last_rdo);
 	} else {
 		/* new request, for debug only */
 		/* pd_dpm_sink_vbus(pd_port, false); */
@@ -155,26 +150,21 @@ void pe_snk_select_capability_entry(
 	/* Disable UART output for Sink SenderResponse */
 	pd_lock_msg_output(pd_port);
 
-	pd_send_data_msg(pd_port,
-		TCPC_TX_SOP, PD_DATA_REQUEST, 1, &pd_port->last_rdo);
+	pd_send_data_msg(pd_port, TCPC_TX_SOP, PD_DATA_REQUEST, 1, &pd_port->last_rdo);
 	pd_free_pd_event(pd_port, pd_event);
 }
 
-void pe_snk_select_capability_exit(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+void pe_snk_select_capability_exit(struct pd_port *pd_port, struct pd_event *pd_event)
 {
-	if (pd_event_msg_match(pd_event,
-		PD_EVT_CTRL_MSG, PD_CTRL_ACCEPT))
+	if (pd_event_msg_match(pd_event, PD_EVT_CTRL_MSG, PD_CTRL_ACCEPT))
 		pd_port->remote_selected_cap = RDO_POS(pd_port->last_rdo);
 
 	/* Waiting for Hard-Reset Done */
-	if (!pd_event_msg_match(pd_event,
-		PD_EVT_TIMER_MSG, PD_TIMER_SENDER_RESPONSE))
+	if (!pd_event_msg_match(pd_event, PD_EVT_TIMER_MSG, PD_TIMER_SENDER_RESPONSE))
 		pd_unlock_msg_output(pd_port);
 }
 
-void pe_snk_transition_sink_entry(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+void pe_snk_transition_sink_entry(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	pd_enable_timer(pd_port, PD_TIMER_PS_TRANSITION);
 
@@ -189,8 +179,7 @@ void pe_snk_transition_sink_entry(
 	pd_free_pd_event(pd_port, pd_event);
 }
 
-void pe_snk_transition_sink_exit(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+void pe_snk_transition_sink_exit(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	if (pd_event_msg_match(pd_event, PD_EVT_CTRL_MSG, PD_CTRL_PS_RDY))
 		pd_dpm_snk_transition_power(pd_port, pd_event);
@@ -213,28 +202,24 @@ void pe_snk_hard_reset_entry(struct pd_port *pd_port, struct pd_event *pd_event)
 	pd_free_pd_event(pd_port, pd_event);
 }
 
-void pe_snk_transition_to_default_entry(
-		struct pd_port *pd_port, struct pd_event *pd_event)
+void pe_snk_transition_to_default_entry(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	pd_reset_local_hw(pd_port);
 	pd_dpm_snk_hard_reset(pd_port, pd_event);
 }
 
-void pe_snk_transition_to_default_exit(
-		struct pd_port *pd_port, struct pd_event *pd_event)
+void pe_snk_transition_to_default_exit(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	pd_enable_timer(pd_port, PD_TIMER_NO_RESPONSE);
 }
 
-void pe_snk_give_sink_cap_entry(
-			struct pd_port *pd_port, struct pd_event *pd_event)
+void pe_snk_give_sink_cap_entry(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	pd_dpm_send_sink_caps(pd_port);
 	pd_free_pd_event(pd_port, pd_event);
 }
 
-void pe_snk_get_source_cap_entry(
-			struct pd_port *pd_port, struct pd_event *pd_event)
+void pe_snk_get_source_cap_entry(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 #ifdef CONFIG_USB_PD_TCPM_CB_2ND
 	pd_port->pd_wait_sender_response = true;
@@ -243,8 +228,7 @@ void pe_snk_get_source_cap_entry(
 	pd_send_ctrl_msg(pd_port, TCPC_TX_SOP, PD_CTRL_GET_SOURCE_CAP);
 }
 
-void pe_snk_send_soft_reset_entry(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+void pe_snk_send_soft_reset_entry(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	pd_port->pd_wait_sender_response = true;
 
@@ -262,38 +246,33 @@ void pe_snk_soft_reset_entry(struct pd_port *pd_port, struct pd_event *pd_event)
 
 #ifdef CONFIG_USB_PD_REV30
 
-void pe_snk_source_alert_received_entry(
-		struct pd_port *pd_port, struct pd_event *pd_event)
+void pe_snk_source_alert_received_entry(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	pd_dpm_inform_alert(pd_port, pd_event);
 	pd_free_pd_event(pd_port, pd_event);
 }
 
-void pe_snk_get_source_status_entry(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+void pe_snk_get_source_status_entry(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	pd_port->pd_wait_sender_response = true;
 
 	pd_send_ctrl_msg(pd_port, TCPC_TX_SOP, PD_CTRL_GET_STATUS);
 }
 
-void pe_snk_get_source_status_exit(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+void pe_snk_get_source_status_exit(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	pd_dpm_inform_status(pd_port, pd_event);
 }
 
 #ifdef CONFIG_USB_PD_REV30_PPS_SINK
-void pe_snk_get_pps_status_entry(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+void pe_snk_get_pps_status_entry(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	pd_port->pd_wait_sender_response = true;
 
 	pd_send_ctrl_msg(pd_port, TCPC_TX_SOP, PD_CTRL_GET_PPS_STATUS);
 }
 
-void pe_snk_get_pps_status_exit(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+void pe_snk_get_pps_status_exit(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	pd_dpm_inform_pps_status(pd_port, pd_event);
 }

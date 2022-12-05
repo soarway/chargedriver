@@ -183,7 +183,7 @@ config USB_SYBC
 config USB_SYCHARGER
 	def_bool y
 
-# source "drivers/usb/sypd/Kconfig"
+source "drivers/usb/sypd/Kconfig"
 # source "drivers/usb/sybc/Kconfig"
 source "drivers/usb/sycharger/Kconfig"
 

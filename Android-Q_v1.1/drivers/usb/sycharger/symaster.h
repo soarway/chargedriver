@@ -12,10 +12,10 @@
 
 
 
-#define  SY_MASTER  "symasterba76"
-#define  SY_BC7D    "SY_BC7D"
-#define  SY_PD7E    "SY_PD7E"
-#define  SY_UF7F    "SY_UF7F"
+#define  SY_MASTER  "silergy,masterba76"
+#define  SY_BC7D    "silergy,ba70x"
+#define  SY_PD7E    "silergy,ba41a"
+#define  SY_UF7F    "silergy,ba52a"
 
 #define  GPIO_IRQ     1159
 #define  MASTER_DEVICE_NAME           "SY_MASTER_DEVICE"
@@ -43,12 +43,18 @@ struct symaster_device {
 	void *drv_data;
 };
 
+struct bc7d_device {
+	struct i2c_client* client;
+	struct device dev;
+	void* drv_data;
+};
+
 extern struct symaster_device *sy_dev_get_by_name(const char *name);
 extern struct symaster_device *sy_device_register(struct device *parent, const char* name, void *drv_data);
 extern int sy_register_notifier(struct symaster_device *sydev, struct notifier_block *nb);
 extern int sy_unregister_notifier(struct symaster_device *sydev, struct notifier_block *nb);
 
-
+extern struct bc7d_device *bc7d_device_register(struct device *parent, const char* name, void *drv_data);
 
 #endif
 

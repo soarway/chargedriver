@@ -41,11 +41,56 @@ static void sy_device_release(struct device *pdev)
 {
 	struct symaster_device *sydev = container_of(pdev, struct symaster_device, dev);
 
-	pr_info("[OBEI][class]%s :  device release\n",  dev_name(pdev));
+	pr_info("[OBEI][class]%s :sy device release\n",  dev_name(pdev));
 
 	devm_kfree(pdev, sydev);
 }
 
+//----------------------------------虚线中的代码为测试代码，无用可以删除------------------------------------
+
+static void bc7d_device_release(struct device *pdev)
+{
+	struct bc7d_device *sydev = container_of(pdev, struct bc7d_device, dev);
+
+	pr_info("[OBEI][class]%s : bc7d device release\n",  dev_name(pdev));
+
+	devm_kfree(pdev, sydev);
+}
+//测试函数， 试图注册动态注册bc7d设备，看看是否会去执行bc7d的probe函数
+struct bc7d_device *bc7d_device_register(struct device *parent, const char* name, void *drv_data)
+{
+	struct bc7d_device *symdev;
+	int ret = 0;
+
+	pr_info("[OBEI][class] bc7d register  device (%s) start!\n", name);
+	symdev = devm_kzalloc(parent, sizeof(*symdev), GFP_KERNEL);
+	if (!symdev) {
+		pr_err("[OBEI][class] : allocate dev reg memeory failed\n");
+		return NULL;
+	}
+
+	symdev->dev.class = sy_class;
+	symdev->dev.type = &sy_dev_type;
+	symdev->dev.parent = parent;
+	symdev->dev.release = bc7d_device_release;
+
+	dev_set_drvdata(&symdev->dev, symdev);
+	symdev->drv_data = drv_data;
+	dev_set_name(&symdev->dev, name);
+
+
+	ret = device_register(&symdev->dev);
+	if (ret) {
+		kfree(symdev);
+		return ERR_PTR(ret);
+	}
+
+	pr_info("[OBEI][class]bc7d register device success!\n");
+	return symdev;
+}
+EXPORT_SYMBOL(bc7d_device_register);
+
+//----------------------------------------------------------------------
 
 //设备注册
 struct symaster_device *sy_device_register(struct device *parent, const char* name, void *drv_data)

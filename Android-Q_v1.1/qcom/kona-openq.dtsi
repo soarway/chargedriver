@@ -835,7 +835,7 @@
 	/////////////////////////////////////////////////////////////////////////////////////////////////
 	//pd sample.dts
 	symaster@1d {
-		compatible = "sy,masterba76";
+		compatible = "silergy,masterba76";
 		reg = <0x1d>;
 		status = "ok";
 	};
@@ -981,7 +981,7 @@
 				//pin_assignment,mode_c;
 				//pin_assignment,mode_d;
 				//pin_assignment,mode_e;
-			      };
+			};
 			dfp_d {
 				// Only support mode C & D 
 				pin_assignment,mode_a;
@@ -990,7 +990,7 @@
 				//pin_assignment,mode_d;
 				//pin_assignment,mode_e;
 				//pin_assignment,mode_f;
-			       };
+			};
 		};
 
 
@@ -998,7 +998,7 @@
 
 ////////////////////////////////////////
     ba70@7d {
-        compatible = "sy,ba70x";
+        compatible = "silergy,ba70x";
 //		compatible = "silergy,ba70";
 		reg = <0x7d>;
         status = "ok";
@@ -1019,9 +1019,9 @@
 		sy,ba70x,charge-current = <2000>;
 		sy,ba70x,term-current = <256>;
 
-//		sy,ba70x,enable-auto-dpdm;
+		sy,ba70x,enable-auto-dpdm;
 		sy,ba70x,enable-terminasyon;
-		//sy,ba70x,enable-ico;
+		sy,ba70x,enable-ico;
 		sy,ba70x,use-absolute-vindpm;
 
 ///////////////////////////////////////

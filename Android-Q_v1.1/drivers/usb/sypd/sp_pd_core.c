@@ -510,8 +510,7 @@ int pd_handle_soft_reset(struct pd_port *pd_port, uint8_t state_machine)
 
 /* ---- Send PD Message ----*/
 
-static int pd_send_message(struct pd_port *pd_port, uint8_t sop_type,
-		uint8_t msg, bool ext, uint16_t count, const uint32_t *data)
+static int pd_send_message(struct pd_port *pd_port, uint8_t sop_type, uint8_t msg, bool ext, uint16_t count, const uint32_t *data)
 {
 	int ret;
 	uint16_t msg_hdr;
@@ -533,15 +532,12 @@ static int pd_send_message(struct pd_port *pd_port, uint8_t sop_type,
 #ifdef CONFIG_USB_PD_REV30
 		pd_rev = pd_port->pd_revision[0];
 #endif	/* CONFIG_USB_PD_REV30 */
-		msg_hdr = PD_HEADER_SOP(msg, pd_rev,
-				pd_port->power_role, pd_port->data_role,
-				pd_port->msg_id_tx[sop_type], count, ext);
+		msg_hdr = PD_HEADER_SOP(msg, pd_rev, pd_port->power_role, pd_port->data_role, pd_port->msg_id_tx[sop_type], count, ext);
 	} else {
 #ifdef CONFIG_USB_PD_REV30
 		pd_rev = pd_port->pd_revision[1];
 #endif	/* CONFIG_USB_PD_REV30 */
-		msg_hdr = PD_HEADER_SOP_PRIME(msg, pd_rev,
-				0, pd_port->msg_id_tx[sop_type], count, ext);
+		msg_hdr = PD_HEADER_SOP_PRIME(msg, pd_rev, 0, pd_port->msg_id_tx[sop_type], count, ext);
 	}
 
 	if ((count > 0) && (msg == PD_DATA_VENDOR_DEF))
@@ -568,9 +564,7 @@ int pd_send_data_msg(struct pd_port *pd_port, uint8_t sop_type, uint8_t msg, uin
 }
 
 #ifdef CONFIG_USB_PD_REV30
-int pd_send_ext_msg(struct pd_port *pd_port,
-		uint8_t sop_type, uint8_t msg, bool request,
-		uint8_t chunk_nr, uint8_t size, uint8_t *data)
+int pd_send_ext_msg(struct pd_port *pd_port, uint8_t sop_type, uint8_t msg, bool request, uint8_t chunk_nr, uint8_t size, uint8_t *data)
 {
 	uint8_t cnt;
 	uint32_t payload[PD_DATA_OBJ_SIZE];
@@ -635,8 +629,7 @@ int pd_send_bist_mode2(struct pd_port *pd_port)
 
 #ifdef CONFIG_USB_PD_TRANSMIT_BIST2
 	TCPC_DBG("BIST_MODE_2\r\n");
-	ret = tcpci_transmit(
-		pd_port->tcpc_dev, TCPC_TX_BIST_MODE_2, 0, NULL);
+	ret = tcpci_transmit(pd_port->tcpc_dev, TCPC_TX_BIST_MODE_2, 0, NULL);
 #else
 	ret = tcpci_set_bist_carrier_mode(
 		pd_port->tcpc_dev, 1 << 2);
@@ -686,8 +679,7 @@ int pd_send_svdm_request(struct pd_port *pd_port,
 	}
 #endif	/* CONFIG_USB_PD_STOP_SEND_VDM_IF_RX_BUSY */
 
-	ret = pd_send_data_msg(
-			pd_port, sop_type, PD_DATA_VENDOR_DEF, 1+cnt, payload);
+	ret = pd_send_data_msg(pd_port, sop_type, PD_DATA_VENDOR_DEF, 1+cnt, payload);
 
 	if (ret == 0 && timer_id != 0)
 		pd_enable_timer(pd_port, timer_id);
@@ -729,8 +721,7 @@ int pd_reply_svdm_request(struct pd_port *pd_port, struct pd_event *pd_event,
 	}
 #endif	/* CONFIG_USB_PD_STOP_REPLY_VDM_IF_RX_BUSY */
 
-	return pd_send_data_msg(pd_port,
-			TCPC_TX_SOP, PD_DATA_VENDOR_DEF, 1+cnt, payload);
+	return pd_send_data_msg(pd_port, TCPC_TX_SOP, PD_DATA_VENDOR_DEF, 1+cnt, payload);
 }
 
 void pd_lock_msg_output(struct pd_port *pd_port)
