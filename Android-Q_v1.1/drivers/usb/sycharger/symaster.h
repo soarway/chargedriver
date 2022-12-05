@@ -11,6 +11,7 @@
 #include <linux/spinlock.h>
 
 
+#define  BC7D_CHIP_ID   0x66
 
 #define  SY_MASTER  "silergy,masterba76"
 #define  SY_BC7D    "silergy,ba70x"

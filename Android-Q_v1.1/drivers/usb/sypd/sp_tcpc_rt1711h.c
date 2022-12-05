@@ -557,23 +557,19 @@ static int rt1711_init_alert(struct tcpc_device *tcpc)
 
 	snprintf(name, PAGE_SIZE, "%s-IRQ", chip->tcpc_desc->name);
 
-	pr_info("[OBEI]%s name = %s, gpio = %d\n", __func__, chip->tcpc_desc->name, chip->irq_gpio);
-
 	ret = devm_gpio_request(chip->dev, chip->irq_gpio, name);
 #ifdef DEBUG_GPIO
 	gpio_request(DEBUG_GPIO, "debug_latency_pin");
 	gpio_direction_output(DEBUG_GPIO, 1);
 #endif
 	if (ret < 0) {
-		pr_err("[OBEI]Error: failed to request GPIO%d (ret = %d)\n",
-		chip->irq_gpio, ret);
+		pr_err("[OBEI]Error: failed to request GPIO%d (ret = %d)\n", chip->irq_gpio, ret);
 		goto init_alert_err;
 	}
 
 	ret = gpio_direction_input(chip->irq_gpio);
 	if (ret < 0) {
-		pr_err("[OBEI]Error: failed to set GPIO%d as input pin(ret = %d)\n",
-		chip->irq_gpio, ret);
+		pr_err("[OBEI]Error: failed to set GPIO%d as input pin(ret = %d)\n", chip->irq_gpio, ret);
 		goto init_alert_err;
 	}
 

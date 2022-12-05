@@ -36,8 +36,7 @@
 enum bq25890_fields {
 	F_EN_HIZ, F_EN_ILIM, F_IILIM,				     		/* Reg00 */
 	F_BHOT, F_BCOLD, F_VINDPM_OFS,				     		/* Reg01 */
-	F_CONV_START, F_CONV_RATE, F_BOOSTF, F_ICO_EN,
-	F_HVDCP_EN, F_MAXC_EN, F_FORCE_DPM, F_AUTO_DPDM_EN,	     /* Reg02 */
+	F_CONV_START, F_CONV_RATE, F_BOOSTF, F_ICO_EN, F_HVDCP_EN, F_MAXC_EN, F_FORCE_DPM, F_AUTO_DPDM_EN,/* Reg02 */
 	F_BAT_LOAD_EN, F_WD_RST, F_OTG_CFG, F_CHG_CFG, F_SYSVMIN,    /* Reg03 */
 	F_PUMPX_EN, F_ICHG,					     		/* Reg04 */
 	F_IPRECHG, F_ITERM,					     		/* Reg05 */
@@ -481,6 +480,7 @@ static int bq25890_get_chip_state(struct bq25890_device *bq, struct bq25890_stat
 		{F_CHG_STAT,	&state->chrg_status},
 		{F_PG_STAT,		&state->online},
 		{F_VSYS_STAT,	&state->vsys_status},
+		
 		{F_BOOST_FAULT, &state->boost_fault},
 		{F_BAT_FAULT,	&state->bat_fault},
 		{F_CHG_FAULT,	&state->chrg_fault}

@@ -638,8 +638,13 @@ static const struct reg_field BC7D_reg_fields[] = {
 
 };
 
+struct bc7d_state {
+	u8 online;
+	u8 chrg_status;
 
-struct bc7d {
+};
+
+struct bc7d_chip {
 	struct power_supply			*charger;
 	struct power_supply_desc	 charger_desc;
 	struct i2c_client			*client;
@@ -656,14 +661,11 @@ struct bc7d {
 	struct regmap_field *rmap_fields[F_MAX_FIELDS];
 };
 
-/* Please handle the notification in notifier call function,
- * User should control the Power here when you got SOURCE_VBUS notification
- * and SINK_VBUS notification
- */
+//消息处理函数
 static int bc7d_event_notifer_call(struct notifier_block *nb, unsigned long event, void *data)
 {
 	struct symaster_device* sydev;
-	struct bc7d * chip = container_of(nb, struct bc7d, bc7d_nb);
+	struct bc7d_chip * chip = container_of(nb, struct bc7d_chip, bc7d_nb);
 
 	//struct tcp_notify *tcp_noti = data;
 
@@ -704,8 +706,9 @@ static int bc7d_event_notifer_call(struct notifier_block *nb, unsigned long even
 }
 
 
+
 //读指定寄存器的值
-static int bc7d_field_read(struct bc7d *bq, enum BC7D_fields field_id)
+static int bc7d_field_read(struct bc7d_chip *bq, enum BC7D_fields field_id)
 {
 	int ret;
 	int val;
@@ -717,11 +720,40 @@ static int bc7d_field_read(struct bc7d *bq, enum BC7D_fields field_id)
 	return val;
 }
 //写指定寄存器的值
-static int bc7d_field_write(struct bc7d *bq, enum BC7D_fields field_id, u8 val)
+static int bc7d_field_write(struct bc7d_chip *bq, enum BC7D_fields field_id, u8 val)
 {
 	return regmap_field_write(bq->rmap_fields[field_id], val);
 }
+//重置寄存器的默认值
+/*
+Register Reset:
+0–Keep current register setting (default)
+1–Reset to default register value and reset safety timer
+*/
+static int bc7d_chip_reset(struct bc7d_chip *bq)
+{
+	int ret;
+	int rst_check_counter = 10;
 
+	ret = bc7d_field_write(bq, F_REG_RST, 1);
+	if (ret < 0)
+		return ret;
+
+	do {
+		
+		ret = bc7d_field_read(bq, F_REG_RST);
+		if (ret < 0)
+			return ret;
+
+		usleep_range(5, 10);
+		//如果失败，重试10次
+	} while (ret == 1 && --rst_check_counter);
+
+	if (!rst_check_counter)
+		return -ETIMEDOUT;
+
+	return 0;
+}
 
 /*
 //是否满足DCP特性
@@ -735,7 +767,7 @@ static int bc7d_field_write(struct bc7d *bq, enum BC7D_fields field_id, u8 val)
 111 – OTG
 */
 //返回true代表满足DCP条件
-bool check_DCP_condition (struct bc7d *bq)
+bool check_DCP_condition (struct bc7d_chip *bq)
 {
 	int val = 0;
 	int ret;
@@ -751,29 +783,131 @@ bool check_DCP_condition (struct bc7d *bq)
 
 	return false;
 }
+static int bc7d_get_chip_state(struct bc7d_chip *bq, struct bc7d_state *state)
+{
+	int i, ret;
 
+	struct {
+		enum BC7D_fields id;
+		u8 *data;
+	} state_fields[] = {
+		{F_CHG_STAT,	&state->chrg_status},
+		{F_PG_STAT,		&state->online},
+		{F_VSYS_STAT,	&state->vsys_status},
+		
+		{F_BOOST_FAULT, &state->boost_fault},
+		{F_BAT_FAULT,	&state->bat_fault},
+		{F_CHG_FAULT,	&state->chrg_fault}
+	};
+
+	for (i = 0; i < ARRAY_SIZE(state_fields); i++) {
+		ret = bq25890_field_read(bq, state_fields[i].id);
+		if (ret < 0)
+			return ret;
+
+		*state_fields[i].data = ret;
+	}
+
+	dev_dbg(bq->dev, "S:CHG/PG/VSYS=%d/%d/%d, F:CHG/BOOST/BAT=%d/%d/%d\n", state->chrg_status, state->online, state->vsys_status, state->chrg_fault, state->boost_fault, state->bat_fault);
+
+	return 0;
+}
+
+//硬件初始化
+static int bc7d_hw_init(struct bc7d_chip *bq)
+{
+	int ret;
+	int i;
+	struct bc7d_state state;
+
+	const struct {
+		enum BC7D_fields id;
+		u32 value;
+	} init_data[] = {
+		{F_ICHG_CC,	 bq->init_data.ichg},
+		{F_VBAT_REG, bq->init_data.vreg},
+		{F_ITERM,	 bq->init_data.iterm},
+		{F_IPRECHG,	 bq->init_data.iprechg},
+		{F_SYS_MIN,	 bq->init_data.sysvmin},
+		{F_VBOOST,	 bq->init_data.boostv},
+		{F_IBOOST_LIM,	 bq->init_data.boosti},
+		{F_BOOST_FREQ,	 bq->init_data.boostf},
+		//{F_EN_ILIM,	 bq->init_data.ilim_en},//这个没有
+		{F_TDIE_REG,	 bq->init_data.treg}
+	};
+
+	ret = bc7d_chip_reset(bq);
+	if (ret < 0)
+		return ret;
+
+	/* 
+	disable watchdog 
+	I2C Watchdog Timer Setting:
+	000 – Disable watchdog timer
+	001 – 0.5s
+	010 – 1s
+	011 – 2s
+	100 – 20s
+	101 – 40s (default)
+	110 – 80s
+	111 – 160s
+	*/
+	ret = bc7d_field_write(bq, F_WD_TIMEOUT, 0);
+	if (ret < 0)
+		return ret;
+
+	/* initialize currents/voltages and other parameters */
+	for (i = 0; i < ARRAY_SIZE(init_data); i++) {
+		ret = bc7d_field_write(bq, init_data[i].id, init_data[i].value);
+		if (ret < 0)
+			return ret;
+	}
+
+	/* Configure ADC for continuous conversions. This does not enable it. */
+	ret = bc7d_field_write(bq, F_ADC_RATE, 0);//貌似要写0值才对
+	if (ret < 0)
+		return ret;
+
+	ret = bq25890_get_chip_state(bq, &state);
+	if (ret < 0)
+		return ret;
+
+	mutex_lock(&bq->lock);
+	bq->state = state;
+	mutex_unlock(&bq->lock);
+
+	return 0;
+}
 
 static int bc7d_charger_probe(struct i2c_client *client, const struct i2c_device_id *id)
 {
 	int ret, i;
-	struct bc7d *charger;
+	struct i2c_adapter *adapter = to_i2c_adapter(client->dev.parent);
 	struct device *dev = &client->dev;
-	struct power_supply_desc *supply_desc;
-	struct symaster_device* sydev;
-
+	struct bc7d_chip *charger;
+	
+	//struct power_supply_desc *supply_desc;
+	//struct symaster_device* sydev;
 	//struct power_supply_config psy_cfg = {};
 	char *name;
 
 	printk("[OBEI][bc7d]call charger probe.\n");
 
+	if (!i2c_check_functionality(adapter, I2C_FUNC_SMBUS_BYTE_DATA)) {
+		pr_err(dev, "[OBEI][bc7d]No support for SMBUS_BYTE_DATA\n");
+		return -ENODEV;
+	}
+
+
+
 	//分配自定义结构体的内存
-	charger = devm_kzalloc(&client->dev, sizeof(*charger), GFP_KERNEL);
+	charger = devm_kzalloc(dev, sizeof(*charger), GFP_KERNEL);
 	if (!charger)
 		return -ENOMEM;
 
 	
 	charger->client = client;
-	charger->dev = &client->dev;
+	charger->dev = dev;
 
 	mutex_init(&charger->lock);
 
@@ -794,6 +928,7 @@ static int bc7d_charger_probe(struct i2c_client *client, const struct i2c_device
 	}
 
 	i2c_set_clientdata(client, charger);
+
 	charger->chip_id = bc7d_field_read(charger, F_DEVICE_ID);//读取设备编号 0x66
 	if (charger->chip_id < 0) {
 		printk("[OBEI][bc7d]read DEVICE ID fail\n");
@@ -801,11 +936,20 @@ static int bc7d_charger_probe(struct i2c_client *client, const struct i2c_device
 	}
 	
 	pr_info("[OBEI][bc7d]read  DEVICE ID = %x\n", charger->chip_id);
-	if (charger->chip_id != 0x66) {
-		printk("[OBEI][bc7d]Chip with  not supported!\n");
+	if (charger->chip_id != BC7D_CHIP_ID) {
+		printk("[OBEI][bc7d]Chip ID is not match!\n");
 		return -ENODEV;
 	}
 
+	//设备树变量初始化
+
+
+	//硬件初始化
+	ret = bq25890_hw_init(bq);
+	if (ret < 0) {
+		dev_err(dev, "Cannot initialize the chip.\n");
+		return ret;
+	}
 
 	//注册事件回调函数
 	sydev = sy_dev_get_by_name(MASTER_DEVICE_NAME);
@@ -829,16 +973,23 @@ static int bc7d_charger_probe(struct i2c_client *client, const struct i2c_device
 
 static int bc7d_charger_remove(struct i2c_client *client)
 {
-	//struct bc7d *charger = i2c_get_clientdata(client);
+	struct bc7d_chip *bq = i2c_get_clientdata(client);
 
-	//if (charger->poll_interval)
-	//	cancel_delayed_work_sync(&charger->poll);//取消定时器
+	power_supply_unregister(bq->ps_charger);
+
+	if (!IS_ERR_OR_NULL(bq->usb_phy))
+		usb_unregister_notifier(bq->usb_phy, &bq->usb_nb);
+
+	/* reset all registers to default values */
+	bc7d_chip_reset(bq);
 
 	printk("[OBEI][bc7d]bc7d charger remove.\n");
 	return 0;
 }
 
 //--------------------------------------------BC7D-------------------------------------------
+
+
 static struct of_device_id    bc7d_charger_match_table[] = {
 	{.compatible = SY_BC7D,},
 	{},
@@ -856,6 +1007,7 @@ static struct i2c_driver   bc7d_charger_driver = {
 	.driver		= {
 		.name	= SY_BC7D,
 		.of_match_table = bc7d_charger_match_table,
+
 	},
 
 	.id_table	= bc7d_charger_id,
@@ -864,6 +1016,8 @@ static struct i2c_driver   bc7d_charger_driver = {
 	.remove = bc7d_charger_remove,
 	//.shutdown   = bc7d_charger_shutdown,
 };
+
+
 
 static struct i2c_board_info __initdata   i2c_bc7d_charger[] = {
 	{

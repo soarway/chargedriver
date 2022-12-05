@@ -898,12 +898,12 @@
         status = "ok";
 
         interrupt-parent = <&tlmm>;
-        ba41,irq_pin = <&tlmm 59 0x00>;
+        ba41,irq_pin = <&tlmm 58 0x00>;
 
-        irq-gpios = <&tlmm 59 0x00>; 
+        irq-gpios = <&tlmm 58 0x00>; 
         irq-flags = <2>;
 
-        interrupts = <0 59 8>;//uu?
+        interrupts = <0 58 8>;//uu?
 	    interrupt-names = "ba41a_irq";        
       	pinctrl-names = "qupv3_se1_ba41a_int_active", "qupv3_se1_ba41a_int_sleep";
 	    pinctrl-0 = <&qupv3_se1_ba41a_int_active &qupv3_se1_ba41a_int_sleep>;
@@ -999,15 +999,14 @@
 ////////////////////////////////////////
     ba70@7d {
         compatible = "silergy,ba70x";
-//		compatible = "silergy,ba70";
 		reg = <0x7d>;
         status = "ok";
   
         interrupt-parent = <&tlmm>;
-        ba70,irq_pin = <&tlmm 59 0x00>;
-        irq-gpios = <&tlmm 59 0x00>; 
+        ba70,irq_pin = <&tlmm 57 0x00>;
+        irq-gpios = <&tlmm 57 0x00>; 
         irq-flags = <2>;
-        interrupts = <0 59 8>;//uu?
+        interrupts = <0 57 8>;//uu?
 	    interrupt-names = "ba70_irq";        
       	pinctrl-names = "qupv3_se1_ba70_int_active", "qupv3_se1_ba70_int_sleep";
 	    pinctrl-0 = <&qupv3_se1_ba70_int_active &qupv3_se1_ba70_int_sleep>;
