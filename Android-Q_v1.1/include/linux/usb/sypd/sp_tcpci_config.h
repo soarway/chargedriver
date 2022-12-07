@@ -16,6 +16,11 @@
 #define __LINUX_TCPC_CONFIG_H
 
 /* default config */
+//启用3.0协议
+#ifndef CONFIG_USB_PD_REV30
+#define CONFIG_USB_PD_REV30 1
+#endif
+
 
 #define CONFIG_PD_DBG_INFO
 #ifndef CONFIG_USB_POWER_DELIVERY

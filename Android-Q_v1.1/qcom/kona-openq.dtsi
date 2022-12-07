@@ -1004,7 +1004,7 @@
   
         interrupt-parent = <&tlmm>;
         ba70,irq_pin = <&tlmm 57 0x00>;
-        irq-gpios = <&tlmm 57 0x00>; 
+        ba70irq-gpios = <&tlmm 57 0x00>; 
         irq-flags = <2>;
         interrupts = <0 57 8>;//uu?
 	    interrupt-names = "ba70_irq";        

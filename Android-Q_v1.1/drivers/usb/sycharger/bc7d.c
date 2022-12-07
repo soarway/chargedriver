@@ -1,4 +1,13 @@
-
+/**
+ * @file bc7d.c
+ * @author your name (you@domain.com)
+ * @brief 
+ * @version 0.1
+ * @date 2022-12-06
+ * 
+ * @copyright Copyright (c) 2022
+ * 
+ */
 #include <linux/gpio.h>
 #include <linux/i2c.h>
 #include <linux/init.h>
@@ -18,9 +27,25 @@
 #include <linux/acpi.h>
 #include <linux/of.h>
 
+
 #include "symaster.h"
 #include "bc7d.h"
-
+/*
+000 – Not charging
+001 – Trickle charging
+010 – Pre-charging
+011 – Fast charging (CC mode)
+100 – Fast charging (CV mode)
+101 – Charge Termination
+*/
+enum bc7d_status {
+	STATUS_NOT_CHARGING,
+	STATUS_TRICKLE_CHARGING,
+	STATUS_PRE_CHARGING,
+	STATUS_FAST_CHARGING_CC,
+	STATUS_FAST_CHARGING_CV,
+	STATUS_TERMINATION_DONE,
+};
 
 enum BC7D_fields {
 	F_DEVICE_ID,				     		/* Reg00 */
@@ -637,15 +662,28 @@ static const struct reg_field BC7D_reg_fields[] = {
 	[F_DM_IN0] = REG_FIELD(0x99, 0, 0)
 
 };
-
 struct bc7d_state {
 	u8 online;
 	u8 chrg_status;
-
+	u8 vsys_status;
+	u8 boost_fault;
+	u8 bat_fault;
 };
-
+/* initial field values, converted to register values */
+struct bc7d_init_data {
+	u8 ichg;	/* charge current		*/
+	u8 vreg;	/* regulation voltage		*/
+	u8 iterm;	/* termination current		*/
+	u8 iprechg;	/* precharge current		*/
+	u8 sysvmin;	/* minimum system voltage limit */
+	u8 boostv;	/* boost regulation voltage	*/
+	u8 boosti;	/* boost current limit		*/
+	u8 boostf;	/* boost frequency		*/
+	//u8 ilim_en;	/* enable ILIM pin		*/
+	u8 treg;	/* thermal regulation threshold */
+};
 struct bc7d_chip {
-	struct power_supply			*charger;
+	struct power_supply *ps_charger;
 	struct power_supply_desc	 charger_desc;
 	struct i2c_client			*client;
 	struct device               *dev;
@@ -655,10 +693,18 @@ struct bc7d_chip {
 	u32						poll_interval;
 	bool					charging;
 	int                     chip_id;
-	struct notifier_block   bc7d_nb;
+
 	struct symaster_device  *sydev;
-	struct regmap *rmap;
+	struct regmap 			*rmap;
 	struct regmap_field *rmap_fields[F_MAX_FIELDS];
+	struct bc7d_init_data init_data;
+	struct bc7d_state state;
+
+	struct notifier_block   bc7d_nb;//3个子模块之间的事件通信
+	struct usb_phy *usb_phy;
+	struct notifier_block usb_nb;//USB的事件通信
+	struct work_struct usb_work;
+	unsigned long usb_event;
 };
 
 //消息处理函数
@@ -792,23 +838,23 @@ static int bc7d_get_chip_state(struct bc7d_chip *bq, struct bc7d_state *state)
 		u8 *data;
 	} state_fields[] = {
 		{F_CHG_STAT,	&state->chrg_status},
-		{F_PG_STAT,		&state->online},
-		{F_VSYS_STAT,	&state->vsys_status},
+		{F_VBUS_STAT,		&state->online},//这个没有
+		{F_VSYSMIN_REG_STAT,	&state->vsys_status},
 		
-		{F_BOOST_FAULT, &state->boost_fault},
-		{F_BAT_FAULT,	&state->bat_fault},
-		{F_CHG_FAULT,	&state->chrg_fault}
+		{F_BOOST_OK_STAT, &state->boost_fault},
+		{F_BATFET_STAT,	&state->bat_fault}//,
+		//{F_CHG_FAULT,	&state->chrg_fault}//这个没有
 	};
 
 	for (i = 0; i < ARRAY_SIZE(state_fields); i++) {
-		ret = bq25890_field_read(bq, state_fields[i].id);
+		ret = bc7d_field_read(bq, state_fields[i].id);
 		if (ret < 0)
 			return ret;
 
 		*state_fields[i].data = ret;
 	}
 
-	dev_dbg(bq->dev, "S:CHG/PG/VSYS=%d/%d/%d, F:CHG/BOOST/BAT=%d/%d/%d\n", state->chrg_status, state->online, state->vsys_status, state->chrg_fault, state->boost_fault, state->bat_fault);
+	//dev_dbg(bq->dev, "S:CHG/PG/VSYS=%d/%d/%d, F:CHG/BOOST/BAT=%d/%d/%d\n", state->chrg_status, state->online, state->vsys_status, state->chrg_fault, state->boost_fault, state->bat_fault);
 
 	return 0;
 }
@@ -838,7 +884,10 @@ static int bc7d_hw_init(struct bc7d_chip *bq)
 
 	ret = bc7d_chip_reset(bq);
 	if (ret < 0)
+	{
+		pr_info("[OBEI][bc7d]chip reset fail!");
 		return ret;
+	}
 
 	/* 
 	disable watchdog 
@@ -854,29 +903,238 @@ static int bc7d_hw_init(struct bc7d_chip *bq)
 	*/
 	ret = bc7d_field_write(bq, F_WD_TIMEOUT, 0);
 	if (ret < 0)
+	{
+		pr_info("[OBEI][bc7d]field write Watchdog fail!");
 		return ret;
+	}
+		
 
 	/* initialize currents/voltages and other parameters */
 	for (i = 0; i < ARRAY_SIZE(init_data); i++) {
 		ret = bc7d_field_write(bq, init_data[i].id, init_data[i].value);
 		if (ret < 0)
+		{
+			pr_info("[OBEI][bc7d]field write init data fail!");
 			return ret;
+		}	
 	}
 
 	/* Configure ADC for continuous conversions. This does not enable it. */
 	ret = bc7d_field_write(bq, F_ADC_RATE, 0);//貌似要写0值才对
 	if (ret < 0)
+	{
+		pr_info("[OBEI][bc7d]field write init ADC rate fail!");
 		return ret;
+	}	
 
-	ret = bq25890_get_chip_state(bq, &state);
+	ret = bc7d_get_chip_state(bq, &state);
 	if (ret < 0)
+	{
+		pr_info("[OBEI][bc7d]get chip state fail!");
 		return ret;
+	}	
 
 	mutex_lock(&bq->lock);
 	bq->state = state;
 	mutex_unlock(&bq->lock);
 
+	pr_info("[OBEI][bc7d]hw init success!");
 	return 0;
+}
+
+static int bc7d_irq_probe(struct bc7d_chip *bq)
+{
+	struct gpio_desc *irq;
+
+	irq = devm_gpiod_get(bq->dev, BC7D_IRQ_PIN, GPIOD_IN);
+	//对应设备树中的：ba70irq-gpios = <&tlmm 57 0x00>; 
+
+	if (IS_ERR(irq)) {
+		pr_err("[OBEI][bc7d]Could not probe irq pin.\n");
+		return PTR_ERR(irq);
+	}
+
+	return gpiod_to_irq(irq);
+}
+
+
+static void bc7d_usb_work(struct work_struct *data)
+{
+	int ret;
+	struct bc7d_chip *bq = container_of(data, struct bc7d_chip, usb_work);
+
+	switch (bq->usb_event) {
+	case USB_EVENT_ID:
+		/* Enable boost mode */
+		pr_err("[OBEI][bc7d]USB EVENT ID\n");
+		break;
+
+	case USB_EVENT_NONE:
+		/* Disable boost mode */
+		pr_err("[OBEI][bc7d]USB EVENT NONE\n");
+		power_supply_changed(bq->ps_charger);
+		break;
+	}
+
+	return;
+
+error:
+	pr_err("[OBEI][bc7d]Error switching to boost/charger mode.\n");
+}
+
+static int bc7d_usb_notifier(struct notifier_block *nb, unsigned long val, void *priv)
+{
+	struct bc7d_chip *bq = container_of(nb, struct bc7d_chip, usb_nb);
+
+	bq->usb_event = val;
+	queue_work(system_power_efficient_wq, &bq->usb_work);
+
+	return NOTIFY_OK;
+}
+
+static bool bc7d_state_changed(struct bc7d_chip *bq, struct bc7d_state *new_state)
+{
+	struct bc7d_state old_state;
+
+	mutex_lock(&bq->lock);
+	old_state = bq->state;
+	mutex_unlock(&bq->lock);
+
+	return (old_state.chrg_status != new_state->chrg_status ||
+		//old_state.chrg_fault != new_state->chrg_fault	||
+		old_state.online != new_state->online		||
+		old_state.bat_fault != new_state->bat_fault	||
+		old_state.boost_fault != new_state->boost_fault ||
+		old_state.vsys_status != new_state->vsys_status);
+}
+
+static void bc7d_handle_state_change(struct bc7d_chip *bq, struct bc7d_state *new_state)
+{
+	int ret;
+	struct bc7d_state old_state;
+
+	mutex_lock(&bq->lock);
+	old_state = bq->state;
+	mutex_unlock(&bq->lock);
+
+	if (!new_state->online) {			     /* power removed */
+		/* disable ADC */
+		ret = bc7d_field_write(bq, F_ADC_EN, 0);
+		if (ret < 0)
+			goto error;
+	} else if (!old_state.online) {			    /* power inserted */
+		/* enable ADC, to have control of charge current/voltage */
+		ret = bc7d_field_write(bq, F_ADC_EN, 1);
+		if (ret < 0)
+			goto error;
+	}
+
+	return;
+
+error:
+	dev_err(bq->dev, "Error communicating with the chip.\n");
+}
+static irqreturn_t bc7d_irq_handler_thread(int irq, void *private)
+{
+	struct bc7d_chip *bq = private;
+	int ret;
+	struct bc7d_state state;
+
+	ret = bc7d_get_chip_state(bq, &state);
+	if (ret < 0)
+		goto handled;
+
+	if (!bc7d_state_changed(bq, &state))
+		goto handled;
+
+	bc7d_handle_state_change(bq, &state);
+
+	mutex_lock(&bq->lock);
+	bq->state = state;
+	mutex_unlock(&bq->lock);
+
+	power_supply_changed(bq->ps_charger);
+
+handled:
+	return IRQ_HANDLED;
+}
+
+
+static int bc7d_power_supply_get_property(struct power_supply *psy, enum power_supply_property psp, union power_supply_propval *val)
+{
+	int ret;
+	struct bc7d_chip *bq = power_supply_get_drvdata(psy);
+	struct bc7d_state state;
+
+	mutex_lock(&bq->lock);
+	state = bq->state;
+	mutex_unlock(&bq->lock);
+
+	switch (psp) {
+	case POWER_SUPPLY_PROP_STATUS:
+		if (!state.online)
+			val->intval = POWER_SUPPLY_STATUS_DISCHARGING;
+		else if (state.chrg_status == STATUS_NOT_CHARGING)
+			val->intval = POWER_SUPPLY_STATUS_NOT_CHARGING;
+		else if (state.chrg_status == STATUS_PRE_CHARGING || state.chrg_status == STATUS_FAST_CHARGING_CC || state.chrg_status == STATUS_FAST_CHARGING_CV)
+			val->intval = POWER_SUPPLY_STATUS_CHARGING;
+		else if (state.chrg_status == STATUS_TERMINATION_DONE)
+			val->intval = POWER_SUPPLY_STATUS_FULL;
+		else
+			val->intval = POWER_SUPPLY_STATUS_UNKNOWN;
+
+		break;
+
+	case POWER_SUPPLY_PROP_MANUFACTURER:
+		val->strval = BC7D_MANUFACTURER;
+		break;
+
+	case POWER_SUPPLY_PROP_ONLINE:
+		val->intval = state.online;
+		break;
+
+	default:
+		return -EINVAL;
+	}
+
+	return 0;
+}
+
+
+static enum power_supply_property  bc7d_power_supply_props[] = {
+	POWER_SUPPLY_PROP_MANUFACTURER,
+	POWER_SUPPLY_PROP_STATUS,
+	POWER_SUPPLY_PROP_ONLINE,
+	//POWER_SUPPLY_PROP_HEALTH,
+	//POWER_SUPPLY_PROP_CONSTANT_CHARGE_CURRENT,
+	//POWER_SUPPLY_PROP_CONSTANT_CHARGE_CURRENT_MAX,
+	//POWER_SUPPLY_PROP_CONSTANT_CHARGE_VOLTAGE,
+	//POWER_SUPPLY_PROP_CONSTANT_CHARGE_VOLTAGE_MAX,
+	//POWER_SUPPLY_PROP_CHARGE_TERM_CURRENT,
+};
+
+static char *bc7d_charger_supplied_to[] = {
+	"main-battery",
+};
+
+static const struct power_supply_desc bc7d_power_supply_desc = {
+	.name = "bc7d-charger",
+	.type = POWER_SUPPLY_TYPE_USB,
+	.properties = bc7d_power_supply_props,
+	.num_properties = ARRAY_SIZE(bc7d_power_supply_props),
+	.get_property = bc7d_power_supply_get_property,
+};
+
+static int bc7d_power_supply_init(struct bc7d_chip *bq)
+{
+	struct power_supply_config psy_cfg = { .drv_data = bq, };
+
+	psy_cfg.supplied_to = bc7d_charger_supplied_to;
+	psy_cfg.num_supplicants = ARRAY_SIZE(bc7d_charger_supplied_to);
+
+	bq->ps_charger = power_supply_register(bq->dev, &bc7d_power_supply_desc, &psy_cfg);
+
+	return PTR_ERR_OR_ZERO(bq->ps_charger);
 }
 
 static int bc7d_charger_probe(struct i2c_client *client, const struct i2c_device_id *id)
@@ -885,16 +1143,16 @@ static int bc7d_charger_probe(struct i2c_client *client, const struct i2c_device
 	struct i2c_adapter *adapter = to_i2c_adapter(client->dev.parent);
 	struct device *dev = &client->dev;
 	struct bc7d_chip *charger;
-	
+	struct symaster_device* sydev;
 	//struct power_supply_desc *supply_desc;
-	//struct symaster_device* sydev;
+
 	//struct power_supply_config psy_cfg = {};
 	char *name;
 
 	printk("[OBEI][bc7d]call charger probe.\n");
 
 	if (!i2c_check_functionality(adapter, I2C_FUNC_SMBUS_BYTE_DATA)) {
-		pr_err(dev, "[OBEI][bc7d]No support for SMBUS_BYTE_DATA\n");
+		pr_err("[OBEI][bc7d]No support for SMBUS_BYTE_DATA\n");
 		return -ENODEV;
 	}
 
@@ -945,9 +1203,9 @@ static int bc7d_charger_probe(struct i2c_client *client, const struct i2c_device
 
 
 	//硬件初始化
-	ret = bq25890_hw_init(bq);
+	ret = bc7d_hw_init(charger);
 	if (ret < 0) {
-		dev_err(dev, "Cannot initialize the chip.\n");
+		dev_err(dev, "[OBEI][bc7d]Cannot initialize the chip.\n");
 		return ret;
 	}
 
@@ -968,7 +1226,45 @@ static int bc7d_charger_probe(struct i2c_client *client, const struct i2c_device
 	}
 
 
+	if (client->irq <= 0)
+	{
+		pr_info("[OBEI][bc7d]client -> irq =%d\n", client->irq);
+		client->irq = bc7d_irq_probe(charger);
+		
+	}	
+
+	if (client->irq < 0) {
+		pr_err("[OBEI][bc7d]No irq resource found.\n");
+		return client->irq;
+	}
+	pr_info("[OBEI][bc7d]irq resource found = %d\n", client->irq);
+
+
+	/* OTG reporting */
+	charger->usb_phy = devm_usb_get_phy(dev, USB_PHY_TYPE_USB2);
+	if (!IS_ERR_OR_NULL(charger->usb_phy)) {
+		INIT_WORK(&charger->usb_work, bc7d_usb_work);
+		charger->usb_nb.notifier_call = bc7d_usb_notifier;
+		usb_register_notifier(charger->usb_phy, &charger->usb_nb);
+	}
+
+	ret = devm_request_threaded_irq(dev, client->irq, NULL, bc7d_irq_handler_thread, 
+				IRQF_TRIGGER_FALLING | IRQF_ONESHOT, BC7D_IRQ_PIN, charger);
+	if (ret)
+		goto irq_fail;
+
+	ret = bc7d_power_supply_init(charger);
+	if (ret < 0) {
+		pr_err("[OBEI][bc7d]Failed to register power supply\n");
+		goto irq_fail;
+	}
+
 	return 0;
+irq_fail:
+	if (!IS_ERR_OR_NULL(charger->usb_phy))
+		usb_unregister_notifier(charger->usb_phy, &charger->usb_nb);
+
+	return ret;
 }
 
 static int bc7d_charger_remove(struct i2c_client *client)

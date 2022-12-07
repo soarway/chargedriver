@@ -19,11 +19,8 @@
 #include <linux/usb/sypd/sp_tcpci_timer.h>
 #include <linux/usb/sypd/sp_tcpci_event.h>
 #include <linux/usb/sypd/sp_tcpm.h>
+#include <linux/usb/sypd/sp_tcpci_config.h>
 
-//启用3.0协议
-#ifndef CONFIG_USB_PD_REV30
-#define CONFIG_USB_PD_REV30 1
-#endif
 
 /*---------------------------------------------------------------------------*/
 

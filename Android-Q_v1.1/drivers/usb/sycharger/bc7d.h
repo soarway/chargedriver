@@ -17,9 +17,9 @@ enum bc7d_vbus_type {
 };
 
 
-struct bc7d;
+struct bc7d_chip;
 
-bool check_DCP_condition (struct bc7d *bq);
+bool check_DCP_condition (struct bc7d_chip *bq);
 
 #endif
 

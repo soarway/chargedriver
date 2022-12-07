@@ -524,7 +524,7 @@ static int __init tcpc_class_init(void)
 	//tcpc_class->suspend = NULL;
 	//tcpc_class->resume = NULL;
 
-	pr_info("[OBEI]TCPC class init OK\n");
+	pr_info("[OBEI][PD]TCPC class init OK\n");
 	return 0;
 }
 

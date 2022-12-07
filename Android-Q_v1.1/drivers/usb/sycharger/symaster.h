@@ -12,6 +12,8 @@
 
 
 #define  BC7D_CHIP_ID   0x66
+#define  BC7D_IRQ_PIN   "ba70irq"
+#define  BC7D_MANUFACTURER		"silergy"
 
 #define  SY_MASTER  "silergy,masterba76"
 #define  SY_BC7D    "silergy,ba70x"
