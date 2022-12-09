@@ -55,7 +55,7 @@
 #define TCPC_V10_REG_TX_DATA				(0x54)/* through 0x6f */
 
 /*
- * TCPC_V10_REG_ALERT				(0x10)
+ * TCPC_V10_REG_ALERT			(0x10)
  * TCPC_V10_REG_ALERT_MASK		(0x12)
  */
 #define TCPC_V10_REG_VBUS_SINK_DISCONNECT		(1<<11)

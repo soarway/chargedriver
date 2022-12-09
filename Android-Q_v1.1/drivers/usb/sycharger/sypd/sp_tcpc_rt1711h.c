@@ -205,6 +205,7 @@ static int rt1711_read_device(void *client, u32 reg, int len, void *dst)
 	}
 	return ret;
 }
+
 //基础函数：写寄存器信息
 static int rt1711_write_device(void *client, u32 reg, int len, const void *src)
 {
@@ -231,6 +232,7 @@ static int rt1711_write_device(void *client, u32 reg, int len, const void *src)
 	}
 	return ret;
 }
+
 //读 长度1
 static int rt1711_reg_read(struct i2c_client *i2c, u8 reg)
 {
@@ -249,6 +251,7 @@ static int rt1711_reg_read(struct i2c_client *i2c, u8 reg)
 	}
 	return val;
 }
+
 //写 长度1
 static int rt1711_reg_write(struct i2c_client *i2c, u8 reg, const u8 data)
 {
@@ -264,6 +267,7 @@ static int rt1711_reg_write(struct i2c_client *i2c, u8 reg, const u8 data)
 		dev_err(chip->dev, "[OBEI]rt1711 reg write fail\n");
 	return ret;
 }
+
 //读寄存器 长度len
 static int rt1711_block_read(struct i2c_client *i2c, u8 reg, int len, void *dst)
 {
@@ -278,6 +282,7 @@ static int rt1711_block_read(struct i2c_client *i2c, u8 reg, int len, void *dst)
 		dev_err(chip->dev, "[OBEI]rt1711 block read fail\n");
 	return ret;
 }
+
 //写寄存器，长度len
 static int rt1711_block_write(struct i2c_client *i2c,u8 reg, int len, const void *src)
 {
@@ -292,6 +297,7 @@ static int rt1711_block_write(struct i2c_client *i2c,u8 reg, int len, const void
 		dev_err(chip->dev, "[OBEI]rt1711 block write fail\n");
 	return ret;
 }
+
 //写寄存器，长度2
 static int32_t rt1711_write_word(struct i2c_client *client,	uint8_t reg_addr, uint16_t data)
 {
@@ -310,28 +316,28 @@ static int32_t rt1711_read_word(struct i2c_client *client,uint8_t reg_addr, uint
 	ret = rt1711_block_read(client, reg_addr, 2, (uint8_t *)data);//调用封装的基础函数
 	return ret;
 }
-
+//写寄存器 长度1
 static inline int rt1711_i2c_write8(struct tcpc_device *tcpc, u8 reg, const u8 data)
 {
 	struct rt1711_chip *chip = tcpc_get_dev_data(tcpc);
 
 	return rt1711_reg_write(chip->client, reg, data);//调用封装的基础函数
 }
-
+//写寄存器 长度2
 static inline int rt1711_i2c_write16(struct tcpc_device *tcpc, u8 reg, const u16 data)
 {
 	struct rt1711_chip *chip = tcpc_get_dev_data(tcpc);
 
 	return rt1711_write_word(chip->client, reg, data);//调用封装的基础函数
 }
-
+//读寄存器 长度1
 static inline int rt1711_i2c_read8(struct tcpc_device *tcpc, u8 reg)
 {
 	struct rt1711_chip *chip = tcpc_get_dev_data(tcpc);
 
 	return rt1711_reg_read(chip->client, reg);//调用封装的基础函数
 }
-
+//读寄存器 长度1
 static inline int rt1711_i2c_read16(struct tcpc_device *tcpc, u8 reg)
 {
 	struct rt1711_chip *chip = tcpc_get_dev_data(tcpc);
@@ -397,7 +403,7 @@ static int rt1711_regmap_deinit(struct rt1711_chip *chip)
 #endif
 	return 0;
 }
-//软件设置设备重启
+//软件设置重置寄存器
 static inline int rt1711_software_reset(struct tcpc_device *tcpc)
 {
 	int ret = rt1711_i2c_write8(tcpc, RT1711H_REG_SWRESET, 1);
@@ -408,12 +414,12 @@ static inline int rt1711_software_reset(struct tcpc_device *tcpc)
 	usleep_range(1000, 2000);
 	return 0;
 }
-//往寄存器0x23写命令
+//往寄存器0x23写命令, 就被调用过一次，写10011001, Start DRP Toggling
 static inline int rt1711_command(struct tcpc_device *tcpc, uint8_t cmd)
 {
 	return rt1711_i2c_write8(tcpc, TCPC_V10_REG_COMMAND, cmd);
 }
-//修改alert的mask值
+//初始化 alert 的mask值
 static int rt1711_init_alert_mask(struct tcpc_device *tcpc)
 {
 	uint16_t mask;
@@ -534,7 +540,7 @@ static irqreturn_t rt1711_intr_handler(int irq, void *data)
 #ifdef DEBUG_GPIO
 	gpio_set_value(DEBUG_GPIO, 0);
 #endif
-    kthread_queue_work(&chip->irq_worker, &chip->irq_work);//uu+
+    kthread_queue_work(&chip->irq_worker, &chip->irq_work);//rt1711_irq_work_handler
 	return IRQ_HANDLED;
 }
 //初始化alert
@@ -1127,7 +1133,7 @@ static int rt1711_transmit(struct tcpc_device *tcpc,enum tcpm_transmit_type type
 	rv = rt1711_i2c_write8(tcpc, TCPC_V10_REG_TRANSMIT,	TCPC_V10_REG_TRANSMIT_SET(type));
 	return rv;
 }
-
+//设置测试模式
 static int rt1711_set_bist_test_mode(struct tcpc_device *tcpc, bool en)
 {
 	int data;
@@ -1144,18 +1150,18 @@ static int rt1711_set_bist_test_mode(struct tcpc_device *tcpc, bool en)
 #endif /* CONFIG_USB_POWER_DELIVERY */
 
 static struct tcpc_ops rt1711_tcpc_ops = {
-	.init = rt1711_tcpc_init,
+	.init               = rt1711_tcpc_init,
 	.alert_status_clear = rt1711_alert_status_clear,
 	.fault_status_clear = rt1711_fault_status_clear,
-	.get_alert_status = rt1711_get_alert_status,
-	.get_power_status = rt1711_get_power_status,
-	.get_fault_status = rt1711_get_fault_status,
-	.get_cc = rt1711_get_cc,
-	.set_cc = rt1711_set_cc,
-	.set_polarity = rt1711_set_polarity,
-	.set_low_rp_duty = rt1711_set_low_rp_duty,
-	.set_vconn = rt1711_set_vconn,
-	.deinit = rt1711_tcpc_deinit,
+	.get_alert_status   = rt1711_get_alert_status,
+	.get_power_status   = rt1711_get_power_status,
+	.get_fault_status   = rt1711_get_fault_status,
+	.get_cc             = rt1711_get_cc,
+	.set_cc             = rt1711_set_cc,
+	.set_polarity       = rt1711_set_polarity,
+	.set_low_rp_duty    = rt1711_set_low_rp_duty,
+	.set_vconn          = rt1711_set_vconn,
+	.deinit             = rt1711_tcpc_deinit,
 
 #ifdef CONFIG_TCPC_LOW_POWER_MODE
 	.is_low_power_mode = rt1711_is_low_power_mode,
@@ -1172,10 +1178,10 @@ static struct tcpc_ops rt1711_tcpc_ops = {
 
 #ifdef CONFIG_USB_POWER_DELIVERY
 	.set_msg_header = rt1711_set_msg_header,
-	.set_rx_enable = rt1711_set_rx_enable,
-	.get_message = rt1711_get_message,
-	.transmit = rt1711_transmit,
-	.set_bist_test_mode = rt1711_set_bist_test_mode,
+	.set_rx_enable  = rt1711_set_rx_enable,
+	.get_message    = rt1711_get_message,
+	.transmit       = rt1711_transmit,
+	.set_bist_test_mode    = rt1711_set_bist_test_mode,
 	.set_bist_carrier_mode = rt1711_set_bist_carrier_mode,
 #endif	/* CONFIG_USB_POWER_DELIVERY */
 
@@ -1197,50 +1203,7 @@ static int rt_parse_device_tree(struct rt1711_chip *chip, struct device *dev)
 	return 0;
 }
 
-/*
- * In some platform pr_info may spend too much time on printing debug message.
- * So we use this function to test the printk performance.
- * If your platform cannot not pass this check function, please config
- * PD_DBG_INFO, this will provide the threaded debug message for you.
- */
-//检测printk函数的性能
-#if TCPC_ENABLE_ANYMSG
-static void check_printk_performance(void)
-{
-	int i;
-	u64 t1, t2;
-	u32 nsrem;
 
-#ifdef CONFIG_PD_DBG_INFO
-	for (i = 0; i < 10; i++) {
-		t1 = local_clock();
-		pd_dbg_info("%d\n", i);
-		t2 = local_clock();
-		t2 -= t1;
-		nsrem = do_div(t2, 1000000000);
-		pd_dbg_info("[OBEI]pd_dbg_info : t2-t1 = %lu\n",(unsigned long)nsrem / 1000);
-	}
-	for (i = 0; i < 10; i++) {
-		t1 = local_clock();
-		pr_info("[OBEI]%d\n", i);
-		t2 = local_clock();
-		t2 -= t1;
-		nsrem = do_div(t2, 1000000000);
-		pr_info("[OBEI]pr_info : t2-t1 = %lu\n",(unsigned long)nsrem / 1000);
-	}
-#else
-	for (i = 0; i < 10; i++) {
-		t1 = local_clock();
-		pr_info("[OBEI]%d\n", i);
-		t2 = local_clock();
-		t2 -= t1;
-		nsrem = do_div(t2, 1000000000);
-		pr_info("[OBEI]t2-t1 = %lu\n", (unsigned long)nsrem /  1000);
-		PD_BUG_ON(nsrem > 100*1000);
-	}
-#endif /* CONFIG_PD_DBG_INFO */
-}
-#endif /* TCPC_ENABLE_ANYMSG */
 
 //从设备树中读取数据，并注册设备
 static int rt1711_tcpcdev_init(struct rt1711_chip *chip, struct device *dev)
@@ -1390,9 +1353,6 @@ static int rt1711_i2c_probe(struct i2c_client *client,	const struct i2c_device_i
 	if (chip_id < 0)
 		return chip_id;
 
-#if TCPC_ENABLE_ANYMSG
-	check_printk_performance();
-#endif /* TCPC_ENABLE_ANYMSG */
 
 	chip = devm_kzalloc(&client->dev, sizeof(*chip), GFP_KERNEL);
 	if (!chip)
