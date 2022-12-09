@@ -284,8 +284,7 @@ static const uint32_t tcpc_timer_timeout[PD_TIMER_NR] = {
 typedef enum hrtimer_restart (*tcpc_hrtimer_call)(struct hrtimer *timer);
 
 #ifdef CONFIG_USB_POWER_DELIVERY
-static inline void on_pe_timer_timeout(
-		struct tcpc_device *tcpc_dev, uint32_t timer_id)
+static inline void on_pe_timer_timeout(struct tcpc_device *tcpc_dev, uint32_t timer_id)
 {
 	struct pd_event pd_event = {0};
 
@@ -314,8 +313,7 @@ static inline void on_pe_timer_timeout(
 			tcpci_get_power_status(tcpc_dev, &power_status);
 			tcpci_vbus_level_init(tcpc_dev, power_status);
 
-			TCPC_INFO("VSafe0V TOUT: now:%d, org:%d\r\n",
-				tcpc_dev->vbus_level, vbus_level);
+			TCPC_INFO("VSafe0V TOUT: now:%d, org:%d\r\n", tcpc_dev->vbus_level, vbus_level);
 
 			if (!tcpci_check_vbus_valid(tcpc_dev))
 				pd_put_vbus_safe0v_event(tcpc_dev);

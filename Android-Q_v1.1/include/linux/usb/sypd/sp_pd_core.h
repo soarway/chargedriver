@@ -59,7 +59,7 @@
 
 #define PD_SOP_NR	3
 
-/* Default retry count for transmitting */
+/* 缺省的重试次数 Default retry count for transmitting */
 #define PD_RETRY_COUNT 3
 
 #if PD_RETRY_COUNT > 3
@@ -76,27 +76,24 @@
  * 4. The Variable Supply (non battery) Objects,
  *    if present, shall be sent in Minimum Voltage order; lowest to highest.
  */
-#define PDO_TYPE_FIXED    (0 << 30)
-#define PDO_TYPE_BATTERY  (1 << 30)
-#define PDO_TYPE_VARIABLE (2 << 30)
-#define PDO_TYPE_APDO	(3 << 30)
-#define PDO_TYPE_MASK     (3 << 30)
+#define PDO_TYPE_FIXED    	(0 << 30)
+#define PDO_TYPE_BATTERY  	(1 << 30)
+#define PDO_TYPE_VARIABLE 	(2 << 30)
+#define PDO_TYPE_APDO		(3 << 30)
+#define PDO_TYPE_MASK     	(3 << 30)
 
-#define PDO_FIXED_DUAL_ROLE (1 << 29) /* Dual role device */
+#define PDO_FIXED_DUAL_ROLE (1 << 29) /* 双重角色设备 Dual role device */
 #define PDO_FIXED_SUSPEND   (1 << 28) /* USB Suspend supported (SRC)*/
 #define PDO_FIXED_HIGH_CAP	(1 << 28) /* Higher Capability (SNK )*/
 #define PDO_FIXED_EXTERNAL  (1 << 27) /* Externally powered */
 #define PDO_FIXED_COMM_CAP  (1 << 26) /* USB Communications Capable */
 #define PDO_FIXED_DATA_SWAP (1 << 25) /* Data role swap command supported */
 
-#define PDO_FIXED_PEAK_CURR(i) \
-	((i & 0x03) << 20) /* [21..20] Peak current */
-#define PDO_FIXED_VOLT(mv)  \
-	((((mv)/50) & 0x3fff) << 10) /* Voltage in 50mV units */
-#define PDO_FIXED_CURR(ma)  \
-	((((ma)/10) & 0x3fff) << 0)  /* Max current in 10mA units */
+#define PDO_FIXED_PEAK_CURR(i) 	((i & 0x03) << 20) /* [21..20] Peak current */
+#define PDO_FIXED_VOLT(mv)  	((((mv)/50) & 0x3fff) << 10) /* Voltage in 50mV units */
+#define PDO_FIXED_CURR(ma)  	((((ma)/10) & 0x3fff) << 0)  /* Max current in 10mA units */
 
-#define PDO_TYPE(raw)	(raw & PDO_TYPE_MASK)
+#define PDO_TYPE(raw)		(raw & PDO_TYPE_MASK)
 #define PDO_TYPE_VAL(raw)	(PDO_TYPE(raw) >> 30)
 
 #define PDO_FIXED_EXTRACT_VOLT_RAW(raw)	(((raw) >> 10) & 0x3ff)
@@ -113,7 +110,7 @@
 
 #define PDO_VAR_EXTRACT_MAX_VOLT_RAW(raw)	(((raw) >> 20) & 0x3ff)
 #define PDO_VAR_EXTRACT_MIN_VOLT_RAW(raw)	(((raw) >> 10) & 0x3ff)
-#define PDO_VAR_EXTRACT_CURR_RAW(raw)		(((raw) >> 0) & 0x3ff)
+#define PDO_VAR_EXTRACT_CURR_RAW(raw)		(((raw) >> 0)  & 0x3ff)
 
 #define PDO_VAR_EXTRACT_MAX_VOLT(raw)	(PDO_VAR_EXTRACT_MAX_VOLT_RAW(raw) * 50)
 #define PDO_VAR_EXTRACT_MIN_VOLT(raw)	(PDO_VAR_EXTRACT_MIN_VOLT_RAW(raw) * 50)
@@ -150,13 +147,13 @@
 #define APDO_TYPE_MASK		(3 << 28)
 #define APDO_TYPE_PPS		(0 << 28)
 
-#define APDO_TYPE(raw)	(raw & APDO_TYPE_MASK)
+#define APDO_TYPE(raw)		(raw & APDO_TYPE_MASK)
 #define APDO_TYPE_VAL(raw)	(APDO_TYPE(raw) >> 28)
 
 #define APDO_PPS_CURR_FOLDBACK	(1<<26)
-#define APDO_PPS_MAX_VOLT(mv) ((((mv) / 100) & 0xff) << 17)
-#define APDO_PPS_MIN_VOLT(mv) ((((mv) / 100) & 0xff) << 8)
-#define APDO_PPS_CURR(ma) ((((ma) / 50) & 0x7f) << 0)
+#define APDO_PPS_MAX_VOLT(mv) 	((((mv) / 100) & 0xff) << 17)
+#define APDO_PPS_MIN_VOLT(mv) 	((((mv) / 100) & 0xff) << 8)
+#define APDO_PPS_CURR(ma) 		((((ma) / 50) & 0x7f) << 0)
 
 #define APDO_PPS_EXTRACT_MAX_VOLT_RAW(raw)	(((raw) >> 17) & 0xff)
 #define APDO_PPS_EXTRACT_MIN_VOLT_RAW(raw)	(((raw) >> 8) & 0Xff)
@@ -232,11 +229,11 @@
 #define SVID_DISCOVERY_MAX 16
 
 /* Protocol revision */
-#define PD_REV10 0
-#define PD_REV20 1
+#define PD_REV10 	0
+#define PD_REV20 	1
 #define PD_REV30	2
 
-/* build message header */
+/* 构建消息头 build message header */
 
 #define PD_HEADER_SOP(msg_type, rev, prole, drole, id, cnt, ext) \
 		((msg_type) | (rev << 6) | \
@@ -249,12 +246,12 @@
 		 ((id) << 9) | ((cnt) << 12) | ((ext) << 15))
 
 #define PD_HEADER_EXT(header) (((header) >> 15) & 1)	/* pd30 */
-#define PD_HEADER_REV(header)  (((header) >> 6) & 3)
-#define PD_HEADER_CNT(header)  (((header) >> 12) & 7)
-#define PD_HEADER_TYPE(header) ((header) & 0x1F)
-#define PD_HEADER_ID(header)   (((header) >> 9) & 7)
-#define PD_HEADER_PR(header)	(((header) >> 8) & 1)
-#define PD_HEADER_DR(header)	(((header) >> 5) & 1)
+#define PD_HEADER_REV(header)  (((header) >> 6) & 3)    //获取REV
+#define PD_HEADER_CNT(header)  (((header) >> 12) & 7)   //获取CNT
+#define PD_HEADER_TYPE(header) ((header) & 0x1F)        //获取TYPE
+#define PD_HEADER_ID(header)   (((header) >> 9) & 7)    //获取ID
+#define PD_HEADER_PR(header)	(((header) >> 8) & 1)   //获取PR
+#define PD_HEADER_DR(header)	(((header) >> 5) & 1)   //获取DR
 
 #define PD_EXT_HEADER_PAYLOAD_INDEX	2
 
@@ -301,13 +298,9 @@ static inline uint8_t *pd_get_ext_msg_payload(struct pd_event *pd_event)
  * <4:0>    :: command
  */
 
-#define VDO(vid, type, custom)				\
-	(((vid) << 16) |				\
-	 ((type) << 15) |				\
-	 ((custom) & 0x7FFF))
+#define VDO(vid, type, custom)		(((vid) << 16) | ((type) << 15) | ((custom) & 0x7FFF))
 
-#define VDO_S(svid, cmd_type, cmd, obj)	\
-	VDO(svid, 1, VDO_CMDT(cmd_type) | VDO_OPOS(obj) | cmd)
+#define VDO_S(svid, cmd_type, cmd, obj)		VDO(svid, 1, VDO_CMDT(cmd_type) | VDO_OPOS(obj) | cmd)
 
 #define VDO_SVDM_TYPE     (1 << 15)
 #define VDO_SVDM_VERS(x)  (x << 13)
@@ -453,8 +446,7 @@ static inline uint8_t *pd_get_ext_msg_payload(struct pd_event *pd_event)
 #define CABLE_USBSS_U2_ONLY  0
 #define CABLE_USBSS_U31_GEN1 1
 #define CABLE_USBSS_U31_GEN2 2
-#define VDO_CABLE(hw, fw, cbl, gdr, lat, term, tx1d,\
-			tx2d, rx1d, rx2d, cur, vps, sopp, usbss) \
+#define VDO_CABLE(hw, fw, cbl, gdr, lat, term, tx1d, tx2d, rx1d, rx2d, cur, vps, sopp, usbss) \
 	(((hw) & 0x7) << 28 | ((fw) & 0x7) << 24 | ((cbl) & 0x3) << 18	\
 	 | (gdr) << 17 | ((lat) & 0x7) << 13 | ((term) & 0x3) << 11	\
 	 | (tx1d) << 10 | (tx2d) << 9 | (rx1d) << 8 | (rx2d) << 7	\
@@ -1017,8 +1009,7 @@ static inline int pd_is_source_support_apdo(struct pd_port *pd_port)
 #define PD_RX_CAP_PE_READY_UFP			(TCPC_RX_CAP_HARD_RESET|TCPC_RX_CAP_SOP)
 
 #ifdef CONFIG_PD_DISCOVER_CABLE_ID
-#define PD_RX_CAP_PE_READY_DFP	\
-	(TCPC_RX_CAP_HARD_RESET|TCPC_RX_CAP_SOP|TCPC_RX_CAP_SOP_PRIME)
+#define PD_RX_CAP_PE_READY_DFP		(TCPC_RX_CAP_HARD_RESET|TCPC_RX_CAP_SOP|TCPC_RX_CAP_SOP_PRIME)
 #else
 #define PD_RX_CAP_PE_READY_DFP	(TCPC_RX_CAP_HARD_RESET|TCPC_RX_CAP_SOP)
 #endif
@@ -1087,8 +1078,7 @@ extern void pd_notify_pe_direct_charge(struct pd_port *pd_port, bool en);
 extern void pd_notify_pe_over_recv_hreset(struct pd_port *pd_port);
 #endif	/* CONFIG_USB_PD_RECV_HRESET_COUNTER */
 
-extern void pd_notify_tcp_event_buf_reset(
-		struct pd_port *pd_port, uint8_t reason);
+extern void pd_notify_tcp_event_buf_reset(struct pd_port *pd_port, uint8_t reason);
 extern void pd_notify_tcp_event_1st_result(struct pd_port *pd_port, int ret);
 extern void pd_notify_tcp_event_2nd_result(struct pd_port *pd_port, int ret);
 extern void pd_notify_tcp_vdm_event_2nd_result(struct pd_port *pd_port, bool ack);
@@ -1266,9 +1256,7 @@ int pd_send_data_msg(struct pd_port *pd_port, uint8_t sop_type, uint8_t msg, uin
 
 #ifdef CONFIG_USB_PD_REV30
 int pd_send_ext_msg(struct pd_port *pd_port,uint8_t sop_type, uint8_t msg, bool request,uint8_t chunk_nr, uint8_t size, uint8_t *data);
-
 int pd_send_status(struct pd_port *pd_port);
-
 #endif	/* CONFIG_USB_PD_REV30 */
 
 #ifdef CONFIG_USB_PD_RESET_CABLE

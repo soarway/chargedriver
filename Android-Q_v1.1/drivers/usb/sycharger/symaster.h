@@ -12,7 +12,13 @@
 
 
 #define  BC7D_CHIP_ID   0x66
+
 #define  BC7D_IRQ_PIN   "ba70irq"
+#define  PD7E_IRQ_PIN   "ba41irq"
+#define  UF7F_IRQ_PIN   "ba52irq"
+
+
+
 #define  BC7D_MANUFACTURER		"silergy"
 
 #define  SY_MASTER  "silergy,masterba76"
@@ -57,7 +63,6 @@ extern struct symaster_device *sy_device_register(struct device *parent, const c
 extern int sy_register_notifier(struct symaster_device *sydev, struct notifier_block *nb);
 extern int sy_unregister_notifier(struct symaster_device *sydev, struct notifier_block *nb);
 
-extern struct bc7d_device *bc7d_device_register(struct device *parent, const char* name, void *drv_data);
 
 #endif
 

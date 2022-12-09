@@ -223,8 +223,7 @@ static inline bool pd_process_ctrl_msg(struct pd_port *pd_port, struct pd_event 
 	switch (pd_port->pe_state_curr) {
 	case PE_SRC_GET_SINK_CAP:
 	case PE_DR_SRC_GET_SOURCE_CAP:
-		if (pd_event->msg >= PD_CTRL_GET_SOURCE_CAP &&
-			pd_event->msg <= PD_CTRL_VCONN_SWAP) {
+		if (pd_event->msg >= PD_CTRL_GET_SOURCE_CAP && pd_event->msg <= PD_CTRL_VCONN_SWAP) {
 			PE_DBG("Port Partner Request First\r\n");
 			pd_port->pe_state_curr = PE_SRC_READY;
 			pd_disable_timer(pd_port, PD_TIMER_SENDER_RESPONSE);
@@ -299,8 +298,7 @@ static inline bool pd_process_ctrl_msg(struct pd_port *pd_port, struct pd_event 
  * [BLOCK] Porcess Data MSG
  */
 
-static inline bool pd_process_data_msg(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_data_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 
 {
 	bool ret = false;
@@ -338,8 +336,7 @@ static inline bool pd_process_data_msg(
 
 #ifdef CONFIG_USB_PD_REV30
 
-static inline bool pd_process_ext_msg(
-		struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_ext_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool ret = false;
 
@@ -352,8 +349,7 @@ static inline bool pd_process_ext_msg(
  * [BLOCK] Porcess DPM MSG
  */
 
-static inline bool pd_process_dpm_msg(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_dpm_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool ret = false;
 
@@ -376,8 +372,7 @@ static inline bool pd_process_dpm_msg(
  * [BLOCK] Porcess HW MSG
  */
 
-static inline bool pd_process_hw_msg_vbus_present(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_hw_msg_vbus_present(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	switch (pd_port->pe_state_curr) {
 	case PE_SRC_STARTUP:
@@ -392,8 +387,7 @@ static inline bool pd_process_hw_msg_vbus_present(
 	return false;
 }
 
-static inline bool pd_process_hw_msg_tx_failed(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_hw_msg_tx_failed(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	if (pd_port->pe_state_curr == PE_SRC_SEND_CAPABILITIES) {
 		if (pd_port->pd_connected) {
@@ -411,12 +405,10 @@ static inline bool pd_process_hw_msg_tx_failed(
 		return false;
 	}
 
-	return PE_MAKE_STATE_TRANSIT_FORCE(
-		PD_HW_MSG_TX_FAILED, PE_SRC_SEND_SOFT_RESET);
+	return PE_MAKE_STATE_TRANSIT_FORCE(PD_HW_MSG_TX_FAILED, PE_SRC_SEND_SOFT_RESET);
 }
 
-static inline bool pd_process_hw_msg(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_hw_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool ret = false;
 
@@ -430,8 +422,7 @@ static inline bool pd_process_hw_msg(
 		return true;
 
 	case PD_HW_RECV_HARD_RESET:
-		ret = pd_process_recv_hard_reset(
-				pd_port, pd_event, PE_SRC_HARD_RESET_RECEIVED);
+		ret = pd_process_recv_hard_reset(pd_port, pd_event, PE_SRC_HARD_RESET_RECEIVED);
 		break;
 
 	case PD_HW_VBUS_PRESENT:
@@ -461,8 +452,7 @@ static inline bool pd_process_hw_msg(
  * [BLOCK] Porcess PE MSG
  */
 
-static inline bool pd_process_pe_msg(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_pe_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	bool ret = false;
 
@@ -486,8 +476,7 @@ static inline bool pd_process_pe_msg(
 /*
  * [BLOCK] Porcess Timer MSG
  */
-static inline bool pd_process_timer_msg_source_start(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_timer_msg_source_start(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 #ifdef CONFIG_USB_PD_SRC_STARTUP_DISCOVER_ID
 	if (pd_is_auto_discover_cable_id(pd_port)) {
@@ -507,8 +496,7 @@ static inline bool pd_process_timer_msg_source_start(
 	return PE_MAKE_STATE_TRANSIT(PD_TIMER_SOURCE_START);
 }
 
-static inline bool pd_process_timer_msg_source_cap(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_timer_msg_source_cap(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	if (pd_port->pe_state_curr != PE_SRC_DISCOVERY)
 		return false;
@@ -521,8 +509,7 @@ static inline bool pd_process_timer_msg_source_cap(
 	return true;
 }
 
-static inline bool pd_process_timer_msg_no_response(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_timer_msg_no_response(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	if (pd_port->hard_reset_counter <= PD_HARD_RESET_COUNT)
 		PE_TRANSIT_STATE(pd_port, PE_SRC_HARD_RESET);
@@ -534,8 +521,7 @@ static inline bool pd_process_timer_msg_no_response(
 	return true;
 }
 
-static inline bool pd_process_timer_msg(
-	struct pd_port *pd_port, struct pd_event *pd_event)
+static inline bool pd_process_timer_msg(struct pd_port *pd_port, struct pd_event *pd_event)
 {
 	switch (pd_event->msg) {
 	case PD_TIMER_BIST_CONT_MODE:

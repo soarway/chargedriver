@@ -226,7 +226,7 @@ static int pd7e_charger_probe(struct i2c_client *client, const struct i2c_device
 	charger->pd7e_nb.notifier_call = pd7e_event_notifer_call;
 	ret = sy_register_notifier(charger->sydev, &charger->pd7e_nb);
 	if (ret < 0) {
-		pr_info("[OBEI]register tcpc notifer fail\n");
+		pr_info("[OBEI][pd7e]register notifer fail\n");
 		return -EINVAL;
 	}
 

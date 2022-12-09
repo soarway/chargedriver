@@ -44,9 +44,7 @@ static int pd_parse_pdata(struct pd_port *pd_port)
 		if (ret < 0)
 			pr_err("[OBEI]%s get source pdo size fail\n", __func__);
 
-		ret = of_property_read_u32_array(np, "pd,source-pdo-data",
-			(u32 *)pd_port->local_src_cap_default.pdos,
-			pd_port->local_src_cap_default.nr);
+		ret = of_property_read_u32_array(np, "pd,source-pdo-data",(u32 *)pd_port->local_src_cap_default.pdos,pd_port->local_src_cap_default.nr);
 		if (ret < 0)
 			pr_err("[OBEI]%s get source pdo data fail\n", __func__);
 
@@ -59,8 +57,7 @@ static int pd_parse_pdata(struct pd_port *pd_port)
 		if (ret < 0)
 			pr_err("[OBEI]%s get sink pdo size fail\n", __func__);
 
-		ret = of_property_read_u32_array(np, "pd,sink-pdo-data",
-			(u32 *)pd_port->local_snk_cap.pdos,	pd_port->local_snk_cap.nr);
+		ret = of_property_read_u32_array(np, "pd,sink-pdo-data",(u32 *)pd_port->local_snk_cap.pdos,	pd_port->local_snk_cap.nr);
 		if (ret < 0)
 			pr_err("[OBEI]%s get sink pdo data fail\n", __func__);
 
@@ -72,15 +69,13 @@ static int pd_parse_pdata(struct pd_port *pd_port)
 		ret = of_property_read_u32(np, "pd,id-vdo-size",(u32 *)&pd_port->id_vdo_nr);
 		if (ret < 0)
 			pr_err("[OBEI]%s get id vdo size fail\n", __func__);
-		ret = of_property_read_u32_array(np, "pd,id-vdo-data",
-			(u32 *)pd_port->id_vdos, pd_port->id_vdo_nr);
+		ret = of_property_read_u32_array(np, "pd,id-vdo-data",(u32 *)pd_port->id_vdos, pd_port->id_vdo_nr);
 		if (ret < 0)
 			pr_err("[OBEI]%s get id vdo data fail\n", __func__);
 
 		pr_info("[OBEI]%s id vdos data =\n", __func__);
 		for (i = 0; i < pd_port->id_vdo_nr; i++)
-			pr_info("[OBEI]%s %d: 0x%08x\n", __func__, i,
-			pd_port->id_vdos[i]);
+			pr_info("[OBEI]%s %d: 0x%08x\n", __func__, i,pd_port->id_vdos[i]);
 
 		val = DPM_CHARGING_POLICY_MAX_POWER_LVIC;
 		if (of_property_read_u32(np, "pd,charging_policy", &val) < 0)
@@ -133,8 +128,7 @@ static void pd_core_power_flags_init(struct pd_port *pd_port)
 	np = of_find_node_by_name(pd_port->tcpc_dev->dev.of_node, "dpm_caps");
 
 	for (i = 0; i < ARRAY_SIZE(supported_dpm_caps); i++) {
-		if (of_property_read_bool(np,
-			supported_dpm_caps[i].prop_name))
+		if (of_property_read_bool(np,supported_dpm_caps[i].prop_name))
 			pd_port->dpm_caps |= supported_dpm_caps[i].val;
 			pr_info("[OBEI]dpm_caps: %s\n",	supported_dpm_caps[i].prop_name);
 	}

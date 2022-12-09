@@ -93,8 +93,7 @@ void pe_src_negotiate_capabilities_entry(struct pd_port *pd_port, struct pd_even
 {
 #ifdef CONFIG_USB_PD_REV30
 	if (!pd_port->pd_prev_connected) {
-		pd_sync_sop_spec_revision(pd_port,
-			PD_HEADER_REV(pd_event->pd_msg->msg_hdr));
+		pd_sync_sop_spec_revision(pd_port, PD_HEADER_REV(pd_event->pd_msg->msg_hdr));
 	}
 #endif	/* CONFIG_USB_PD_REV30 */
 

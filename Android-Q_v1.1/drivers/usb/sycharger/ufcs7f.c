@@ -10,6 +10,12 @@
 #include <linux/kthread.h>
 #include <linux/delay.h>
 #include <linux/of_gpio.h>
+#include <linux/regmap.h>
+#include <linux/types.h>
+#include <linux/gpio/consumer.h>
+#include <linux/usb/phy.h>
+#include <linux/acpi.h>
+#include <linux/of.h>
 
 #include "symaster.h"
 #include "ufcs7f.h"
@@ -17,7 +23,7 @@
 enum pd7e_fields {
 	UFCS_EN,UFCS_HANDSHAKE_EN,BAUD_RATE,SND_CMD,CABLE_HARDRESET,SOURCE_HARDRESET, /* Reg00 */
 	TX_BUFFER_CLR,RX_BUFFER_CLR,ACK_CABLE,EN_DM_HIZ, /* Reg01 */
-	,/* Reg02 */
+	/* Reg02 */
 	UFCS_HANDSHAKE_FAIL_FLAG,UFCS_HANDSHAKE_SUCC_FLAG,SENT_PACKET_COMPLETE_FLAG,DATA_READY_FLAG,RX_OVERFLOW_FLAG,RX_BUFFER_BUSY_FLAG,MSG_TRANS_FAIL_FLAG,ACK_RECEIVE_TIMEOUT_FLAG,/* Reg03 */
 	BAUD_RATE_ERROR_FLAG,TRAINING_BYTES_ERROR_FLAG,DATA_BYTE_TMOUT_FLAG,LENGTH_ERROR_FLAG,START_FAIL_FLAG,STOP_ERROR_FLAG,CRC_ERROR_FLAG,HARD_RESET_FLAG,/* Reg04 */
 	BUS_CONFLICT_FLAG,BAUDRATE_CHG_FLAG,DATA_BIT_ERR_FLAG,TX_BUSY,RX_BUSY,/* Reg05 */

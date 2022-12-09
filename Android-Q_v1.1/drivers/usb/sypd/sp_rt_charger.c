@@ -233,7 +233,7 @@ static int rt_charger_probe(struct platform_device *pdev)
 	info->nb.notifier_call = chg_tcp_notifer_call;
 	ret = register_tcp_dev_notifier(info->tcpc, &info->nb);
 	if (ret < 0) {
-		dev_err(&pdev->dev, "[OBEI]register tcpc notifer fail\n");
+		pr_err("[OBEI][sp]register tcpc notifer fail\n");
 		return -EINVAL;
 	}
 

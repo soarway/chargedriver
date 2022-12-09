@@ -443,9 +443,7 @@ bool pd_process_ctrl_msg_dr_swap(struct pd_port *pd_port, struct pd_event *pd_ev
 		pd_port->during_swap = false;
 		pd_port->state_machine = PE_STATE_MACHINE_DR_SWAP;
 
-		PE_TRANSIT_DATA_STATE(pd_port,
-				PE_DRS_UFP_DFP_EVALUATE_DR_SWAP,
-				PE_DRS_DFP_UFP_EVALUATE_DR_SWAP);
+		PE_TRANSIT_DATA_STATE(pd_port,PE_DRS_UFP_DFP_EVALUATE_DR_SWAP,PE_DRS_DFP_UFP_EVALUATE_DR_SWAP);
 		return true;
 	}
 
@@ -477,9 +475,7 @@ bool pd_process_ctrl_msg_pr_swap(struct pd_port *pd_port, struct pd_event *pd_ev
 	pd_port->during_swap = false;
 	pd_port->state_machine = PE_STATE_MACHINE_PR_SWAP;
 
-	PE_TRANSIT_POWER_STATE(pd_port,
-			PE_PRS_SNK_SRC_EVALUATE_PR_SWAP,
-			PE_PRS_SRC_SNK_EVALUATE_PR_SWAP);
+	PE_TRANSIT_POWER_STATE(pd_port,PE_PRS_SNK_SRC_EVALUATE_PR_SWAP,PE_PRS_SRC_SNK_EVALUATE_PR_SWAP);
 
 	return true;
 }
@@ -571,8 +567,7 @@ static inline int pd_handle_tcp_event_vconn_swap(struct pd_port *pd_port, uint8_
 	if (pd_port->vconn_source == new_role)
 		return TCP_DPM_RET_DENIED_SAME_ROLE;
 
-	if ((!pd_port->vconn_source) &&
-		(!(pd_port->dpm_caps & DPM_CAP_LOCAL_VCONN_SUPPLY)))
+	if ((!pd_port->vconn_source) &&	(!(pd_port->dpm_caps & DPM_CAP_LOCAL_VCONN_SUPPLY)))
 		return TCP_DPM_RET_DENIED_LOCAL_CAP;
 
 	if (!pd_check_pe_state_ready(pd_port))

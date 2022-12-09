@@ -23,11 +23,11 @@
 #ifdef CONFIG_USB_POWER_DELIVERY
 #ifdef CONFIG_USB_PD_ALT_MODE_RTDC
 
-#define RTDC_UVDM_EN_UNLOCK		0x2024
+#define RTDC_UVDM_EN_UNLOCK			0x2024
 #define RTDC_UVDM_RECV_EN_UNLOCK	0x4024
 #define RTDC_SVDM_PPS_AUTHORIZATION	0x10
 
-#define RTDC_VALID_MODE				0x01
+#define RTDC_VALID_MODE					0x01
 #define RTDC_UVDM_EN_UNLOCK_SUCCESS		0x01
 
 void crcBits(uint32_t Data, uint32_t *crc, uint32_t *pPolynomial)

@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (C) 2016 Richtek Technology Corp.
  *
  * Author: TH <tsunghan_tsai@richtek.com>
@@ -10,7 +10,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- */
+ **/
 
 #ifndef TCPC_EVENT_BUF_H_INCLUDED
 #define TCPC_EVENT_BUF_H_INCLUDED
@@ -223,8 +223,7 @@ enum pd_tx_transmit_state {
 	PD_TX_STATE_WAIT_HARD_RESET,
 };
 
-static inline bool pd_event_msg_match(struct pd_event *pd_event,
-					uint8_t type, uint8_t msg)
+static inline bool pd_event_msg_match(struct pd_event *pd_event, uint8_t type, uint8_t msg)
 {
 	if (pd_event->event_type != type)
 		return false;
@@ -234,8 +233,7 @@ static inline bool pd_event_msg_match(struct pd_event *pd_event,
 
 #ifdef CONFIG_USB_PD_REV30
 
-static inline bool pd_event_ext_msg_match(
-			struct pd_event *pd_event, uint8_t msg)
+static inline bool pd_event_ext_msg_match(struct pd_event *pd_event, uint8_t msg)
 {
 	return pd_event_msg_match(pd_event, PD_EVT_EXT_MSG, msg);
 }

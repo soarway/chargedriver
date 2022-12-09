@@ -1719,8 +1719,7 @@ static ssize_t eachreg_write(struct file *file, const char __user *ubuf,
 	}
 
 	down(&rd->semaphore);
-	rc = rd->regmap_ops.regmap_block_write(rd, rm->addr,
-					rm->size, &pars[0]);
+	rc = rd->regmap_ops.regmap_block_write(rd, rm->addr, rm->size, &pars[0]);
 	up(&rd->semaphore);
 	if (rc < 0) {
 		dev_err(&rd->dev, "[OBEI]regmap block read fail\n");
@@ -1730,8 +1729,7 @@ static ssize_t eachreg_write(struct file *file, const char __user *ubuf,
 	return count;
 }
 
-static ssize_t eachreg_read(struct file *file, char __user *ubuf,
-			    size_t count, loff_t *ppos)
+static ssize_t eachreg_read(struct file *file, char __user *ubuf, size_t count, loff_t *ppos)
 {
 	struct rt_debug_st *st = file->private_data;
 	struct rt_regmap_device *rd = st->info;
@@ -1765,8 +1763,7 @@ static const struct file_operations eachreg_ops = {
 };
 
 /* create every register node at debugfs */
-static void rt_create_every_debug(struct rt_regmap_device *rd,
-				  struct dentry *dir)
+static void rt_create_every_debug(struct rt_regmap_device *rd, struct dentry *dir)
 {
 	int i;
 	char buf[10];
@@ -1869,21 +1866,16 @@ static int rt_create_simple_map(struct rt_regmap_device *rd)
 
 	for (i = 0; i < rd->props.register_num; i++) {
 		for (j = 0; j < rd->props.rm[i]->size; j++) {
-			rm[count] = devm_kzalloc(&rd->dev,
-						 sizeof(struct rt_register),
-						 GFP_KERNEL);
-			rm[count]->wbit_mask = devm_kzalloc(&rd->dev,
-				sizeof(unsigned char), GFP_KERNEL);
+			rm[count] = devm_kzalloc(&rd->dev,sizeof(struct rt_register), GFP_KERNEL);
+			rm[count]->wbit_mask = devm_kzalloc(&rd->dev, sizeof(unsigned char), GFP_KERNEL);
 
 			rm[count]->addr = rd->props.rm[i]->addr + j;
 			rm[count]->size = 1;
 			rm[count]->reg_type = rd->props.rm[i]->reg_type;
-			if ((rd->props.rm[i]->reg_type&RT_REG_TYPE_MASK) !=
-								RT_WBITS)
+			if ((rd->props.rm[i]->reg_type&RT_REG_TYPE_MASK) !=	RT_WBITS)
 				rm[count]->wbit_mask[0] = 0xff;
 			else
-				rm[count]->wbit_mask[0] =
-					rd->props.rm[i]->wbit_mask[0];
+				rm[count]->wbit_mask[0] = rd->props.rm[i]->wbit_mask[0];
 			count++;
 		}
 		if (count > num)

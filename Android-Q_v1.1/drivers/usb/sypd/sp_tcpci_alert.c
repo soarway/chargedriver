@@ -65,8 +65,7 @@ void tcpci_vbus_level_init(struct tcpc_device *tcpc_dev, uint16_t power_status)
 {
 	mutex_lock(&tcpc_dev->access_lock);
 
-	tcpc_dev->vbus_level = power_status & TCPC_REG_POWER_STATUS_VBUS_PRES ?
-			TCPC_VBUS_VALID : TCPC_VBUS_INVALID;
+	tcpc_dev->vbus_level = power_status & TCPC_REG_POWER_STATUS_VBUS_PRES ? TCPC_VBUS_VALID : TCPC_VBUS_INVALID;
 
 #ifdef CONFIG_TCPC_VSAFE0V_DETECT_IC
 	if (power_status & TCPC_REG_POWER_STATUS_EXT_VSAFE0V) {

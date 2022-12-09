@@ -838,6 +838,7 @@
 		compatible = "silergy,masterba76";
 		reg = <0x1d>;
 		status = "ok";
+		symaster-gpios = <&tlmm 60 0x00>; 
 	};
     ba52@7f {
 		compatible = "silergy,ba52a";
@@ -847,7 +848,7 @@
         interrupt-parent = <&tlmm>;
         ba52,irq_pin = <&tlmm 59 0x00>;
 
-        irq-gpios = <&tlmm 59 0x00>; 
+        ba52irq-gpios = <&tlmm 59 0x00>; 
         irq-flags = <2>;
 
         interrupts = <0 59 8>;//uu?
@@ -891,7 +892,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////  
 
-//pd sample.dts
+    //pd
     ba41@7e {
 		compatible = "silergy,ba41a";
 		reg = <0x7e>;
@@ -900,7 +901,7 @@
         interrupt-parent = <&tlmm>;
         ba41,irq_pin = <&tlmm 58 0x00>;
 
-        irq-gpios = <&tlmm 58 0x00>; 
+        ba41irq-gpios = <&tlmm 58 0x00>; 
         irq-flags = <2>;
 
         interrupts = <0 58 8>;//uu?

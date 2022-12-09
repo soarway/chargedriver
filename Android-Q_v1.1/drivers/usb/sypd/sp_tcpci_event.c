@@ -109,7 +109,7 @@ void pd_free_event(struct tcpc_device *tcpc_dev, struct pd_event *pd_event)
 }
 
 /*----------------------------------------------------------------------------*/
-
+//从环形队列中获取pd_event
 static bool __pd_get_event(struct tcpc_device *tcpc_dev, struct pd_event *pd_event)
 {
 	int index = 0;
@@ -128,7 +128,7 @@ static bool __pd_get_event(struct tcpc_device *tcpc_dev, struct pd_event *pd_eve
 	tcpc_dev->pd_event_head_index = index;
 	return true;
 }
-
+//调用基础函数获取pd_event
 bool pd_get_event(struct tcpc_device *tcpc_dev, struct pd_event *pd_event)
 {
 	bool ret;
@@ -138,7 +138,7 @@ bool pd_get_event(struct tcpc_device *tcpc_dev, struct pd_event *pd_event)
 	mutex_unlock(&tcpc_dev->access_lock);
 	return ret;
 }
-
+//把pd_event放入环形队列
 static bool __pd_put_event(struct tcpc_device *tcpc_dev,const struct pd_event *pd_event, bool from_port_partner)
 {
 	int index;
@@ -149,7 +149,7 @@ static bool __pd_put_event(struct tcpc_device *tcpc_dev,const struct pd_event *p
 #endif	/* CONFIG_USB_PD_POSTPONE_OTHER_VDM */
 
 	if (tcpc_dev->pd_event_count >= PD_EVENT_BUF_SIZE) {
-		PD_ERR("pd_put_event failed\r\n");
+		PD_ERR("pd put event failed\r\n");
 		return false;
 	}
 
@@ -163,7 +163,7 @@ static bool __pd_put_event(struct tcpc_device *tcpc_dev,const struct pd_event *p
 	wake_up_interruptible(&tcpc_dev->event_loop_wait_que);
 	return true;
 }
-
+//调用基础函数把pd_event放入环形队列
 bool pd_put_event(struct tcpc_device *tcpc_dev, const struct pd_event *pd_event,bool from_port_partner)
 {
 	bool ret;
@@ -767,9 +767,7 @@ bool pd_put_pd_msg_event(struct tcpc_device *tcpc_dev, struct pd_msg *pd_msg)
 	}
 
 #ifdef CONFIG_USB_PD_RETRY_CRC_DISCARD
-	if (tcpc_dev->pd_discard_pending &&
-		(pd_msg->frame_type == TCPC_TX_SOP) &&
-		(tcpc_dev->tcpc_flags & TCPC_FLAGS_RETRY_CRC_DISCARD)) {
+	if (tcpc_dev->pd_discard_pending &&	(pd_msg->frame_type == TCPC_TX_SOP) && (tcpc_dev->tcpc_flags & TCPC_FLAGS_RETRY_CRC_DISCARD)) {
 
 		discard_pending = true;
 		tcpc_dev->pd_discard_pending = false;

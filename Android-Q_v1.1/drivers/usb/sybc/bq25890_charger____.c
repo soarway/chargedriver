@@ -853,7 +853,7 @@ static int bq25890_probe(struct i2c_client *client, const struct i2c_device_id *
 
 	ret = bq25890_hw_init(bq);
 	if (ret < 0) {
-		dev_err(dev, "Cannot initialize the chip.\n");
+		pr_err(dev, "Cannot initialize the chip.\n");
 		return ret;
 	}
 

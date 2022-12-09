@@ -936,7 +936,7 @@ static inline bool pd_try_get_next_event(struct tcpc_device *tcpc_dev, struct pd
 
 	return false;
 }
-
+//策略引擎运行函数
 int pd_policy_engine_run(struct tcpc_device *tcpc_dev)
 {
 	bool vdm_evt = false;

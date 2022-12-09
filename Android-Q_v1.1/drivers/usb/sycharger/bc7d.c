@@ -707,6 +707,8 @@ struct bc7d_chip {
 	unsigned long usb_event;
 };
 
+static DEFINE_MUTEX(bc7d_i2c_lock);
+
 //消息处理函数
 static int bc7d_event_notifer_call(struct notifier_block *nb, unsigned long event, void *data)
 {
@@ -751,7 +753,52 @@ static int bc7d_event_notifer_call(struct notifier_block *nb, unsigned long even
 	return NOTIFY_OK;
 }
 
+//-------------------------------------------
+//传统写法的读寄存器
+static int bc7d_read_byte(struct bc7d_chip *bq, u8 *data, u8 reg)
+{
+	int ret;
 
+	mutex_lock(&bc7d_i2c_lock);
+	ret = i2c_smbus_read_byte_data(bq->client, reg);
+	if (ret < 0) {
+		dev_err(bq->dev, "failed to read 0x%.2x\n", reg);
+		mutex_unlock(&bc7d_i2c_lock);
+		return ret;
+	}
+
+	*data = (u8)ret;
+	mutex_unlock(&bc7d_i2c_lock);
+
+	return 0;
+}
+//传统写法的写寄存器
+static int bc7d_write_byte(struct bc7d_chip *bq, u8 reg, u8 data)
+{
+	int ret;
+	mutex_lock(&bc7d_i2c_lock);
+	ret = i2c_smbus_write_byte_data(bq->client, reg, data);
+	mutex_unlock(&bc7d_i2c_lock);
+	return ret;
+}
+//传统写法的更新寄存器
+static int bc7d_update_bits(struct bc7d_chip *bq, u8 reg, u8 mask, u8 data)
+{
+	int ret;
+	u8 tmp;
+
+	ret = bc7d_read_byte(bq, &tmp, reg);
+
+	if (ret)
+		return ret;
+
+	tmp &= ~mask;
+	tmp |= data & mask;
+
+	return bc7d_write_byte(bq, reg, tmp);
+}
+
+//--------------------------------------------
 
 //读指定寄存器的值
 static int bc7d_field_read(struct bc7d_chip *bq, enum BC7D_fields field_id)
@@ -783,21 +830,35 @@ static int bc7d_chip_reset(struct bc7d_chip *bq)
 
 	ret = bc7d_field_write(bq, F_REG_RST, 1);
 	if (ret < 0)
+	{
+		pr_info("[OBEI][bc7d]field write fail");
 		return ret;
+	}	
 
 	do {
 		
 		ret = bc7d_field_read(bq, F_REG_RST);
 		if (ret < 0)
+		{
+			pr_info("[OBEI][bc7d]field read fail");
 			return ret;
+		}
 
 		usleep_range(5, 10);
 		//如果失败，重试10次
 	} while (ret == 1 && --rst_check_counter);
 
 	if (!rst_check_counter)
-		return -ETIMEDOUT;
+	{
+		pr_info("[OBEI][bc7d]rst_check_counter fail");
+		//return -ETIMEDOUT;
 
+		bc7d_update_bits(bq, 0x08, 0x80, 1);
+		usleep_range(5, 10);
+		ret = bc7d_field_read(bq, F_REG_RST);
+		pr_info("[OBEI][bc7d]rst_check_counter ret = %d", ret);
+	}	
+ 
 	return 0;
 }
 
@@ -942,11 +1003,11 @@ static int bc7d_hw_init(struct bc7d_chip *bq)
 	return 0;
 }
 
-static int bc7d_irq_probe(struct bc7d_chip *bq)
+static int bc7d_irq_probe(struct bc7d_chip *bq, const char* name)
 {
 	struct gpio_desc *irq;
 
-	irq = devm_gpiod_get(bq->dev, BC7D_IRQ_PIN, GPIOD_IN);
+	irq = devm_gpiod_get(bq->dev, name, GPIOD_IN);
 	//对应设备树中的：ba70irq-gpios = <&tlmm 57 0x00>; 
 
 	if (IS_ERR(irq)) {
@@ -1205,7 +1266,7 @@ static int bc7d_charger_probe(struct i2c_client *client, const struct i2c_device
 	//硬件初始化
 	ret = bc7d_hw_init(charger);
 	if (ret < 0) {
-		dev_err(dev, "[OBEI][bc7d]Cannot initialize the chip.\n");
+		pr_err("[OBEI][bc7d]Cannot initialize the chip.\n");
 		return ret;
 	}
 
@@ -1229,7 +1290,7 @@ static int bc7d_charger_probe(struct i2c_client *client, const struct i2c_device
 	if (client->irq <= 0)
 	{
 		pr_info("[OBEI][bc7d]client -> irq =%d\n", client->irq);
-		client->irq = bc7d_irq_probe(charger);
+		client->irq = bc7d_irq_probe(charger, BC7D_IRQ_PIN);
 		
 	}	
 
@@ -1251,7 +1312,10 @@ static int bc7d_charger_probe(struct i2c_client *client, const struct i2c_device
 	ret = devm_request_threaded_irq(dev, client->irq, NULL, bc7d_irq_handler_thread, 
 				IRQF_TRIGGER_FALLING | IRQF_ONESHOT, BC7D_IRQ_PIN, charger);
 	if (ret)
+	{
+		pr_err("[OBEI][bc7d]request threaded irq fail\n");
 		goto irq_fail;
+	}	
 
 	ret = bc7d_power_supply_init(charger);
 	if (ret < 0) {
@@ -1259,6 +1323,7 @@ static int bc7d_charger_probe(struct i2c_client *client, const struct i2c_device
 		goto irq_fail;
 	}
 
+	pr_info("[OBEI][bc7d]probe success!\n");
 	return 0;
 irq_fail:
 	if (!IS_ERR_OR_NULL(charger->usb_phy))

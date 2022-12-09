@@ -60,8 +60,7 @@ static int tcpc_dual_role_get_prop(struct dual_role_phy_instance *dual_role,
 	return ret;
 }
 
-static	int tcpc_dual_role_prop_is_writeable(
-	struct dual_role_phy_instance *dual_role, enum dual_role_property prop)
+static	int tcpc_dual_role_prop_is_writeable(struct dual_role_phy_instance *dual_role, enum dual_role_property prop)
 {
 	int retval = -EINVAL;
 	struct tcpc_device *tcpc = dev_get_drvdata(dual_role->dev.parent);

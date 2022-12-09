@@ -179,7 +179,7 @@ static const rt_register_map_t rt1711_chip_regmap[] = {
 
 #endif /* CONFIG_RT_REGMAP */
 
-//读寄存器信息
+//基础函数：读寄存器信息
 static int rt1711_read_device(void *client, u32 reg, int len, void *dst)
 {
 	struct i2c_client *i2c = (struct i2c_client *)client;
@@ -205,7 +205,7 @@ static int rt1711_read_device(void *client, u32 reg, int len, void *dst)
 	}
 	return ret;
 }
-//写寄存器信息
+//基础函数：写寄存器信息
 static int rt1711_write_device(void *client, u32 reg, int len, const void *src)
 {
 	const u8 *data;
@@ -231,7 +231,7 @@ static int rt1711_write_device(void *client, u32 reg, int len, const void *src)
 	}
 	return ret;
 }
-//读寄存器， 长度1
+//读 长度1
 static int rt1711_reg_read(struct i2c_client *i2c, u8 reg)
 {
 	struct rt1711_chip *chip = i2c_get_clientdata(i2c);
@@ -241,7 +241,7 @@ static int rt1711_reg_read(struct i2c_client *i2c, u8 reg)
 #ifdef CONFIG_RT_REGMAP
 	ret = rt_regmap_block_read(chip->m_dev, reg, 1, &val);
 #else
-	ret = rt1711_read_device(chip->client, reg, 1, &val);//调用封装的函数
+	ret = rt1711_read_device(chip->client, reg, 1, &val);//调用封装的基础函数
 #endif /* CONFIG_RT_REGMAP */
 	if (ret < 0) {
 		dev_err(chip->dev, "[OBEI]rt1711 reg read fail\n");
@@ -249,7 +249,7 @@ static int rt1711_reg_read(struct i2c_client *i2c, u8 reg)
 	}
 	return val;
 }
-//写寄存器 长度1
+//写 长度1
 static int rt1711_reg_write(struct i2c_client *i2c, u8 reg, const u8 data)
 {
 	struct rt1711_chip *chip = i2c_get_clientdata(i2c);
@@ -258,7 +258,7 @@ static int rt1711_reg_write(struct i2c_client *i2c, u8 reg, const u8 data)
 #ifdef CONFIG_RT_REGMAP
 	ret = rt_regmap_block_write(chip->m_dev, reg, 1, &data);
 #else
-	ret = rt1711_write_device(chip->client, reg, 1, &data);//调用封装的函数
+	ret = rt1711_write_device(chip->client, reg, 1, &data);//调用封装的基础函数
 #endif /* CONFIG_RT_REGMAP */
 	if (ret < 0)
 		dev_err(chip->dev, "[OBEI]rt1711 reg write fail\n");
@@ -272,7 +272,7 @@ static int rt1711_block_read(struct i2c_client *i2c, u8 reg, int len, void *dst)
 #ifdef CONFIG_RT_REGMAP
 	ret = rt_regmap_block_read(chip->m_dev, reg, len, dst);
 #else
-	ret = rt1711_read_device(chip->client, reg, len, dst);//调用封装的函数
+	ret = rt1711_read_device(chip->client, reg, len, dst);//调用封装的基础函数
 #endif /* #ifdef CONFIG_RT_REGMAP */
 	if (ret < 0)
 		dev_err(chip->dev, "[OBEI]rt1711 block read fail\n");
@@ -286,7 +286,7 @@ static int rt1711_block_write(struct i2c_client *i2c,u8 reg, int len, const void
 #ifdef CONFIG_RT_REGMAP
 	ret = rt_regmap_block_write(chip->m_dev, reg, len, src);
 #else
-	ret = rt1711_write_device(chip->client, reg, len, src);//调用封装的函数
+	ret = rt1711_write_device(chip->client, reg, len, src);//调用封装的基础函数
 #endif /* #ifdef CONFIG_RT_REGMAP */
 	if (ret < 0)
 		dev_err(chip->dev, "[OBEI]rt1711 block write fail\n");
@@ -298,7 +298,7 @@ static int32_t rt1711_write_word(struct i2c_client *client,	uint8_t reg_addr, ui
 	int ret;
 
 	/* don't need swap */
-	ret = rt1711_block_write(client, reg_addr, 2, (uint8_t *)&data);//调用封装的函数
+	ret = rt1711_block_write(client, reg_addr, 2, (uint8_t *)&data);//调用封装的基础函数
 	return ret;
 }
 //读寄存器，长度2
@@ -307,7 +307,7 @@ static int32_t rt1711_read_word(struct i2c_client *client,uint8_t reg_addr, uint
 	int ret;
 
 	/* don't need swap */
-	ret = rt1711_block_read(client, reg_addr, 2, (uint8_t *)data);//调用封装的函数
+	ret = rt1711_block_read(client, reg_addr, 2, (uint8_t *)data);//调用封装的基础函数
 	return ret;
 }
 
@@ -315,21 +315,21 @@ static inline int rt1711_i2c_write8(struct tcpc_device *tcpc, u8 reg, const u8 d
 {
 	struct rt1711_chip *chip = tcpc_get_dev_data(tcpc);
 
-	return rt1711_reg_write(chip->client, reg, data);//调用封装的函数
+	return rt1711_reg_write(chip->client, reg, data);//调用封装的基础函数
 }
 
 static inline int rt1711_i2c_write16(struct tcpc_device *tcpc, u8 reg, const u16 data)
 {
 	struct rt1711_chip *chip = tcpc_get_dev_data(tcpc);
 
-	return rt1711_write_word(chip->client, reg, data);//调用封装的函数
+	return rt1711_write_word(chip->client, reg, data);//调用封装的基础函数
 }
 
 static inline int rt1711_i2c_read8(struct tcpc_device *tcpc, u8 reg)
 {
 	struct rt1711_chip *chip = tcpc_get_dev_data(tcpc);
 
-	return rt1711_reg_read(chip->client, reg);//调用封装的函数
+	return rt1711_reg_read(chip->client, reg);//调用封装的基础函数
 }
 
 static inline int rt1711_i2c_read16(struct tcpc_device *tcpc, u8 reg)
@@ -338,7 +338,7 @@ static inline int rt1711_i2c_read16(struct tcpc_device *tcpc, u8 reg)
 	u16 data;
 	int ret;
 
-	ret = rt1711_read_word(chip->client, reg, &data);//调用封装的函数
+	ret = rt1711_read_word(chip->client, reg, &data);//调用封装的基础函数
 	if (ret < 0)
 		return ret;
 	return data;
@@ -471,7 +471,7 @@ static int rt1711_init_rt_mask(struct tcpc_device *tcpc)
 
 	return rt1711_i2c_write8(tcpc, RT1711H_REG_RT_MASK, rt_mask);
 }
-//轮询控制：取消work，然后在调用work
+//轮询控制：取消work，然后在调用work，被中断处理函数所调用
 static inline void rt1711_poll_ctrl(struct rt1711_chip *chip)
 {
 	cancel_delayed_work_sync(&chip->poll_work);
@@ -650,10 +650,7 @@ static int rt1711h_set_clock_gating(struct tcpc_device *tcpc_dev, bool en)
 
 	if (en) {
 		//清除alert状态
-		ret = rt1711_alert_status_clear(tcpc_dev,
-			TCPC_REG_ALERT_RX_STATUS |
-			TCPC_REG_ALERT_RX_HARD_RST |
-			TCPC_REG_ALERT_RX_BUF_OVF);
+		ret = rt1711_alert_status_clear(tcpc_dev,TCPC_REG_ALERT_RX_STATUS |	TCPC_REG_ALERT_RX_HARD_RST | TCPC_REG_ALERT_RX_BUF_OVF);
 	}
 
 	if (ret == 0)
@@ -816,7 +813,7 @@ static int rt1711_get_power_status(struct tcpc_device *tcpc, uint16_t *pwr_statu
 {
 	int ret;
 
-	ret = rt1711_i2c_read8(tcpc, TCPC_V10_REG_POWER_STATUS);
+	ret = rt1711_i2c_read8(tcpc, TCPC_V10_REG_POWER_STATUS);//0x1E寄存器
 	if (ret < 0)
 		return ret;
 
@@ -910,9 +907,12 @@ static int rt1711_set_cc(struct tcpc_device *tcpc, int pull)
 
 		ret = rt1711_i2c_write8(tcpc, TCPC_V10_REG_ROLE_CTRL, data);
 
+		//Start DRP Toggling if ROLE_CONTROL.DRP = 1b. If ROLE_CONTROL.CC1/CC2= 01b start with Rp, if ROLE_CONTROL.CC1/CC2 =10b start with Rd.
+
 		if (ret == 0)
 			ret = rt1711_command(tcpc, TCPM_CMD_LOOK_CONNECTION);
-	} else {
+	} 
+	else {
 #ifdef CONFIG_USB_POWER_DELIVERY
 		if (pull == TYPEC_CC_RD && tcpc->pd_wait_pr_swap_complete)
 			rt1711h_init_cc_params(tcpc, TYPEC_CC_VOLT_SNK_DFT);
@@ -1007,8 +1007,7 @@ int rt1711h_set_watchdog(struct tcpc_device *tcpc_dev, bool en)
 {
 	uint8_t data = RT1711H_REG_WATCHDOG_CTRL_SET(en, 7);
 
-	return	rt1711_i2c_write8(tcpc_dev,
-		RT1711H_REG_WATCHDOG_CTRL, data);
+	return	rt1711_i2c_write8(tcpc_dev, RT1711H_REG_WATCHDOG_CTRL, data);
 }
 #endif	/* CONFIG_TCPC_WATCHDOG_EN */
 
@@ -1025,9 +1024,8 @@ static int rt1711_tcpc_deinit(struct tcpc_device *tcpc_dev)
 	rt1711_set_cc(tcpc_dev, TYPEC_CC_DRP);
 	rt1711_set_cc(tcpc_dev, TYPEC_CC_OPEN);
 
-	rt1711_i2c_write8(tcpc_dev,RT1711H_REG_I2CRST_CTRL,RT1711H_REG_I2CRST_SET(true, 4));
-
-	rt1711_i2c_write8(tcpc_dev,RT1711H_REG_INTRST_CTRL,RT1711H_REG_INTRST_SET(true, 0));
+	rt1711_i2c_write8(tcpc_dev, RT1711H_REG_I2CRST_CTRL, RT1711H_REG_I2CRST_SET(true, 4));
+	rt1711_i2c_write8(tcpc_dev, RT1711H_REG_INTRST_CTRL, RT1711H_REG_INTRST_SET(true, 0));
 #else
 	rt1711_i2c_write8(tcpc_dev, RT1711H_REG_SWRESET, 1);
 #endif	/* CONFIG_TCPC_SHUTDOWN_CC_DETACH */
@@ -1111,7 +1109,8 @@ static int rt1711_transmit(struct tcpc_device *tcpc,enum tcpm_transmit_type type
 	int data_cnt, packet_cnt;
 	uint8_t temp[RT1711_TRANSMIT_MAX_SIZE];
 
-	if (type < TCPC_TX_HARD_RESET) {
+	if (type < TCPC_TX_HARD_RESET) 
+	{
 		data_cnt = sizeof(uint32_t) * PD_HEADER_CNT(header);
 		packet_cnt = data_cnt + sizeof(uint16_t);
 
@@ -1120,7 +1119,7 @@ static int rt1711_transmit(struct tcpc_device *tcpc,enum tcpm_transmit_type type
 		if (data_cnt > 0)
 			memcpy(temp+3, (uint8_t *)data, data_cnt);
 
-		rv = rt1711_block_write(chip->client,TCPC_V10_REG_TX_BYTE_CNT, packet_cnt+1, (uint8_t *)temp);
+		rv = rt1711_block_write(chip->client, TCPC_V10_REG_TX_BYTE_CNT, packet_cnt+1, (uint8_t *)temp);
 		if (rv < 0)
 			return rv;
 	}

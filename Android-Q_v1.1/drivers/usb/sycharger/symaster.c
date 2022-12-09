@@ -105,7 +105,7 @@ static irqreturn_t master_irq_handler(int irq, void *devid)
 	struct power_supply *psy = devid;
 	struct symaster *charger = to_master(psy);
 	struct symaster_device* sydev = charger->master_dev;
-	printk("[OBEI][master]irq handler\n");
+	//printk("[OBEI][master]irq handler\n");
 	//master_update(charger);
 	
 
@@ -143,7 +143,7 @@ static int master_charger_set_property(struct power_supply *psy, enum power_supp
 }
 
 
-/*
+
 //解析设备树，读取设备树的属性值
 static struct master_platform *parse_dt_data(struct i2c_client *client)
 {
@@ -174,7 +174,7 @@ static struct master_platform *parse_dt_data(struct i2c_client *client)
 
 	return pdata;
 }
-*/
+
 static int master_charger_property_is_writeable(struct power_supply *psy, enum power_supply_property psp)
 {
 	return 0;
@@ -220,9 +220,27 @@ static int master_device_init(struct symaster *chip, struct device *dev)
 	}
 	chip->master_dev = mdev;
 
-	bc7ddev = bc7d_device_register(dev, SY_BC7D, chip);
+
 	return 0;
 
+}
+
+static int symaster_irq_probe(struct symaster *bq)
+{
+	struct gpio_desc *irq;
+	int ret;
+
+	irq = devm_gpiod_get(bq->dev, "symaster", GPIOD_IN);
+	//对应设备树中的：ba70irq-gpios = <&tlmm 57 0x00>; 
+
+	if (IS_ERR(irq)) {
+		pr_err("[OBEI][master]Could not probe irq pin.\n");
+		return PTR_ERR(irq);
+	}
+
+	ret = gpiod_to_irq(irq);
+	pr_info("[OBEI][master]symaster irq =%d\n", ret);
+	return ret;
 }
 
 //驱动匹配后被系统内核调用的初始化函数
@@ -244,17 +262,18 @@ static int master_charger_probe(struct i2c_client *client, const struct i2c_devi
 	mutex_init(&charger->lock);
 	charger->charging = true;//要求进入充电状态
 	charger->pdata = client->dev.platform_data;
-	/*
+	
 	if (IS_ENABLED(CONFIG_OF) && !charger->pdata && client->dev.of_node)
 	{
 		charger->pdata = parse_dt_data(client);
 		printk("[OBEI][master]pdata success\n");
-	}*/
+	}
 
 	if (!charger->pdata) {
 		printk("[OBEI][master]no platform data provided\n");
 		return -EINVAL;
 	}
+	
 
 	name = (char *)charger->pdata->name;
 	if (!name) {
@@ -292,7 +311,7 @@ static int master_charger_probe(struct i2c_client *client, const struct i2c_devi
 
 	ret = master_device_init(charger, &client->dev);
 	if (ret < 0) {
-		printk("[OBEI][master] tcpc dev init fail\n");
+		printk("[OBEI][master] dev init fail\n");
 		return ret;
 	}
 
@@ -348,7 +367,8 @@ static int master_charger_probe(struct i2c_client *client, const struct i2c_devi
 		goto err_1;
 	}
 	client->irq = irqn;
-
+	ret = symaster_irq_probe(charger);
+	printk("[OBEI][master]irq probe ret = %d\n", ret);
 
 	//支持中断
 	//内核提供 request_threaded_irq 和 devm_request_threaded_irq 为中断分配内核线程
