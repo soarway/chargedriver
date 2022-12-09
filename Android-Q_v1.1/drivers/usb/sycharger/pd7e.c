@@ -163,7 +163,7 @@ static const struct reg_field pd7e_reg_fields[] = {
 
 
 
-struct pd7e {
+struct pd7e_chip {
 	struct power_supply			*charger;
 	struct power_supply_desc	 charger_desc;
 	struct i2c_client			*client;
@@ -201,12 +201,33 @@ static int pd7e_event_notifer_call(struct notifier_block *nb, unsigned long even
 	return NOTIFY_OK;
 }
 
+static int pd7e_irq_probe(struct pd7e_chip *bq, const char* name)
+{
+	struct gpio_desc *irq;
 
+	irq = devm_gpiod_get(bq->dev, name, GPIOD_IN);
+	//对应设备树中的：ba70irq-gpios = <&tlmm 57 0x00>; 
+
+	if (IS_ERR(irq)) {
+		pr_err("[OBEI][pd7e]Could not probe irq pin.\n");
+		return PTR_ERR(irq);
+	}
+
+	return gpiod_to_irq(irq);
+}
+
+static irqreturn_t pd7e_irq_handler_thread(int irq, void *private)
+{
+
+	pr_info("[OBEI][pd7e]irq handler thread\n");
+
+	return IRQ_HANDLED;
+}
 
 static int pd7e_charger_probe(struct i2c_client *client, const struct i2c_device_id *id)
 {
-	int ret;
-	struct pd7e *charger;
+	int ret, irqn;
+	struct pd7e_chip *chip;
 	struct power_supply_desc *supply_desc;
 	struct power_supply_config psy_cfg = {};
 	char *name;
@@ -214,29 +235,40 @@ static int pd7e_charger_probe(struct i2c_client *client, const struct i2c_device
 	pr_info("[OBEI][pd7e]pd7e charger probe.\n");
 
 	//分配自定义结构体的内存
-	charger = devm_kzalloc(&client->dev, sizeof(*charger), GFP_KERNEL);
-	if (!charger)
+	chip = devm_kzalloc(&client->dev, sizeof(*chip), GFP_KERNEL);
+	if (!chip)
 		return -ENOMEM;
 
-	charger->client = client;
-	charger->dev = &client->dev;
-	i2c_set_clientdata(client, charger);
+	chip->client = client;
+	chip->dev = &client->dev;
+	i2c_set_clientdata(client, chip);
 
 	//注册事件回调函数
-	charger->pd7e_nb.notifier_call = pd7e_event_notifer_call;
-	ret = sy_register_notifier(charger->sydev, &charger->pd7e_nb);
+	chip->pd7e_nb.notifier_call = pd7e_event_notifer_call;
+	ret = sy_register_notifier(chip->sydev, &chip->pd7e_nb);
 	if (ret < 0) {
 		pr_info("[OBEI][pd7e]register notifer fail\n");
 		return -EINVAL;
 	}
 
+	irqn = pd7e_irq_probe(chip, "ba41irq");
+	pr_info("[OBEI][pd7e]irq probe irqn = %d\n", irqn);
+	client->irq = irqn;
+
+	ret = devm_request_threaded_irq(chip->dev, client->irq, NULL, pd7e_irq_handler_thread, 
+				IRQF_TRIGGER_FALLING | IRQF_ONESHOT, BC7D_IRQ_PIN, chip);
+	if (ret)
+	{
+		pr_err("[OBEI][pd7e]request threaded irq fail\n");
+		//goto irq_fail;
+	}	
 
 	return 0;
 }
 
 static int pd7e_charger_remove(struct i2c_client *client)
 {
-	struct pd7e *charger = i2c_get_clientdata(client);
+	struct pd7e *chip = i2c_get_clientdata(client);
 
 	//if (charger->poll_interval)
 	//	cancel_delayed_work_sync(&charger->poll);//取消定时器

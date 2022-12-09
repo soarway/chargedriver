@@ -838,8 +838,12 @@
 		compatible = "silergy,masterba76";
 		reg = <0x1d>;
 		status = "ok";
-		symaster-gpios = <&tlmm 60 0x00>; 
+		symaster-gpios = <&tlmm 60 0x00>;
+		//1 PD  2 UFCS
+		priority_proto = <1>;
 	};
+
+	//ufcs
     ba52@7f {
 		compatible = "silergy,ba52a";
 		reg = <0x7f>;
@@ -1004,8 +1008,8 @@
         status = "ok";
   
         interrupt-parent = <&tlmm>;
-        ba70,irq_pin = <&tlmm 57 0x00>;
-        ba70irq-gpios = <&tlmm 57 0x00>; 
+        ba70,irq_pin = <&tlmm 59 0x00>;
+        ba70irq-gpios = <&tlmm 59 0x00>; 
         irq-flags = <2>;
         interrupts = <0 57 8>;//uu?
 	    interrupt-names = "ba70_irq";        

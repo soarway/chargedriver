@@ -19,7 +19,7 @@ struct master_platform {
 	uint32_t charge_current;
 	uint32_t charge_voltage;
 	uint32_t input_current;
-
+	uint32_t protocol_priority;//协议优先级
 	const char *name;
 
 	bool ext_control;
@@ -152,25 +152,36 @@ static struct master_platform *parse_dt_data(struct i2c_client *client)
 	u32 val;
 	int ret;
 
+
 	pdata = devm_kzalloc(&client->dev, sizeof(*pdata), GFP_KERNEL);
 	if (!pdata) {
-		printk("Memory alloc for bq24735 pdata failed\n");
+		printk("[OBEI][master]Memory alloc for pdata failed\n");
 		return NULL;
 	}
 
-	//ret = of_property_read_u32(np, "ti,charge-current", &val);
-	//if (!ret)
-		pdata->charge_current = 2000;
+	pdata->protocol_priority = 0;
+	pdata->charge_voltage = 0;
+	
+	ret = of_property_read_u32(np, "priority_proto", &val);
+	if (!ret)
+	{
+		pdata->protocol_priority = val;
+	}
+	
 
-	//ret = of_property_read_u32(np, "ti,charge-voltage", &val);
-	//if (!ret)
-		pdata->charge_voltage = 16800;
+	pdata->charge_current = 2000;
+
+	ret = of_property_read_u32(np, "sy,ba70x,charge-voltage", &val);
+	if (!ret)
+		pdata->charge_voltage = val;
 
 	//ret = of_property_read_u32(np, "ti,input-current", &val);
 	//if (!ret)
 		pdata->input_current = 500;
 
 	pdata->ext_control = true;//of_property_read_bool(np, "ti,external-control");
+
+	printk("[OBEI][master]read protocol_priority=%d, charge_voltage=%d\n", val, pdata->charge_voltage);
 
 	return pdata;
 }
@@ -208,7 +219,7 @@ static int master_event_notifer_call(struct notifier_block *nb, unsigned long ev
 static int master_device_init(struct symaster *chip, struct device *dev)
 {
 	struct symaster_device *mdev;
-	struct bc7d_device* bc7ddev;
+	//struct bc7d_device* bc7ddev;
 
 
 	pr_info("[OBEI][master] device init (%s)\n",  MASTER_DEVICE_NAME);
@@ -225,23 +236,6 @@ static int master_device_init(struct symaster *chip, struct device *dev)
 
 }
 
-static int symaster_irq_probe(struct symaster *bq)
-{
-	struct gpio_desc *irq;
-	int ret;
-
-	irq = devm_gpiod_get(bq->dev, "symaster", GPIOD_IN);
-	//对应设备树中的：ba70irq-gpios = <&tlmm 57 0x00>; 
-
-	if (IS_ERR(irq)) {
-		pr_err("[OBEI][master]Could not probe irq pin.\n");
-		return PTR_ERR(irq);
-	}
-
-	ret = gpiod_to_irq(irq);
-	pr_info("[OBEI][master]symaster irq =%d\n", ret);
-	return ret;
-}
 
 //驱动匹配后被系统内核调用的初始化函数
 static int master_charger_probe(struct i2c_client *client, const struct i2c_device_id *id)
@@ -367,8 +361,7 @@ static int master_charger_probe(struct i2c_client *client, const struct i2c_devi
 		goto err_1;
 	}
 	client->irq = irqn;
-	ret = symaster_irq_probe(charger);
-	printk("[OBEI][master]irq probe ret = %d\n", ret);
+
 
 	//支持中断
 	//内核提供 request_threaded_irq 和 devm_request_threaded_irq 为中断分配内核线程

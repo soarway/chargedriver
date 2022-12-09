@@ -1116,6 +1116,7 @@ static irqreturn_t bc7d_irq_handler_thread(int irq, void *private)
 
 	power_supply_changed(bq->ps_charger);
 
+	pr_info("[OBEI][bc7d]irq handler thread\n");
 handled:
 	return IRQ_HANDLED;
 }
@@ -1294,12 +1295,13 @@ static int bc7d_charger_probe(struct i2c_client *client, const struct i2c_device
 		
 	}	
 
+	pr_info("[OBEI][bc7d]irqn = %d\n", client->irq);
+
 	if (client->irq < 0) {
 		pr_err("[OBEI][bc7d]No irq resource found.\n");
 		return client->irq;
 	}
-	pr_info("[OBEI][bc7d]irq resource found = %d\n", client->irq);
-
+	
 
 	/* OTG reporting */
 	charger->usb_phy = devm_usb_get_phy(dev, USB_PHY_TYPE_USB2);

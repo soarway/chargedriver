@@ -44,19 +44,22 @@ enum {
 	
 };
 
+enum {
+	PROTOCOL_BC,
+	PROTOCOL_PD,
+	PROTOCOL_UFCS
+};
+
 
 struct symaster_device {
 	struct i2c_client *client;
 	struct device dev;
     struct srcu_notifier_head  master_event;
 	void *drv_data;
+	int   cur_protocol;
 };
 
-struct bc7d_device {
-	struct i2c_client* client;
-	struct device dev;
-	void* drv_data;
-};
+
 
 extern struct symaster_device *sy_dev_get_by_name(const char *name);
 extern struct symaster_device *sy_device_register(struct device *parent, const char* name, void *drv_data);
